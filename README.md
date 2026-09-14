@@ -4,7 +4,7 @@ Operational management system for an English / language center.
 
 ## Status
 
-**M0 — Foundation phase.** No application code yet. Product and domain foundation documented in [`docs/m0/`](./docs/m0/).
+**M0 — Foundation phase.** No application code yet. Product contract (M0-T01) and canonical domain model (M0-T02) documented in [`docs/m0/`](./docs/m0/). Awaiting architecture review before M0-T03 physical schema.
 
 ## Documentation
 

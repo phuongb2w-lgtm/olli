@@ -1,6 +1,15 @@
 # M0-T01 — Preliminary Entity Inventory
 
-**Date:** 2026-09-14
+**Date:** 2026-09-14  
+**Status:** ⚠ **Partially superseded by M0-T02** — see [07-canonical-domain-model.md](./07-canonical-domain-model.md) for authoritative entity decisions.
+
+### Corrections applied in M0-T02
+- **Receivable, InvoiceLine** — rejected (duplicate debt source)
+- **FinancialPeriod** — deferred
+- **LocalePreference** — removed (locale on User/Organization)
+- **CostGroup codes** `operating`/`teacher_direct` — not canonical; use `group_slot`
+- **ClassSchedule** — added as explicit entity
+- **ObservationRating** — added under TeacherObservation
 
 For each entity: **purpose**, **key relationships**, **data classification** (master / event / financial transaction), and **historical-truth notes**.
 

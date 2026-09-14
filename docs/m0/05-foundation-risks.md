@@ -47,24 +47,16 @@
 
 | Risk | Severity | Notes |
 |------|----------|-------|
-| **Cost B not documented in repo** | **High** | Two-group structure assumed (`operating`, `teacher_direct`). **Must confirm before M0-T02.** |
+| **Cost B not documented in repo** | **High** | M0-T02: two-group **structure** locked via `group_slot` (1, 2). Business codes/names **still pending confirmation** — do not seed guessed labels. |
 | Flattening cost groups into tags | High | Violates Cost B; reporting would lose operating vs direct split |
 | Mixing accrual and cash without period model | Medium | FinancialPeriod + explicit posting dates |
 | Charges editable after payment | High | Immutable charges; adjustments as separate records |
 | Multi-currency (if needed) | Medium | Not specified; default single currency per Organization with code field |
 | Tax / VAT | Low (unknown) | Not in M0 scope unless specified; avoid hardcoding "no tax" |
 
-### Cost B — Assumed Structure (Pending Confirmation)
+### Cost B — M0-T02 Update
 
-```
-CostGroup: operating
-  └── ExpenseCategory: rent, utilities, marketing, admin_salary, ...
-
-CostGroup: teacher_direct
-  └── ExpenseCategory: teacher_salary, teaching_materials, contractor_fee, ...
-```
-
-If the prior agreement differs (different group names, different split logic, or mandatory sub-group rules), **M0-T02 must not proceed until resolved**.
+M0-T02 modelled Cost B **structurally** with exactly two `CostGroup` rows per organization (`group_slot` = 1 or 2). Business codes and display names are **not canonical yet** and must not be seeded until confirmed. See [09-finance-model.md](./09-finance-model.md).
 
 ---
 

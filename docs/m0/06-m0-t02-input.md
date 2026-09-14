@@ -1,6 +1,8 @@
 # M0-T01 — Proposed Input for M0-T02 (Relational Modelling)
 
 **Date:** 2026-09-14  
+**Status:** ⚠ **Superseded** — M0-T02 complete. See [07-canonical-domain-model.md](./07-canonical-domain-model.md).
+
 **Prerequisite:** Cost B two-group structure confirmed by stakeholder
 
 M0-T02 should produce **detailed relational models** (ER diagram, table definitions, keys, constraints) for the entity set below. M0-T02 should **not** implement UI or application code.
