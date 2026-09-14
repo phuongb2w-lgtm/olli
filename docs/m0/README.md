@@ -8,8 +8,8 @@ English Language Center Management Web App (**Olli**)
 |------|----------|--------|
 | M0-T01 | Product Contract & Foundation Audit | **Complete** (`294e6d3`) |
 | M0-T02 | Canonical Domain Model | **Complete** (`b1ff5c4`) |
-| M0-T03 | PostgreSQL / Supabase Data Foundation | **Complete — pending review** |
-| M0-T04 | TBD | Not started |
+| M0-T03 | PostgreSQL Data Foundation | **Complete** (`ca1e1c6`) |
+| M0-T04 | Identity, Permissions & RLS | **Complete — pending review** |
 
 ---
 
@@ -50,10 +50,32 @@ English Language Center Management Web App (**Olli**)
 | M0-T03 decisions | [17-m0-t03-decisions.md](./17-m0-t03-decisions.md) |
 
 **Executable artifacts:**
-- `supabase/migrations/20250914140000_m0_foundation.sql`
-- `supabase/seed.sql`
+- `supabase/migrations/20260914140000_m0_foundation.sql`
 - `supabase/tests/m0_integrity_tests.sql`
 - `scripts/db-verify.ps1`
+
+---
+
+## M0-T04 Deliverables
+
+| Section | File |
+|---------|------|
+| Auth identity model | [18-auth-identity-model.md](./18-auth-identity-model.md) |
+| Permission model | [19-permission-model.md](./19-permission-model.md) |
+| RLS policy matrix | [20-rls-policy-matrix.md](./20-rls-policy-matrix.md) |
+| Security tests | [21-security-tests.md](./21-security-tests.md) |
+| M0-T04 decisions | [22-m0-t04-decisions.md](./22-m0-t04-decisions.md) |
+
+**Executable artifacts:**
+- `supabase/migrations/20260914140100_reference_data.sql` (production-safe)
+- `supabase/migrations/20260914140200_auth_identity.sql`
+- `supabase/migrations/20260914140300_rls_helpers_and_grants.sql`
+- `supabase/migrations/20260914140400_rls_policies.sql`
+- `supabase/migrations/20260914140500_charge_amount_immutability.sql`
+- `supabase/seed.sql` (**dev only — never deploy to production**)
+- `supabase/tests/m0_security_tests.sql`
+- `scripts/supabase-verify.ps1`
+- `types/database.generated.ts`
 
 ---
 
@@ -64,21 +86,34 @@ English Language Center Management Web App (**Olli**)
 3. **Charge is sole debt source** — no Receivable/InvoiceLine  
 4. **Cost B** — two structural slots per org; business names pending  
 5. **Bilingual presentation** — stable machine codes in DB  
-6. **Tenant integrity** — composite FK pattern prevents cross-org references  
+6. **Tenant integrity** — composite FK pattern + RLS org isolation  
+7. **Permission codes, not role names** — authorization via `has_permission()`  
+8. **Auth ≠ app_user** — stable Olli identity with optional Auth mapping  
+
+---
+
+## Rebaseline
+
+M0-T02/M0-T03 already incorporated finance and learning-evidence foundation work. **M0-T04** adds Identity / Permission / RLS on the real local Supabase stack — not a repeat of T03 schema work.
 
 ---
 
 ## Database Quick Start
 
 ```powershell
-# Requires Docker Desktop
-powershell -ExecutionPolicy Bypass -File scripts/db-verify.ps1
+npm install
+
+# Generic PostgreSQL compatibility (25 integrity tests)
+npm run db:verify:postgres
+
+# Full local Supabase stack (25 integrity + 30 security tests)
+npm run db:verify:supabase
 ```
 
-Runs: migrate → seed → 25 integrity tests.
+Requires Docker Desktop. Olli local Supabase uses ports **54421–54424** (see `supabase/config.toml`).
 
 ---
 
 ## Next Step
 
-Review M0-T03 physical schema, then proceed to **M0-T04** (recommended: application bootstrap + RLS/auth integration).
+Review M0-T04 security architecture, then proceed to **M0-T05** (application bootstrap — scope TBD after review).

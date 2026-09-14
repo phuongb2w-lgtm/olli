@@ -10,7 +10,7 @@
 
 ```text
 empty PostgreSQL 15 (Docker)
-  → supabase/migrations/20250914140000_m0_foundation.sql
+  → supabase/migrations/20260914140000_m0_foundation.sql
   → supabase/seed.sql
   → supabase/tests/m0_integrity_tests.sql
 ```

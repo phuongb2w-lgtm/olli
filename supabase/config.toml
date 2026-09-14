@@ -1,27 +1,44 @@
-# Olli — Supabase local configuration (M0-T03)
-# Standard PostgreSQL migrations; no proprietary features required for M0.
+# Olli — Supabase local configuration (M0-T04)
+# Ports 5442x avoid conflict with other local Supabase projects on default 5432x.
 
 project_id = "olli-local"
 
 [api]
-enabled = false
+enabled = true
+port = 54421
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
 
 [db]
-port = 54322
+port = 54422
 major_version = 15
 
 [db.migrations]
 enabled = true
 
 [db.seed]
-enabled = true
+# Dev fixtures require auth.instances — run manually after stack is up (see scripts/supabase-verify.ps1).
+enabled = false
 sql_paths = ["./seed.sql"]
 
 [studio]
-enabled = false
+enabled = true
+port = 54423
+
+[inbucket]
+enabled = true
+port = 54424
 
 [auth]
-enabled = false
+enabled = true
+site_url = "http://127.0.0.1:54421"
+additional_redirect_urls = ["http://127.0.0.1:54421"]
+jwt_expiry = 3600
+enable_signup = false
 
 [storage]
+enabled = false
+
+[analytics]
 enabled = false

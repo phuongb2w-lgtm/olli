@@ -1,0 +1,18 @@
+{
+  "name": "olli",
+  "private": true,
+  "description": "Olli language center management — tooling only (no frontend framework in M0)",
+  "scripts": {
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "db:reset": "supabase db reset",
+    "db:lint": "supabase db lint",
+    "db:types": "supabase gen types typescript --local > types/database.generated.ts",
+    "db:verify:postgres": "powershell -ExecutionPolicy Bypass -File scripts/db-verify.ps1",
+    "db:verify:supabase": "powershell -ExecutionPolicy Bypass -File scripts/supabase-verify.ps1"
+  },
+  "devDependencies": {
+    "supabase": "^2.117.0"
+  }
+}

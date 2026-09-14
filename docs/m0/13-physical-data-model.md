@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-14  
 **PostgreSQL:** 15 (Supabase-compatible)  
-**Migration:** `supabase/migrations/20250914140000_m0_foundation.sql`
+**Migration:** `supabase/migrations/20260914140000_m0_foundation.sql`
 
 ---
 

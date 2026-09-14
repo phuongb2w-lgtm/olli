@@ -38,11 +38,17 @@ function Invoke-PsqlFile {
     if ($LASTEXITCODE -ne 0) { throw "psql failed: $Path" }
 }
 
-Write-Host "==> Applying migrations..."
-Invoke-PsqlFile -Path (Join-Path $ProjectRoot "supabase\migrations\20250914140000_m0_foundation.sql")
+Write-Host "==> Applying PostgreSQL-compatible migrations (foundation + reference data)..."
+@(
+  "20260914140000_m0_foundation.sql",
+  "20260914140100_reference_data.sql"
+) | ForEach-Object {
+  $path = Join-Path $ProjectRoot "supabase\migrations\$_"
+  Write-Host "    $_"
+  Invoke-PsqlFile -Path $path
+}
 
-Write-Host "==> Applying seed..."
-Invoke-PsqlFile -Path (Join-Path $ProjectRoot "supabase\seed.sql")
+Write-Host "==> Skipping dev seed (reference data is in migrations; seed requires Supabase auth)."
 
 Write-Host "==> Running integrity tests (25 scenarios)..."
 Invoke-PsqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m0_integrity_tests.sql")

@@ -4,26 +4,39 @@ Operational management system for an English / language center.
 
 ## Status
 
-**M0 — Foundation phase.** Canonical domain model (M0-T02) and PostgreSQL data foundation (M0-T03) are documented and migration-ready. No application UI yet.
+**M0 — Foundation phase.** Domain model (M0-T02), PostgreSQL schema (M0-T03), and Auth/RLS security foundation (M0-T04) are implemented and verified locally. No application UI yet.
 
 ## Documentation
 
 - [M0 Foundation Index](./docs/m0/README.md)
-- [Physical Data Model](./docs/m0/13-physical-data-model.md)
-- [Database Constraints](./docs/m0/14-database-constraints.md)
-- [Integrity Tests](./docs/m0/16-data-integrity-tests.md)
+- [Auth Identity Model](./docs/m0/18-auth-identity-model.md)
+- [Permission Model](./docs/m0/19-permission-model.md)
+- [RLS Policy Matrix](./docs/m0/20-rls-policy-matrix.md)
+- [Security Tests](./docs/m0/21-security-tests.md)
 
 ## Database Setup
 
 Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/db-verify.ps1
+npm install
+
+# Generic PostgreSQL (schema + 25 integrity tests)
+npm run db:verify:postgres
+
+# Local Supabase stack (25 integrity + 30 security tests)
+npm run db:verify:supabase
 ```
 
-This resets a local PostgreSQL 15 container, applies migrations, seeds reference data, and runs 25 integrity tests.
-
 Configuration template: [`.env.example`](./.env.example)
+
+Regenerate TypeScript types after schema changes:
+
+```powershell
+npm run db:types
+```
+
+Output: [`types/database.generated.ts`](./types/database.generated.ts) (do not hand-edit).
 
 ## Scope Summary
 
