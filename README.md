@@ -4,14 +4,26 @@ Operational management system for an English / language center.
 
 ## Status
 
-**M0 — Foundation phase.** No application code yet. Product contract (M0-T01) and canonical domain model (M0-T02) documented in [`docs/m0/`](./docs/m0/). Awaiting architecture review before M0-T03 physical schema.
+**M0 — Foundation phase.** Canonical domain model (M0-T02) and PostgreSQL data foundation (M0-T03) are documented and migration-ready. No application UI yet.
 
 ## Documentation
 
 - [M0 Foundation Index](./docs/m0/README.md)
-- [Product Contract](./docs/m0/02-product-contract.md)
-- [Domain Map](./docs/m0/03-domain-map.md)
-- [Entity Inventory](./docs/m0/04-entity-inventory.md)
+- [Physical Data Model](./docs/m0/13-physical-data-model.md)
+- [Database Constraints](./docs/m0/14-database-constraints.md)
+- [Integrity Tests](./docs/m0/16-data-integrity-tests.md)
+
+## Database Setup
+
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/db-verify.ps1
+```
+
+This resets a local PostgreSQL 15 container, applies migrations, seeds reference data, and runs 25 integrity tests.
+
+Configuration template: [`.env.example`](./.env.example)
 
 ## Scope Summary
 

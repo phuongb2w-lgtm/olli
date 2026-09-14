@@ -48,5 +48,7 @@ venv/
 *.sqlite3
 *.db
 
-# Supabase local (future M0-T03+)
+# Supabase local
 .supabase/
+supabase/.temp/
+supabase/.branches/

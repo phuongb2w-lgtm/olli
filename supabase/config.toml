@@ -1,0 +1,27 @@
+# Olli — Supabase local configuration (M0-T03)
+# Standard PostgreSQL migrations; no proprietary features required for M0.
+
+project_id = "olli-local"
+
+[api]
+enabled = false
+
+[db]
+port = 54322
+major_version = 15
+
+[db.migrations]
+enabled = true
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[studio]
+enabled = false
+
+[auth]
+enabled = false
+
+[storage]
+enabled = false
