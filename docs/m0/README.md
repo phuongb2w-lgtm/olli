@@ -9,7 +9,8 @@ English Language Center Management Web App (**Olli**)
 | M0-T01 | Product Contract & Foundation Audit | **Complete** (`294e6d3`) |
 | M0-T02 | Canonical Domain Model | **Complete** (`b1ff5c4`) |
 | M0-T03 | PostgreSQL Data Foundation | **Complete** (`ca1e1c6`) |
-| M0-T04 | Identity, Permissions & RLS | **Complete — pending review** |
+| M0-T04 | Identity, Permissions & RLS | **Complete** (`83168e6`) |
+| M0-T05 | Web Application & i18n Bootstrap | **Complete — pending review** |
 
 ---
 
@@ -79,6 +80,28 @@ English Language Center Management Web App (**Olli**)
 
 ---
 
+## M0-T05 Deliverables
+
+| Section | File |
+|---------|------|
+| Web stack | [23-web-stack.md](./23-web-stack.md) |
+| Auth application flow | [24-auth-application-flow.md](./24-auth-application-flow.md) |
+| i18n foundation | [25-i18n-foundation.md](./25-i18n-foundation.md) |
+| API security smoke | [26-api-security-smoke.md](./26-api-security-smoke.md) |
+| CI foundation | [27-ci-foundation.md](./27-ci-foundation.md) |
+| M0-T05 decisions | [28-m0-t05-decisions.md](./28-m0-t05-decisions.md) |
+
+**Executable artifacts:**
+- `src/` — Next.js 16 App Router application
+- `messages/vi.json`, `messages/en.json`
+- `supabase/migrations/20260914140600_m0_t05_security_hardening.sql`
+- `supabase/tests/m0_charge_balance_tests.sql`
+- `scripts/api-security-smoke.mjs`, `scripts/seed-auth-users.mjs`
+- `tests/e2e/app-smoke.spec.ts`
+- `.github/workflows/foundation-ci.yml`
+
+---
+
 ## Key Principles (Locked)
 
 1. **Not an LMS** — management evidence only  
@@ -106,8 +129,13 @@ npm install
 # Generic PostgreSQL compatibility (25 integrity tests)
 npm run db:verify:postgres
 
-# Full local Supabase stack (25 integrity + 30 security tests)
-npm run db:verify:supabase
+# Full local Supabase stack (25 + 30 + 5 SQL tests)
+npm run db:verify
+
+# Application
+npm run dev
+npm run test:api
+npm run test:app
 ```
 
 Requires Docker Desktop. Olli local Supabase uses ports **54421–54424** (see `supabase/config.toml`).
@@ -116,4 +144,4 @@ Requires Docker Desktop. Olli local Supabase uses ports **54421–54424** (see `
 
 ## Next Step
 
-Review M0-T04 security architecture, then proceed to **M0-T05** (application bootstrap — scope TBD after review).
+Review M0-T05 application foundation, then proceed to **M0-T06** (scope TBD after architecture review).

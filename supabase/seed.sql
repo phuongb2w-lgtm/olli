@@ -9,7 +9,6 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 DO $$
 DECLARE
-  v_instance_id uuid;
   v_org_a uuid := 'a0000000-0000-4000-8000-000000000001';
   v_org_b uuid := 'b0000000-0000-4000-8000-000000000001';
   v_auth_a_admin uuid := 'a1111111-1111-4111-8111-111111111111';
@@ -32,40 +31,8 @@ BEGIN
     RETURN;
   END IF;
 
-  -- Local Supabase may start with empty auth.instances; bootstrap dev instance row.
-  INSERT INTO auth.instances (id, uuid, raw_base_config, created_at, updated_at)
-  VALUES (
-    '00000000-0000-0000-0000-000000000001',
-    '00000000-0000-0000-0000-000000000001',
-    '{}',
-    now(),
-    now()
-  ) ON CONFLICT (id) DO NOTHING;
-
-  SELECT id INTO v_instance_id FROM auth.instances LIMIT 1;
-  IF v_instance_id IS NULL THEN
-    RAISE EXCEPTION 'auth.instances not available — seed requires local Supabase stack';
-  END IF;
-
-  INSERT INTO auth.users (
-    id, instance_id, aud, role, email, encrypted_password,
-    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at
-  ) VALUES
-    (v_auth_a_admin, v_instance_id, 'authenticated', 'authenticated', 'org-a-admin@olli.local', crypt('testpass123', gen_salt('bf')), now(), '{}', '{}', now(), now()),
-    (v_auth_a_staff, v_instance_id, 'authenticated', 'authenticated', 'org-a-staff@olli.local', crypt('testpass123', gen_salt('bf')), now(), '{}', '{}', now(), now()),
-    (v_auth_b_admin, v_instance_id, 'authenticated', 'authenticated', 'org-b-admin@olli.local', crypt('testpass123', gen_salt('bf')), now(), '{}', '{}', now(), now()),
-    (v_auth_b_staff, v_instance_id, 'authenticated', 'authenticated', 'org-b-staff@olli.local', crypt('testpass123', gen_salt('bf')), now(), '{}', '{}', now(), now()),
-    (v_auth_unmapped, v_instance_id, 'authenticated', 'authenticated', 'unmapped@olli.local', crypt('testpass123', gen_salt('bf')), now(), '{}', '{}', now(), now()),
-    (v_auth_disabled, v_instance_id, 'authenticated', 'authenticated', 'disabled@olli.local', crypt('testpass123', gen_salt('bf')), now(), '{}', '{}', now(), now());
-
-  INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
-  VALUES
-    (v_auth_a_admin, v_auth_a_admin, jsonb_build_object('sub', v_auth_a_admin::text, 'email', 'org-a-admin@olli.local'), 'email', v_auth_a_admin::text, now(), now(), now()),
-    (v_auth_a_staff, v_auth_a_staff, jsonb_build_object('sub', v_auth_a_staff::text, 'email', 'org-a-staff@olli.local'), 'email', v_auth_a_staff::text, now(), now(), now()),
-    (v_auth_b_admin, v_auth_b_admin, jsonb_build_object('sub', v_auth_b_admin::text, 'email', 'org-b-admin@olli.local'), 'email', v_auth_b_admin::text, now(), now(), now()),
-    (v_auth_b_staff, v_auth_b_staff, jsonb_build_object('sub', v_auth_b_staff::text, 'email', 'org-b-staff@olli.local'), 'email', v_auth_b_staff::text, now(), now(), now()),
-    (v_auth_unmapped, v_auth_unmapped, jsonb_build_object('sub', v_auth_unmapped::text, 'email', 'unmapped@olli.local'), 'email', v_auth_unmapped::text, now(), now(), now()),
-    (v_auth_disabled, v_auth_disabled, jsonb_build_object('sub', v_auth_disabled::text, 'email', 'disabled@olli.local'), 'email', v_auth_disabled::text, now(), now(), now());
+  -- Auth users are created via scripts/seed-auth-users.mjs (GoTrue admin API)
+  -- so password sign-in works through the HTTP Auth boundary.
 
   INSERT INTO organization (id, name) VALUES
     (v_org_a, 'Olli Test Org A'),

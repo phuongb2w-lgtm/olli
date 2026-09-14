@@ -1710,6 +1710,13 @@ export type Database = {
       }
     }
     Functions: {
+      _cb_as_anon: { Args: never; Returns: undefined }
+      _cb_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _cb_as_super: { Args: never; Returns: undefined }
+      _cb_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _sec_as_anon: { Args: never; Returns: undefined }
       _sec_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _sec_as_super: { Args: never; Returns: undefined }

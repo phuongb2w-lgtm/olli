@@ -19,6 +19,10 @@ function Invoke-SupabaseSqlFile {
   if ($LASTEXITCODE -ne 0) { throw "psql failed: $Path" }
 }
 
+Write-Host "==> Create Auth users via GoTrue admin API..."
+node (Join-Path $ProjectRoot "scripts\seed-auth-users.mjs")
+if ($LASTEXITCODE -ne 0) { throw "seed-auth-users.mjs failed" }
+
 Write-Host "==> Apply dev seed fixtures..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\seed.sql")
 
@@ -31,6 +35,9 @@ Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m0_integrit
 
 Write-Host "==> M0-T04 security tests (30)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m0_security_tests.sql")
+
+Write-Host "==> M0-T05 charge_balance tests (5)..."
+Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m0_charge_balance_tests.sql")
 
 Write-Host "==> Generating TypeScript types..."
 New-Item -ItemType Directory -Force -Path (Join-Path $ProjectRoot "types") | Out-Null

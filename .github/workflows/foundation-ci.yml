@@ -1,0 +1,65 @@
+name: Foundation CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase
+        run: supabase start
+
+      - name: Reset database and run SQL verification
+        run: |
+          supabase db reset
+          node scripts/seed-auth-users.mjs
+          docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/seed.sql
+          supabase db lint
+          docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/m0_integrity_tests.sql
+          docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/m0_security_tests.sql
+          docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/m0_charge_balance_tests.sql
+          npm run db:types
+
+      - name: Export Supabase env
+        run: |
+          supabase status -o env >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_SUPABASE_URL=${API_URL}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${PUBLISHABLE_KEY}" >> $GITHUB_ENV
+
+      - name: Lint, typecheck, build
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run build
+
+      - name: API security smoke tests
+        run: npm run test:api
+
+      - name: Install Playwright browser
+        run: npx playwright install chromium --with-deps
+
+      - name: Application smoke tests
+        run: |
+          npm run start &
+          npx wait-on http://127.0.0.1:3000 --timeout 120000
+          npm run test:app

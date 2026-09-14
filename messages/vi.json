@@ -1,0 +1,51 @@
+{
+  "app": {
+    "name": "Olli",
+    "tagline": "Hệ thống quản lý trung tâm ngoại ngữ"
+  },
+  "auth": {
+    "signIn": "Đăng nhập",
+    "signOut": "Đăng xuất",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+    "networkError": "Không thể kết nối. Vui lòng thử lại.",
+    "signingIn": "Đang đăng nhập…"
+  },
+  "access": {
+    "denied": "Truy cập bị từ chối",
+    "noMapping": "Tài khoản đăng nhập chưa được liên kết với người dùng Olli.",
+    "inactive": "Tài khoản Olli của bạn không còn hoạt động.",
+    "noOrganization": "Không thể xác định tổ chức cho tài khoản này.",
+    "contactAdmin": "Liên hệ quản trị viên để được hỗ trợ."
+  },
+  "shell": {
+    "organization": "Tổ chức",
+    "account": "Tài khoản",
+    "overview": "Tổng quan",
+    "students": "Học viên",
+    "classes": "Lớp học",
+    "teachers": "Giáo viên",
+    "finance": "Tài chính",
+    "reports": "Báo cáo",
+    "settings": "Cài đặt",
+    "comingSoon": "Sắp có",
+    "foundationProof": "Kiểm chứng nền tảng"
+  },
+  "students": {
+    "proofTitle": "Học viên (chỉ đọc — kiểm chứng RLS)",
+    "proofEmpty": "Không có học viên nào trong phạm vi quyền của bạn.",
+    "proofDenied": "Bạn không có quyền đọc học viên.",
+    "proofError": "Không thể tải dữ liệu học viên."
+  },
+  "common": {
+    "loading": "Đang tải…",
+    "error": "Đã xảy ra lỗi.",
+    "language": "Ngôn ngữ",
+    "vietnamese": "Tiếng Việt",
+    "english": "English"
+  },
+  "permissions": {
+    "student.read": "Đọc học viên"
+  }
+}

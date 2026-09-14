@@ -20,9 +20,9 @@
 
 ---
 
-## Table Inventory (32 physical tables)
+## Table Inventory (31 physical tables)
 
-Includes 30 canonical domain tables + 2 global reference tables.
+Includes 28 organization-owned business tables + `organization` tenant root + 2 global reference tables.
 
 | # | Table | Domain | Scope |
 |---|-------|--------|-------|

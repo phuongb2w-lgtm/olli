@@ -89,3 +89,35 @@ File is CLI-generated — do not hand-edit.
 ## Rebaseline Note
 
 M0-T02/M0-T03 incorporated finance and learning-evidence foundation. **M0-T04** is the Identity / Permission / RLS security layer on top of that schema — not a duplicate of T03 work.
+
+---
+
+## M0-T05 Amendments (2026-09-14)
+
+These corrections were applied during M0-T05 security preflight. The historical M0-T04 report is not rewritten — this section records the reconciled facts.
+
+### Exposed object count
+
+| Object type | Actual count |
+|-------------|-------------:|
+| Tables (`public`, exposed) | **31** |
+| Views | **1** (`charge_balance`) |
+
+Prior reporting discrepancies:
+- M0-T03 header “32 tables” was off-by-one (inventory lists 31).
+- M0-T04 “33 operational + 2 global” double-counted global reference tables.
+
+### charge_balance
+
+- Set `security_invoker = true`.
+- Revoked `anon` access.
+- Added 5 automated tests (`supabase/tests/m0_charge_balance_tests.sql`).
+
+### Helper RPC exposure
+
+- Revoked `anon` EXECUTE on all four helpers.
+- Removed blanket function grant; re-granted only the four helpers to `authenticated`.
+
+### API key terminology
+
+Documentation updated to **Publishable Key** / **Secret Key** (replacing “anon key only” wording where it implied a separate security model).

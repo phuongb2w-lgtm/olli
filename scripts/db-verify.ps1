@@ -40,7 +40,7 @@ function Invoke-PsqlFile {
 
 Write-Host "==> Applying PostgreSQL-compatible migrations (foundation + reference data)..."
 @(
-  "20260914140000_m0_foundation.sql",
+  "20250914140000_m0_foundation.sql",
   "20260914140100_reference_data.sql"
 ) | ForEach-Object {
   $path = Join-Path $ProjectRoot "supabase\migrations\$_"

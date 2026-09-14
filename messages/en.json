@@ -1,0 +1,51 @@
+{
+  "app": {
+    "name": "Olli",
+    "tagline": "Language center management system"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "email": "Email",
+    "password": "Password",
+    "invalidCredentials": "Invalid email or password.",
+    "networkError": "Unable to connect. Please try again.",
+    "signingIn": "Signing in…"
+  },
+  "access": {
+    "denied": "Access denied",
+    "noMapping": "Your sign-in account is not linked to an Olli user.",
+    "inactive": "Your Olli account is not active.",
+    "noOrganization": "No organization could be resolved for this account.",
+    "contactAdmin": "Contact an administrator for assistance."
+  },
+  "shell": {
+    "organization": "Organization",
+    "account": "Account",
+    "overview": "Overview",
+    "students": "Students",
+    "classes": "Classes",
+    "teachers": "Teachers",
+    "finance": "Finance",
+    "reports": "Reports",
+    "settings": "Settings",
+    "comingSoon": "Coming soon",
+    "foundationProof": "Foundation proof"
+  },
+  "students": {
+    "proofTitle": "Students (read-only — RLS proof)",
+    "proofEmpty": "No students in your authorized scope.",
+    "proofDenied": "You do not have permission to read students.",
+    "proofError": "Unable to load student data."
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong.",
+    "language": "Language",
+    "vietnamese": "Tiếng Việt",
+    "english": "English"
+  },
+  "permissions": {
+    "student.read": "Read students"
+  }
+}

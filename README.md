@@ -4,39 +4,42 @@ Operational management system for an English / language center.
 
 ## Status
 
-**M0 — Foundation phase.** Domain model (M0-T02), PostgreSQL schema (M0-T03), and Auth/RLS security foundation (M0-T04) are implemented and verified locally. No application UI yet.
+**M0 — Foundation phase.** Domain model (M0-T02), PostgreSQL schema (M0-T03), Auth/RLS (M0-T04), and bilingual web application bootstrap (M0-T05) are implemented and verified locally.
 
 ## Documentation
 
 - [M0 Foundation Index](./docs/m0/README.md)
-- [Auth Identity Model](./docs/m0/18-auth-identity-model.md)
-- [Permission Model](./docs/m0/19-permission-model.md)
-- [RLS Policy Matrix](./docs/m0/20-rls-policy-matrix.md)
-- [Security Tests](./docs/m0/21-security-tests.md)
+- [Web Stack](./docs/m0/23-web-stack.md)
+- [Auth Application Flow](./docs/m0/24-auth-application-flow.md)
+- [i18n Foundation](./docs/m0/25-i18n-foundation.md)
 
-## Database Setup
+## Local Setup
 
-Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) and Node.js **>= 20.9** (22 LTS recommended).
 
 ```powershell
-npm install
-
-# Generic PostgreSQL (schema + 25 integrity tests)
-npm run db:verify:postgres
-
-# Local Supabase stack (25 integrity + 30 security tests)
-npm run db:verify:supabase
+npm ci
+npx supabase start
+npm run db:verify          # 25 + 30 + 5 SQL gates, types
+cp .env.example .env.local # then set publishable key from: npx supabase status
+npm run dev
 ```
 
 Configuration template: [`.env.example`](./.env.example)
 
-Regenerate TypeScript types after schema changes:
+### Verification pipeline
 
 ```powershell
-npm run db:types
+npm ci
+npm run db:verify          # Supabase: integrity + security + charge_balance + types
+npm run lint
+npm run typecheck
+npm run build
+npm run test:api           # 6 HTTP/API security scenarios
+npm run test:app           # 8 Playwright application scenarios (requires running app)
 ```
 
-Output: [`types/database.generated.ts`](./types/database.generated.ts) (do not hand-edit).
+Dev sign-in (local fixtures): `org-a-admin@olli.local` / `testpass123`
 
 ## Scope Summary
 

@@ -22,6 +22,8 @@ Helpers/grants: `20260914140300_rls_helpers_and_grants.sql`
 
 All are `SECURITY DEFINER` with `SET search_path = public`.
 
+**M0-T05 amendment:** `EXECUTE` granted to `authenticated` only (not `anon`). Removed blanket `GRANT EXECUTE ON ALL FUNCTIONS`. Direct RPC is intentional for `has_permission` (UX) and identity helpers used during RLS evaluation.
+
 ---
 
 ## Grant Summary
@@ -31,6 +33,9 @@ All are `SECURITY DEFINER` with `SET search_path = public`.
 | `anon` | all public operational | **none** (REVOKE ALL) |
 | `authenticated` | operational tables | SELECT, INSERT, UPDATE (no DELETE in M0) |
 | `authenticated` | `charge_balance` view | SELECT only |
+| `anon` | `charge_balance` view | **none** |
+
+**M0-T05 amendment:** `charge_balance` uses `security_invoker = true` so underlying charge/payment/adjustment RLS applies. See `20260914140600_m0_t05_security_hardening.sql`.
 
 DELETE policies are intentionally omitted in M0; historical truth prefers status transitions and constraints over hard deletes.
 
