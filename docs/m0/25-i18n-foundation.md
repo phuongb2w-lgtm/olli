@@ -20,7 +20,14 @@ app_user.preferred_locale
 → vi
 ```
 
-Pre-auth login defaults to Vietnamese with a visible language switch (persists via `olli_locale` cookie).
+Pre-auth login defaults to Vietnamese with a visible language switch (persists via `olli_locale` cookie only).
+
+Authenticated language switch:
+
+1. Updates visible UI immediately
+2. Sets `olli_locale` cookie
+3. Persists `app_user.preferred_locale` via `set_own_preferred_locale()` RPC (RLS-governed, no service credential)
+4. Keeps user on the same application context
 
 ## Formatting
 

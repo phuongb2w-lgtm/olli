@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -1717,6 +1717,13 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _loc_as_anon: { Args: never; Returns: undefined }
+      _loc_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _loc_as_super: { Args: never; Returns: undefined }
+      _loc_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _sec_as_anon: { Args: never; Returns: undefined }
       _sec_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _sec_as_super: { Args: never; Returns: undefined }
@@ -1728,6 +1735,10 @@ export type Database = {
       current_organization_id: { Args: never; Returns: string }
       has_permission: { Args: { p_code: string }; Returns: boolean }
       is_active_app_user: { Args: never; Returns: boolean }
+      set_own_preferred_locale: {
+        Args: { p_locale: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

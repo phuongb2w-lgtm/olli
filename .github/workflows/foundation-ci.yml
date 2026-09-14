@@ -38,7 +38,11 @@ jobs:
           docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/m0_integrity_tests.sql
           docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/m0_security_tests.sql
           docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/m0_charge_balance_tests.sql
+          docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/m0_locale_tests.sql
           npm run db:types
+          npm run test:types:stale
+          npm run test:i18n
+          npm run test:env
 
       - name: Export Supabase env
         run: |

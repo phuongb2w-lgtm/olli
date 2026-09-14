@@ -1,11 +1,10 @@
 import { getRequestConfig } from "next-intl/server";
-import { cookies } from "next/headers";
-import { defaultLocale, isValidLocale, LOCALE_COOKIE } from "./config";
+import { getCurrentAppUser } from "@/lib/auth/get-identity-state";
+import { resolveLocale } from "./resolve-locale";
 
 export default getRequestConfig(async () => {
-  const cookieStore = await cookies();
-  const cookieLocale = cookieStore.get(LOCALE_COOKIE)?.value;
-  const locale = isValidLocale(cookieLocale) ? cookieLocale : defaultLocale;
+  const appUser = await getCurrentAppUser();
+  const locale = await resolveLocale(appUser);
 
   return {
     locale,
