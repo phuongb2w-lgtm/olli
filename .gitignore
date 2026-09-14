@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & temp
+*.log
+npm-debug.log*
+tmp/
+temp/
+.cache/
+
+# Test & coverage
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Python (if used later)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Database local artifacts
+*.sqlite
+*.sqlite3
+*.db
+
+# Supabase local (future M0-T03+)
+.supabase/
