@@ -33,10 +33,35 @@
     "foundationProof": "Foundation proof"
   },
   "students": {
-    "proofTitle": "Students (read-only — RLS proof)",
-    "proofEmpty": "No students in your authorized scope.",
-    "proofDenied": "You do not have permission to read students.",
-    "proofError": "Unable to load student data."
+    "title": "Students",
+    "search": "Search",
+    "searchPlaceholder": "Search by name or student code…",
+    "statusColumn": "Status",
+    "filterAll": "All",
+    "pageSize": "Per page",
+    "applyFilters": "Apply",
+    "nameColumn": "Student name",
+    "codeColumn": "Student code",
+    "primaryContactColumn": "Primary contact",
+    "emptyValue": "—",
+    "denied": "You do not have permission to read students.",
+    "loadError": "Unable to load student data.",
+    "emptyOrganization": "No students in your organization yet.",
+    "noResults": "No students found.",
+    "paginationLabel": "Student list pagination",
+    "paginationSummary": "Showing {from}–{to} of {total}",
+    "previous": "Previous",
+    "next": "Next",
+    "pageIndicator": "Page {page} of {totalPages}"
+  },
+  "status": {
+    "student": {
+      "prospect": "Prospect",
+      "active": "Active",
+      "inactive": "Inactive",
+      "graduated": "Graduated",
+      "withdrawn": "Withdrawn"
+    }
   },
   "common": {
     "loading": "Loading…",

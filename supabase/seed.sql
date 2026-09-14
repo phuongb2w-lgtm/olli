@@ -17,13 +17,23 @@ DECLARE
   v_auth_b_staff uuid := 'b2222222-2222-4222-8222-222222222222';
   v_auth_unmapped uuid := 'c1111111-1111-4111-8111-111111111111';
   v_auth_disabled uuid := 'a3333333-3333-4333-8333-333333333333';
+  v_auth_a_reader uuid := 'a4444444-4444-4444-8444-444444444444';
+  v_auth_a_no_student uuid := 'a5555555-5555-4555-8555-555555555555';
   v_app_a_admin uuid := 'a1000000-0000-4000-8000-000000000001';
   v_app_a_staff uuid := 'a2000000-0000-4000-8000-000000000001';
+  v_app_a_reader uuid := 'a4000000-0000-4000-8000-000000000001';
+  v_app_a_no_student uuid := 'a5000000-0000-4000-8000-000000000001';
   v_app_b_admin uuid := 'b1000000-0000-4000-8000-000000000001';
   v_app_b_staff uuid := 'b2000000-0000-4000-8000-000000000001';
   v_app_disabled uuid := 'a3000000-0000-4000-8000-000000000001';
   v_role_a_admin uuid;
   v_role_a_staff uuid;
+  v_role_a_reader uuid;
+  v_role_a_no_student uuid;
+  v_student_tran uuid := 'a5100000-0000-4000-8000-000000000001';
+  v_student_nguyen uuid := 'a5100000-0000-4000-8000-000000000002';
+  v_guardian_lan uuid := 'a5200000-0000-4000-8000-000000000001';
+  v_guardian_quang uuid := 'a5200000-0000-4000-8000-000000000002';
   v_role_b_admin uuid;
   v_role_b_staff uuid;
 BEGIN
@@ -43,10 +53,14 @@ BEGIN
     (v_app_a_staff, v_org_a, 'org-a-staff@olli.local', 'Org A Staff', v_auth_a_staff, 'active'),
     (v_app_b_admin, v_org_b, 'org-b-admin@olli.local', 'Org B Admin', v_auth_b_admin, 'active'),
     (v_app_b_staff, v_org_b, 'org-b-staff@olli.local', 'Org B Staff', v_auth_b_staff, 'active'),
-    (v_app_disabled, v_org_a, 'disabled@olli.local', 'Disabled User', v_auth_disabled, 'inactive');
+    (v_app_disabled, v_org_a, 'disabled@olli.local', 'Disabled User', v_auth_disabled, 'inactive'),
+    (v_app_a_reader, v_org_a, 'org-a-reader@olli.local', 'Org A Reader', v_auth_a_reader, 'active'),
+    (v_app_a_no_student, v_org_a, 'org-a-no-student@olli.local', 'Org A No Student', v_auth_a_no_student, 'active');
 
   INSERT INTO role (organization_id, code) VALUES (v_org_a, 'admin') RETURNING id INTO v_role_a_admin;
   INSERT INTO role (organization_id, code) VALUES (v_org_a, 'staff') RETURNING id INTO v_role_a_staff;
+  INSERT INTO role (organization_id, code) VALUES (v_org_a, 'student_reader') RETURNING id INTO v_role_a_reader;
+  INSERT INTO role (organization_id, code) VALUES (v_org_a, 'no_student') RETURNING id INTO v_role_a_no_student;
   INSERT INTO role (organization_id, code) VALUES (v_org_b, 'admin') RETURNING id INTO v_role_b_admin;
   INSERT INTO role (organization_id, code) VALUES (v_org_b, 'staff') RETURNING id INTO v_role_b_staff;
 
@@ -70,14 +84,28 @@ BEGIN
     'attendance.read', 'payment.read', 'guardian.read', 'teacher.read'
   );
 
+  INSERT INTO role_permission (role_id, permission_id)
+  SELECT v_role_a_reader, p.id FROM permission p
+  WHERE p.code IN ('student.read', 'organization.read');
+
+  INSERT INTO role_permission (role_id, permission_id)
+  SELECT v_role_a_no_student, p.id FROM permission p
+  WHERE p.code IN ('organization.read');
+
   INSERT INTO user_role (organization_id, user_id, role_id, effective_from, status) VALUES
     (v_org_a, v_app_a_admin, v_role_a_admin, CURRENT_DATE, 'active'),
     (v_org_a, v_app_a_staff, v_role_a_staff, CURRENT_DATE, 'active'),
+    (v_org_a, v_app_a_reader, v_role_a_reader, CURRENT_DATE, 'active'),
+    (v_org_a, v_app_a_no_student, v_role_a_no_student, CURRENT_DATE, 'active'),
     (v_org_b, v_app_b_admin, v_role_b_admin, CURRENT_DATE, 'active'),
     (v_org_b, v_app_b_staff, v_role_b_staff, CURRENT_DATE, 'active');
 
+  INSERT INTO student (id, organization_id, given_name, family_name, student_code, status) VALUES
+    (v_student_tran, v_org_a, 'Văn Phương', 'Trần', 'HV001', 'active'),
+    (v_student_nguyen, v_org_a, 'Minh Anh', 'Nguyễn', 'HV002', 'prospect');
   INSERT INTO student (organization_id, given_name, family_name) VALUES
     (v_org_a, 'Student', 'A'),
+    (v_org_a, 'Thị Hoa', 'Lê'),
     (v_org_b, 'Student', 'B');
 
   INSERT INTO course (organization_id, code, name) VALUES
@@ -103,9 +131,16 @@ BEGIN
   WHERE s.organization_id = v_org_b
   LIMIT 1;
 
+  INSERT INTO guardian (id, organization_id, given_name, family_name, phone) VALUES
+    (v_guardian_lan, v_org_a, 'Lan', 'Phạm', '0912345678'),
+    (v_guardian_quang, v_org_a, 'Quang', 'Phạm', '0987654321');
   INSERT INTO guardian (organization_id, given_name, family_name) VALUES
     (v_org_a, 'Guardian', 'A'),
     (v_org_b, 'Guardian', 'B');
+
+  INSERT INTO student_guardian (organization_id, student_id, guardian_id, relationship_type, is_primary_contact, is_billing_contact) VALUES
+    (v_org_a, v_student_tran, v_guardian_lan, 'mother', true, true),
+    (v_org_a, v_student_tran, v_guardian_quang, 'father', false, false);
 
   INSERT INTO charge (organization_id, student_id, guardian_id, amount)
   SELECT s.organization_id, s.id, g.id, 100000

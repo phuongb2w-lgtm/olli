@@ -33,10 +33,35 @@
     "foundationProof": "Kiểm chứng nền tảng"
   },
   "students": {
-    "proofTitle": "Học viên (chỉ đọc — kiểm chứng RLS)",
-    "proofEmpty": "Không có học viên nào trong phạm vi quyền của bạn.",
-    "proofDenied": "Bạn không có quyền đọc học viên.",
-    "proofError": "Không thể tải dữ liệu học viên."
+    "title": "Học viên",
+    "search": "Tìm kiếm",
+    "searchPlaceholder": "Tìm theo tên hoặc mã học viên…",
+    "statusColumn": "Trạng thái",
+    "filterAll": "Tất cả",
+    "pageSize": "Mỗi trang",
+    "applyFilters": "Áp dụng",
+    "nameColumn": "Tên học viên",
+    "codeColumn": "Mã học viên",
+    "primaryContactColumn": "Liên hệ chính",
+    "emptyValue": "—",
+    "denied": "Bạn không có quyền đọc học viên.",
+    "loadError": "Không thể tải dữ liệu học viên.",
+    "emptyOrganization": "Chưa có học viên nào trong tổ chức của bạn.",
+    "noResults": "Không tìm thấy học viên.",
+    "paginationLabel": "Phân trang danh sách học viên",
+    "paginationSummary": "Hiển thị {from}–{to} trong tổng {total}",
+    "previous": "Trước",
+    "next": "Sau",
+    "pageIndicator": "Trang {page} / {totalPages}"
+  },
+  "status": {
+    "student": {
+      "prospect": "Tiềm năng",
+      "active": "Đang hoạt động",
+      "inactive": "Ngừng hoạt động",
+      "graduated": "Đã tốt nghiệp",
+      "withdrawn": "Đã rút lui"
+    }
   },
   "common": {
     "loading": "Đang tải…",

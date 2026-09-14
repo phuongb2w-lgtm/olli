@@ -1,17 +1,8 @@
 import { useTranslations } from "next-intl";
+import { AppNav } from "@/components/app-nav";
 import { LanguageSwitch } from "@/components/language-switch";
 import { SignOutButton } from "@/components/sign-out-button";
 import type { AppUserContext } from "@/types/app-user";
-
-const navItems = [
-  "overview",
-  "students",
-  "classes",
-  "teachers",
-  "finance",
-  "reports",
-  "settings",
-] as const;
 
 type Props = {
   appUser: AppUserContext;
@@ -42,20 +33,7 @@ export function AppShell({ appUser, children }: Props) {
       </header>
 
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 md:grid-cols-[220px_1fr]">
-        <nav className="space-y-1">
-          {navItems.map((item) => (
-            <div
-              key={item}
-              className="flex items-center justify-between rounded px-3 py-2 text-sm text-slate-500"
-              aria-disabled="true"
-            >
-              <span>{t(`shell.${item}`)}</span>
-              {item !== "overview" ? (
-                <span className="text-xs text-slate-400">{t("shell.comingSoon")}</span>
-              ) : null}
-            </div>
-          ))}
-        </nav>
+        <AppNav />
 
         <main className="space-y-6">{children}</main>
       </div>
