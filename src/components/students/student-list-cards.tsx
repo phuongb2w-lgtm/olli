@@ -1,12 +1,14 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type { StudentListItem } from "@/lib/students/types";
 
 type Props = {
   items: StudentListItem[];
   showPrimaryContact: boolean;
+  canUpdate: boolean;
 };
 
-export async function StudentListCards({ items, showPrimaryContact }: Props) {
+export async function StudentListCards({ items, showPrimaryContact, canUpdate }: Props) {
   const t = await getTranslations("students");
   const tStatus = await getTranslations("status.student");
   const placeholder = t("emptyValue");
@@ -49,6 +51,16 @@ export async function StudentListCards({ items, showPrimaryContact }: Props) {
               </div>
             ) : null}
           </dl>
+          {canUpdate ? (
+            <div className="mt-3">
+              <Link
+                href={`/students/${item.id}/edit`}
+                className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+              >
+                {t("editStudent")}
+              </Link>
+            </div>
+          ) : null}
         </li>
       ))}
     </ul>

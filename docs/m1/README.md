@@ -26,6 +26,7 @@ M1 is **not** admissions CRM, LMS, enrollment workflow, or guardian portal acces
 | 06 | [Student & Guardian Workflows](./06-student-guardian-workflows.md) | Create/edit flows, validation, errors, audit, Server Action architecture |
 | 07 | [M1 Data Gap Analysis](./07-m1-data-gap-analysis.md) | Data-gap matrix, schema change recommendations, M1-T02+ task breakdown |
 | 08 | [M1-T02 Implementation](./08-m1-t02-implementation.md) | Student list read model, permissions, URL contract, tests |
+| 09 | [M1-T03 Implementation](./09-m1-t03-implementation.md) | Student create/edit, code uniqueness, validation, duplicates, lifecycle |
 
 ---
 

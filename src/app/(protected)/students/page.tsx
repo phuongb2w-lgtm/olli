@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { StudentListCards } from "@/components/students/student-list-cards";
 import { StudentListFilters } from "@/components/students/student-list-filters";
@@ -31,6 +32,11 @@ export default async function StudentsPage({ searchParams }: Props) {
   }
 
   const hasGuardianRead = await can("guardian.read");
+  const hasCreate = await can("student.create");
+  const hasUpdate = await can("student.update");
+  const successParam = rawParams.success;
+  const success =
+    successParam === "created" || successParam === "updated" ? successParam : null;
   const supabase = await createClient();
   const { result, error } = await queryStudentList(supabase, rawParams, {
     hasGuardianRead,
@@ -53,7 +59,28 @@ export default async function StudentsPage({ searchParams }: Props) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{t("title")}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold">{t("title")}</h1>
+        {hasCreate ? (
+          <Link
+            href="/students/new"
+            className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          >
+            {t("createStudent")}
+          </Link>
+        ) : null}
+      </div>
+
+      {success === "created" ? (
+        <p className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800" role="status">
+          {t("createdSuccess")}
+        </p>
+      ) : null}
+      {success === "updated" ? (
+        <p className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800" role="status">
+          {t("updatedSuccess")}
+        </p>
+      ) : null}
 
       <StudentListFilters params={params} />
 
@@ -71,8 +98,16 @@ export default async function StudentsPage({ searchParams }: Props) {
 
       {items.length > 0 ? (
         <>
-          <StudentListTable items={items} showPrimaryContact={hasGuardianRead} />
-          <StudentListCards items={items} showPrimaryContact={hasGuardianRead} />
+          <StudentListTable
+            items={items}
+            showPrimaryContact={hasGuardianRead}
+            canUpdate={hasUpdate}
+          />
+          <StudentListCards
+            items={items}
+            showPrimaryContact={hasGuardianRead}
+            canUpdate={hasUpdate}
+          />
           <StudentListPagination params={params} totalCount={totalCount} />
         </>
       ) : null}

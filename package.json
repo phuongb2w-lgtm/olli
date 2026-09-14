@@ -19,7 +19,7 @@
     "db:verify": "npm run db:verify:supabase",
     "db:seed:auth": "node scripts/seed-auth-users.mjs",
     "test:api": "node scripts/api-security-smoke.mjs",
-    "test:students": "node scripts/student-list-smoke.mjs",
+    "test:students": "node scripts/student-list-smoke.mjs && node scripts/student-mutations-smoke.mjs",
     "test:app": "playwright test",
     "test:app:install": "playwright install chromium",
     "test:locale": "powershell -ExecutionPolicy Bypass -Command \"Get-Content supabase/tests/m0_locale_tests.sql -Raw | docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1\"",

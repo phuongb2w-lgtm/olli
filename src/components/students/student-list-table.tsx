@@ -1,12 +1,14 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type { StudentListItem } from "@/lib/students/types";
 
 type Props = {
   items: StudentListItem[];
   showPrimaryContact: boolean;
+  canUpdate: boolean;
 };
 
-export async function StudentListTable({ items, showPrimaryContact }: Props) {
+export async function StudentListTable({ items, showPrimaryContact, canUpdate }: Props) {
   const t = await getTranslations("students");
   const tStatus = await getTranslations("status.student");
   const placeholder = t("emptyValue");
@@ -30,6 +32,11 @@ export async function StudentListTable({ items, showPrimaryContact }: Props) {
             <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
               {t("statusColumn")}
             </th>
+            {canUpdate ? (
+              <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
+                <span className="sr-only">{t("actionsColumn")}</span>
+              </th>
+            ) : null}
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-200 bg-white">
@@ -58,6 +65,16 @@ export async function StudentListTable({ items, showPrimaryContact }: Props) {
                   {tStatus(item.status)}
                 </span>
               </td>
+              {canUpdate ? (
+                <td className="px-4 py-3">
+                  <Link
+                    href={`/students/${item.id}/edit`}
+                    className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                  >
+                    {t("editStudent")}
+                  </Link>
+                </td>
+              ) : null}
             </tr>
           ))}
         </tbody>
