@@ -654,6 +654,32 @@
   "permissions": {
     "student.read": "Read students"
   },
+  "enrollmentFinance": {
+    "title": "Enrollment finance",
+    "financialAgreement": "Financial agreement",
+    "netTuition": "Net tuition",
+    "summary": "Financial summary"
+  },
+  "tuitionTerms": {
+    "agreedTuition": "Agreed tuition",
+    "discount": "Discount",
+    "agreementDate": "Agreement date",
+    "draft": "Draft",
+    "active": "Active",
+    "superseded": "Superseded",
+    "cancelled": "Cancelled"
+  },
+  "paymentSchedule": {
+    "title": "Payment schedule",
+    "paymentTerms": "Payment terms",
+    "fullPayment": "Full payment",
+    "deposit": "Deposit",
+    "remainder": "Remainder",
+    "installments": "Installments",
+    "deferredPayment": "Deferred payment",
+    "dueDate": "Due date",
+    "custom": "Custom schedule"
+  },
   "costDomain": {
     "capital": "Capital investment",
     "operating_overhead": "Operating overhead",

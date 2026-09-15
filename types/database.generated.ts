@@ -373,16 +373,21 @@ export type Database = {
       }
       charge: {
         Row: {
+          agreed_tuition_snapshot: number | null
           amount: number
+          charge_source_code: string | null
           charged_at: string
           created_at: string
           created_by: string | null
           currency_code: string
           description: string | null
           due_date: string | null
+          enrollment_financial_terms_id: string | null
           enrollment_id: string | null
+          enrollment_payment_schedule_item_id: string | null
           guardian_id: string
           id: string
+          net_tuition_snapshot: number | null
           organization_id: string
           status: string
           student_id: string
@@ -390,16 +395,21 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          agreed_tuition_snapshot?: number | null
           amount: number
+          charge_source_code?: string | null
           charged_at?: string
           created_at?: string
           created_by?: string | null
           currency_code?: string
           description?: string | null
           due_date?: string | null
+          enrollment_financial_terms_id?: string | null
           enrollment_id?: string | null
+          enrollment_payment_schedule_item_id?: string | null
           guardian_id: string
           id?: string
+          net_tuition_snapshot?: number | null
           organization_id: string
           status?: string
           student_id: string
@@ -407,16 +417,21 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          agreed_tuition_snapshot?: number | null
           amount?: number
+          charge_source_code?: string | null
           charged_at?: string
           created_at?: string
           created_by?: string | null
           currency_code?: string
           description?: string | null
           due_date?: string | null
+          enrollment_financial_terms_id?: string | null
           enrollment_id?: string | null
+          enrollment_payment_schedule_item_id?: string | null
           guardian_id?: string
           id?: string
+          net_tuition_snapshot?: number | null
           organization_id?: string
           status?: string
           student_id?: string
@@ -424,6 +439,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "charge_enrollment_financial_terms_fk"
+            columns: ["organization_id", "enrollment_financial_terms_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment_financial_terms"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "charge_enrollment_payment_schedule_item_fk"
+            columns: ["organization_id", "enrollment_payment_schedule_item_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment_payment_schedule_item"
+            referencedColumns: ["organization_id", "id"]
+          },
           {
             foreignKeyName: "charge_organization_id_enrollment_id_fkey"
             columns: ["organization_id", "enrollment_id"]
@@ -908,6 +937,159 @@ export type Database = {
             columns: ["organization_id", "updated_by"]
             isOneToOne: false
             referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      enrollment_financial_terms: {
+        Row: {
+          agreed_tuition_amount: number
+          agreement_date: string
+          charges_generated_at: string | null
+          created_at: string
+          created_by: string | null
+          currency_code: string
+          discount_amount: number
+          enrollment_id: string
+          id: string
+          net_tuition_amount: number
+          notes: string | null
+          organization_id: string
+          payment_plan_mode: string | null
+          recognition_basis_code: string | null
+          status: string
+          superseded_by_id: string | null
+          tuition_plan_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          agreed_tuition_amount: number
+          agreement_date?: string
+          charges_generated_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency_code?: string
+          discount_amount?: number
+          enrollment_id: string
+          id?: string
+          net_tuition_amount: number
+          notes?: string | null
+          organization_id: string
+          payment_plan_mode?: string | null
+          recognition_basis_code?: string | null
+          status?: string
+          superseded_by_id?: string | null
+          tuition_plan_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          agreed_tuition_amount?: number
+          agreement_date?: string
+          charges_generated_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency_code?: string
+          discount_amount?: number
+          enrollment_id?: string
+          id?: string
+          net_tuition_amount?: number
+          notes?: string | null
+          organization_id?: string
+          payment_plan_mode?: string | null
+          recognition_basis_code?: string | null
+          status?: string
+          superseded_by_id?: string | null
+          tuition_plan_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollment_financial_terms_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "enrollment_financial_terms_organization_id_enrollment_id_fkey"
+            columns: ["organization_id", "enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "enrollment_financial_terms_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollment_financial_terms_organization_id_superseded_by_i_fkey"
+            columns: ["organization_id", "superseded_by_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment_financial_terms"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "enrollment_financial_terms_organization_id_tuition_plan_id_fkey"
+            columns: ["organization_id", "tuition_plan_id"]
+            isOneToOne: false
+            referencedRelation: "tuition_plan"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "enrollment_financial_terms_organization_id_updated_by_fkey"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      enrollment_payment_schedule_item: {
+        Row: {
+          amount: number
+          created_at: string
+          due_date: string
+          enrollment_financial_terms_id: string
+          id: string
+          label: string | null
+          organization_id: string
+          sequence_number: number
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          due_date: string
+          enrollment_financial_terms_id: string
+          id?: string
+          label?: string | null
+          organization_id: string
+          sequence_number: number
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          due_date?: string
+          enrollment_financial_terms_id?: string
+          id?: string
+          label?: string | null
+          organization_id?: string
+          sequence_number?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollment_payment_schedule_i_organization_id_enrollment_f_fkey"
+            columns: ["organization_id", "enrollment_financial_terms_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment_financial_terms"
             referencedColumns: ["organization_id", "id"]
           },
         ]
@@ -2138,12 +2320,29 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _replace_enrollment_payment_schedule: {
+        Args: { p_items: Json; p_mode: string; p_terms_id: string }
+        Returns: undefined
+      }
       _sec_as_anon: { Args: never; Returns: undefined }
       _sec_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _sec_as_super: { Args: never; Returns: undefined }
       _sec_record: {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
+      }
+      activate_enrollment_financial_terms: {
+        Args: { p_terms_id: string }
+        Returns: undefined
+      }
+      apply_enrollment_tuition_correction: {
+        Args: {
+          p_new_net_tuition: number
+          p_notes?: string
+          p_reason_code?: string
+          p_terms_id: string
+        }
+        Returns: string
       }
       capital_asset_period_month: {
         Args: { p_period_number: number; p_placed_in_service: string }
@@ -2161,6 +2360,18 @@ export type Database = {
         }
         Returns: string
       }
+      create_enrollment_financial_terms: {
+        Args: {
+          p_agreed_tuition_amount: number
+          p_agreement_date?: string
+          p_discount_amount?: number
+          p_enrollment_id: string
+          p_notes?: string
+          p_recognition_basis_code?: string
+          p_tuition_plan_id?: string
+        }
+        Returns: string
+      }
       create_quick_capital_asset: {
         Args: {
           p_name?: string
@@ -2172,9 +2383,17 @@ export type Database = {
       }
       current_app_user_id: { Args: never; Returns: string }
       current_organization_id: { Args: never; Returns: string }
+      enrollment_schedule_total: {
+        Args: { p_terms_id: string }
+        Returns: number
+      }
       generate_depreciation_schedule: {
         Args: { p_capital_asset_id: string }
         Returns: undefined
+      }
+      generate_enrollment_charges: {
+        Args: { p_terms_id: string }
+        Returns: number
       }
       generate_teaching_sessions: {
         Args: {
@@ -2184,7 +2403,19 @@ export type Database = {
         }
         Returns: number
       }
+      get_enrollment_financial_summary: {
+        Args: { p_enrollment_id: string }
+        Returns: Json
+      }
       has_permission: { Args: { p_code: string }; Returns: boolean }
+      installment_schedule_amount: {
+        Args: {
+          p_installment_count: number
+          p_sequence_number: number
+          p_total: number
+        }
+        Returns: number
+      }
       is_active_app_user: { Args: never; Returns: boolean }
       post_depreciation_through: {
         Args: { p_capital_asset_id: string; p_through_month: string }
@@ -2194,12 +2425,41 @@ export type Database = {
         Args: { p_organization_id: string }
         Returns: string
       }
+      resolve_enrollment_billing_guardian_id: {
+        Args: { p_enrollment_id: string }
+        Returns: string
+      }
       retire_capital_asset: {
         Args: { p_capital_asset_id: string; p_retired_at?: string }
         Returns: undefined
       }
       seed_organization_cost_categories: {
         Args: { p_organization_id: string }
+        Returns: undefined
+      }
+      set_enrollment_payment_schedule_custom: {
+        Args: { p_schedule: Json; p_terms_id: string }
+        Returns: undefined
+      }
+      set_enrollment_payment_schedule_deposit_remainder: {
+        Args: {
+          p_deposit_amount: number
+          p_deposit_due_date: string
+          p_remainder_due_date: string
+          p_terms_id: string
+        }
+        Returns: undefined
+      }
+      set_enrollment_payment_schedule_full_upfront: {
+        Args: { p_due_date: string; p_terms_id: string }
+        Returns: undefined
+      }
+      set_enrollment_payment_schedule_installments: {
+        Args: {
+          p_first_due_date: string
+          p_installment_count: number
+          p_terms_id: string
+        }
         Returns: undefined
       }
       set_own_preferred_locale: {
@@ -2222,6 +2482,18 @@ export type Database = {
           p_source_enrollment_id: string
         }
         Returns: string
+      }
+      update_draft_enrollment_financial_terms: {
+        Args: {
+          p_agreed_tuition_amount: number
+          p_agreement_date?: string
+          p_discount_amount?: number
+          p_notes?: string
+          p_recognition_basis_code?: string
+          p_terms_id: string
+          p_tuition_plan_id?: string
+        }
+        Returns: undefined
       }
     }
     Enums: {

@@ -470,7 +470,7 @@ Order driven by **physical dependencies** and **accounting integrity** (configur
 |-------|------------|------------|
 | ~~**M2-T02**~~ | **DONE** — `cost_domain_code` on `cost_group`, four domains, baseline categories, snapshot preserved | M0 cost_group |
 | ~~**M2-T03**~~ | **DONE** — Cost A: `capital_asset`, `depreciation_entry`, quick/detailed convergence, immutability | T02 |
-| **M2-T04** | Enrollment finance terms + charge generation contract (`enrollment_id` required, tuition snapshots on charge) | M1 enrollment |
+| ~~**M2-T04**~~ | **DONE** — Enrollment financial terms, payment schedule, charge generation with provenance | M1 enrollment |
 | **M2-T05** | Payment & adjustment application layer (Server Actions, charge status sync, no new debt entities) | T04 |
 | **M2-T06** | Revenue recognition: policy config, recognition events, prepaid/deferred derivation | T05, M1 sessions/attendance/assessments |
 | **M2-T07** | Personnel cost templates & welfare fund category (Cost B2 completion) | T02 |
@@ -946,4 +946,120 @@ Class P&L will consume posted depreciation via allocation rules (M2-T08). Per-cl
 
 ---
 
-*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 Cost A implementation.*
+---
+
+## Appendix E — M2-T04 Enrollment Financial Terms & Charge Generation (after `f1fbe52`)
+
+**Migration:** `20260914141700_m2_t04_enrollment_financial_terms.sql`
+
+### Canonical pricing rule
+
+```text
+Course / Class → academic structure only
+Enrollment → enrollment_financial_terms → net tuition (authoritative)
+Payment schedule → enrollment_payment_schedule_item
+Obligations → charge (charge_source_code = tuition)
+```
+
+Tuition is **not** authoritative on `course`, `class`, or `tuition_plan.amount` alone.
+
+### Role of `tuition_plan`
+
+`tuition_plan` remains a **optional list-price / payment-plan template** at course or class scope. It may be referenced by `enrollment_financial_terms.tuition_plan_id` but does **not** determine per-student net tuition. Existing rows are preserved; no destructive migration.
+
+### Physical model
+
+| Table | Purpose |
+|-------|---------|
+| `enrollment_financial_terms` | Per-enrollment commercial agreement |
+| `enrollment_payment_schedule_item` | Deterministic due schedule (no paid amounts) |
+
+**Charge extensions:** `enrollment_financial_terms_id`, `enrollment_payment_schedule_item_id` (UNIQUE), `charge_source_code`, `agreed_tuition_snapshot`, `net_tuition_snapshot`.
+
+**Tuition charge invariant:** `charge_source_code = 'tuition'` ⇒ `enrollment_id`, terms, and schedule item required.
+
+### Net tuition formula
+
+```text
+net_tuition_amount = agreed_tuition_amount - discount_amount
+```
+
+Enforced by CHECK; `bigint` minor units; `net_tuition_amount >= 0`.
+
+### Lifecycle
+
+| Status | Meaning |
+|--------|---------|
+| `draft` | Editable; schedule mutable |
+| `active` | Core monetary fields immutable; charges may be generated |
+| `superseded` | Historical agreement replaced |
+| `cancelled` | Voided agreement |
+
+One `draft` and one `active` row per enrollment (partial unique indexes).
+
+### Payment schedule modes
+
+All modes converge on `enrollment_payment_schedule_item`:
+
+| Mode | RPC |
+|------|-----|
+| Full upfront | `set_enrollment_payment_schedule_full_upfront` |
+| Deposit + remainder | `set_enrollment_payment_schedule_deposit_remainder` |
+| Equal installments | `set_enrollment_payment_schedule_installments` (integer remainder handling) |
+| Custom | `set_enrollment_payment_schedule_custom(jsonb)` |
+
+**Invariant:** `SUM(scheduled items) = net_tuition_amount` exactly.
+
+### Charge generation
+
+1. `activate_enrollment_financial_terms` — validates schedule, sets `active`
+2. `generate_enrollment_charges` — idempotent INSERT into `charge` from schedule items
+
+**Idempotency:** `UNIQUE (enrollment_payment_schedule_item_id)` on `charge`.
+
+**Billing guardian:** resolved via `student_guardian.is_billing_contact`, fallback to `is_primary_contact`.
+
+**Snapshots on charge:** `amount` from schedule item; `agreed_tuition_snapshot` / `net_tuition_snapshot` from terms at generation time.
+
+### Historical corrections
+
+After charges exist:
+
+- `charge.amount` remains immutable (`protect_charge_amount`)
+- Tuition reductions/increases use `apply_enrollment_tuition_correction` → `financial_adjustment` on open charges
+- Active terms monetary fields cannot be silently UPDATEd (trigger)
+
+### Separation of concerns
+
+| Concept | Representation |
+|---------|----------------|
+| Net tuition | `enrollment_financial_terms.net_tuition_amount` |
+| Payment timing | `enrollment_payment_schedule_item.due_date` |
+| Obligation | `charge` |
+| Cash received | `payment` + `payment_allocation` |
+| Revenue recognition | **Deferred to M2-T06** (`recognition_basis_code` placeholder only) |
+
+### Security
+
+Reuses `charge.read` / `charge.create`. RLS ENABLE + FORCE on new tables. RPCs SECURITY INVOKER with permission checks.
+
+### Application layer (no UI)
+
+- `src/lib/enrollment-finance/`
+- `src/app/actions/enrollment-finance.ts`
+
+### Tests
+
+`supabase/tests/m2_enrollment_financial_tests.sql` — 35 scenarios.
+
+### Deferred
+
+- Payment recording workflow UI
+- Revenue recognition engine
+- Refund/withdrawal policy
+- Payer snapshot on charge (optional future)
+- Enrollment cancellation financial automation
+
+---
+
+*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04.*

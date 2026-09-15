@@ -654,6 +654,32 @@
   "permissions": {
     "student.read": "Đọc học viên"
   },
+  "enrollmentFinance": {
+    "title": "Tài chính ghi danh",
+    "financialAgreement": "Thỏa thuận tài chính",
+    "netTuition": "Học phí ròng",
+    "summary": "Tóm tắt tài chính"
+  },
+  "tuitionTerms": {
+    "agreedTuition": "Học phí thỏa thuận",
+    "discount": "Giảm giá",
+    "agreementDate": "Ngày thỏa thuận",
+    "draft": "Nháp",
+    "active": "Đang hiệu lực",
+    "superseded": "Đã thay thế",
+    "cancelled": "Đã hủy"
+  },
+  "paymentSchedule": {
+    "title": "Lịch thanh toán",
+    "paymentTerms": "Điều khoản thanh toán",
+    "fullPayment": "Thanh toán toàn bộ",
+    "deposit": "Đặt cọc",
+    "remainder": "Phần còn lại",
+    "installments": "Trả góp",
+    "deferredPayment": "Thanh toán hoãn",
+    "dueDate": "Ngày đến hạn",
+    "custom": "Lịch tùy chỉnh"
+  },
   "costDomain": {
     "capital": "Đầu tư thiết lập",
     "operating_overhead": "Chi phí vận hành",
