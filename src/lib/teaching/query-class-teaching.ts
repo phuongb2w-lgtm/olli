@@ -98,7 +98,7 @@ export async function fetchTeacherAssignments(
   const { data, error } = await supabase
     .from("class_teacher_assignment")
     .select(
-      "id, teacher_id, role_code, effective_from, effective_to, status, teacher:teacher_id(given_name, family_name)",
+      "id, teacher_id, role_code, effective_from, effective_to, status, teacher:teacher(given_name, family_name)",
     )
     .eq("class_id", classId)
     .order("effective_from", { ascending: false });
@@ -126,7 +126,7 @@ export async function fetchClassSchedules(
   const { data, error } = await supabase
     .from("class_schedule")
     .select(
-      "id, weekday_code, start_time, end_time, effective_from, effective_to, location, room_id, teacher_id, status, room:room_id(name), teacher:teacher_id(given_name, family_name)",
+      "id, weekday_code, start_time, end_time, effective_from, effective_to, location, room_id, teacher_id, status, room:room(name), teacher:teacher(given_name, family_name)",
     )
     .eq("class_id", classId)
     .order("weekday_code")
@@ -161,7 +161,7 @@ export async function fetchClassSessions(
   const { data, error } = await supabase
     .from("teaching_session")
     .select(
-      "id, occurrence_date, scheduled_start_at, scheduled_end_at, status, class_schedule_id, teacher_id, room_id, teacher:teacher_id(given_name, family_name), room:room_id(name)",
+      "id, occurrence_date, scheduled_start_at, scheduled_end_at, status, class_schedule_id, teacher_id, room_id, teacher:teacher(given_name, family_name), room:room(name)",
     )
     .eq("class_id", classId)
     .order("scheduled_start_at", { ascending: true });

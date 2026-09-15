@@ -191,6 +191,7 @@ export type Database = {
           status: string
           teaching_session_id: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           created_at?: string
@@ -202,6 +203,7 @@ export type Database = {
           status: string
           teaching_session_id: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           created_at?: string
@@ -213,6 +215,7 @@ export type Database = {
           status?: string
           teaching_session_id?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -227,6 +230,20 @@ export type Database = {
             columns: ["organization_id", "teaching_session_id"]
             isOneToOne: false
             referencedRelation: "teaching_session"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "attendance_recorded_by_fk"
+            columns: ["organization_id", "recorded_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "attendance_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
             referencedColumns: ["organization_id", "id"]
           },
         ]
@@ -1620,6 +1637,7 @@ export type Database = {
           teacher_id: string
           teaching_session_id: string | null
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           class_id: string
@@ -1634,6 +1652,7 @@ export type Database = {
           teacher_id: string
           teaching_session_id?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           class_id?: string
@@ -1648,8 +1667,16 @@ export type Database = {
           teacher_id?: string
           teaching_session_id?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "teacher_observation_created_by_fk"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
           {
             foreignKeyName: "teacher_observation_organization_id_class_id_fkey"
             columns: ["organization_id", "class_id"]
@@ -1677,6 +1704,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "teaching_session"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_observation_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
           },
         ]
       }

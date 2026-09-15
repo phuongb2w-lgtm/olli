@@ -286,6 +286,12 @@
     "room": {
       "active": "Active",
       "inactive": "Inactive"
+    },
+    "attendance": {
+      "present": "Present",
+      "absent": "Absent",
+      "late": "Late",
+      "excused": "Excused"
     }
   },
   "teaching": {
@@ -335,6 +341,7 @@
     "historicalSessions": "Historical sessions",
     "cancelSession": "Cancel session",
     "completeSession": "Complete session",
+    "openSession": "Open session",
     "roomCapacityWarning": "Class capacity exceeds room capacity.",
     "roomConflict": "Room is already booked for this time.",
     "teacherConflict": "Teacher is already scheduled for this time.",
@@ -384,6 +391,60 @@
       "created": "Room created successfully.",
       "updated": "Room updated successfully."
     }
+  },
+  "sessionExecution": {
+    "title": "Session execution",
+    "backToTeaching": "Back to teaching",
+    "denied": "You do not have permission to view session execution.",
+    "permissionDenied": "You do not have permission for this action.",
+    "date": "Date",
+    "time": "Time",
+    "teacher": "Teacher",
+    "room": "Room",
+    "noLocation": "No room assigned",
+    "attendance": "Attendance",
+    "attendanceProgress": "Attendance progress",
+    "attendanceProgressSummary": "{recorded}/{total} attendance recorded",
+    "learnersNotRecorded": "{count} not recorded",
+    "learnerRoster": "Learner roster",
+    "student": "Student",
+    "studentCode": "Student code",
+    "observation": "Observation",
+    "notRecorded": "Not recorded",
+    "startSession": "Start session",
+    "completeSession": "Complete session",
+    "cancelSession": "Cancel session",
+    "markAllPresent": "Mark all present",
+    "learnerObservation": "Learner observation",
+    "teacherComment": "Teacher comment",
+    "saveObservation": "Save observation",
+    "noRating": "No rating",
+    "noObservation": "No observation",
+    "observationRecorded": "Observation recorded",
+    "emptyRoster": "No eligible learners for this session date.",
+    "confirmUnrecorded": "{count} learners have no attendance recorded.",
+    "confirmCompleteWithUnrecorded": "I confirm completing with unrecorded attendance",
+    "confirmOverwriteNonPresent": "Overwrite existing non-present marks",
+    "confirmOverwriteRequired": "Confirm overwrite to change existing non-present marks.",
+    "saving": "Saving…",
+    "success": {
+      "started": "Session started.",
+      "completed": "Session completed.",
+      "cancelled": "Session cancelled.",
+      "attendance_recorded": "Attendance recorded.",
+      "attendance_bulk": "Bulk attendance updated.",
+      "observation_saved": "Observation saved."
+    }
+  },
+  "observationIndicators": {
+    "concentration": "Concentration",
+    "engagement": "Engagement",
+    "participation": "Participation"
+  },
+  "observationRatings": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
   },
   "common": {
     "loading": "Loading…",

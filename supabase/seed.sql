@@ -126,11 +126,9 @@ BEGIN
     (v_org_b, 'B101', 'Room B101', 15, 'active');
 
   INSERT INTO enrollment (organization_id, student_id, class_id, start_date, status)
-  SELECT v_org_a, s.id, c.id, CURRENT_DATE, 'active'
-  FROM student s
-  JOIN class c ON c.organization_id = s.organization_id
-  WHERE s.organization_id = v_org_a
-  LIMIT 1;
+  SELECT v_org_a, v_student_tran, cl.id, CURRENT_DATE - 30, 'active'
+  FROM class cl
+  WHERE cl.organization_id = v_org_a AND cl.name = 'Class A1';
 
   INSERT INTO enrollment (organization_id, student_id, class_id, start_date, status)
   SELECT v_org_b, s.id, c.id, CURRENT_DATE, 'active'
@@ -172,6 +170,45 @@ BEGIN
   SELECT v_org_a, ec.id, ec.cost_group_id, 50000, CURRENT_DATE
   FROM expense_category ec
   WHERE ec.organization_id = v_org_a
+  LIMIT 1;
+
+  INSERT INTO class_teacher_assignment (organization_id, class_id, teacher_id, role_code, effective_from, status)
+  SELECT v_org_a, cl.id, te.id, 'primary', CURRENT_DATE - 30, 'active'
+  FROM class cl
+  JOIN teacher te ON te.organization_id = cl.organization_id AND te.given_name = 'Mai'
+  WHERE cl.organization_id = v_org_a AND cl.name = 'Class A1';
+
+  INSERT INTO class_schedule (
+    organization_id, class_id, weekday_code, start_time, end_time,
+    effective_from, room_id, teacher_id, status
+  )
+  SELECT
+    v_org_a, cl.id, 'tue', '18:00'::time, '19:30'::time,
+    CURRENT_DATE - 30, r.id, te.id, 'active'
+  FROM class cl
+  JOIN teacher te ON te.organization_id = cl.organization_id AND te.given_name = 'Mai'
+  JOIN room r ON r.organization_id = cl.organization_id AND r.code = 'A101'
+  WHERE cl.organization_id = v_org_a AND cl.name = 'Class A1';
+
+  INSERT INTO teaching_session (
+    organization_id, class_id, class_schedule_id, teacher_id, room_id,
+    occurrence_date, scheduled_start_at, scheduled_end_at, status
+  )
+  SELECT
+    v_org_a,
+    cl.id,
+    cs.id,
+    te.id,
+    r.id,
+    CURRENT_DATE + 7,
+    ((CURRENT_DATE + 7) + time '18:00') AT TIME ZONE 'Asia/Ho_Chi_Minh',
+    ((CURRENT_DATE + 7) + time '19:30') AT TIME ZONE 'Asia/Ho_Chi_Minh',
+    'scheduled'
+  FROM class cl
+  JOIN teacher te ON te.organization_id = cl.organization_id AND te.given_name = 'Mai'
+  JOIN room r ON r.organization_id = cl.organization_id AND r.code = 'A101'
+  JOIN class_schedule cs ON cs.class_id = cl.id AND cs.organization_id = cl.organization_id
+  WHERE cl.organization_id = v_org_a AND cl.name = 'Class A1'
   LIMIT 1;
 
 END $$;

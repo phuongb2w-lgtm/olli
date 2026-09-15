@@ -43,6 +43,8 @@ export default async function ClassTeachingPage({ params, searchParams }: Props)
 
   const hasCreate = await can("enrollment.create");
   const hasUpdate = await can("enrollment.update");
+  const canOpenExecution =
+    (await can("attendance.read")) || (await can("enrollment.read"));
   const supabase = await createClient();
 
   const classContext = await fetchClassTeachingContext(supabase, classId);
@@ -117,7 +119,11 @@ export default async function ClassTeachingPage({ params, searchParams }: Props)
 
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-slate-900">{t("teachingSessions")}</h2>
-        <SessionList classId={classId} sessions={sessions} canUpdate={hasUpdate} />
+        <SessionList
+          classId={classId}
+          sessions={sessions}
+          canOpenExecution={canOpenExecution}
+        />
       </section>
     </div>
   );

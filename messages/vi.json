@@ -286,6 +286,12 @@
     "room": {
       "active": "Đang hoạt động",
       "inactive": "Ngừng hoạt động"
+    },
+    "attendance": {
+      "present": "Có mặt",
+      "absent": "Vắng mặt",
+      "late": "Đi muộn",
+      "excused": "Vắng có phép"
     }
   },
   "teaching": {
@@ -335,6 +341,7 @@
     "historicalSessions": "Buổi học trước đây",
     "cancelSession": "Hủy buổi học",
     "completeSession": "Hoàn thành buổi học",
+    "openSession": "Mở buổi học",
     "roomCapacityWarning": "Sĩ số lớp vượt sức chứa phòng.",
     "roomConflict": "Phòng đã được đặt trong khung giờ này.",
     "teacherConflict": "Giáo viên đã có lịch trùng khung giờ.",
@@ -384,6 +391,60 @@
       "created": "Đã tạo phòng học.",
       "updated": "Đã cập nhật phòng học."
     }
+  },
+  "sessionExecution": {
+    "title": "Thực hiện buổi học",
+    "backToTeaching": "Quay lại giảng dạy",
+    "denied": "Bạn không có quyền xem thực hiện buổi học.",
+    "permissionDenied": "Bạn không có quyền thực hiện thao tác này.",
+    "date": "Ngày",
+    "time": "Giờ",
+    "teacher": "Giáo viên",
+    "room": "Phòng học",
+    "noLocation": "Chưa gán phòng",
+    "attendance": "Điểm danh",
+    "attendanceProgress": "Tiến độ điểm danh",
+    "attendanceProgressSummary": "Đã điểm danh {recorded}/{total}",
+    "learnersNotRecorded": "{count} chưa điểm danh",
+    "learnerRoster": "Danh sách học viên",
+    "student": "Học viên",
+    "studentCode": "Mã học viên",
+    "observation": "Nhận xét",
+    "notRecorded": "Chưa điểm danh",
+    "startSession": "Bắt đầu buổi học",
+    "completeSession": "Hoàn thành buổi học",
+    "cancelSession": "Hủy buổi học",
+    "markAllPresent": "Điểm danh tất cả có mặt",
+    "learnerObservation": "Nhận xét học viên",
+    "teacherComment": "Nhận xét của giáo viên",
+    "saveObservation": "Lưu nhận xét",
+    "noRating": "Không chọn mức",
+    "noObservation": "Chưa có nhận xét",
+    "observationRecorded": "Đã ghi nhận xét",
+    "emptyRoster": "Không có học viên đủ điều kiện cho ngày buổi học này.",
+    "confirmUnrecorded": "{count} học viên chưa được điểm danh.",
+    "confirmCompleteWithUnrecorded": "Tôi xác nhận hoàn thành khi còn học viên chưa điểm danh",
+    "confirmOverwriteNonPresent": "Ghi đè các điểm danh khác “có mặt”",
+    "confirmOverwriteRequired": "Cần xác nhận để ghi đè điểm danh khác “có mặt”.",
+    "saving": "Đang lưu…",
+    "success": {
+      "started": "Đã bắt đầu buổi học.",
+      "completed": "Đã hoàn thành buổi học.",
+      "cancelled": "Đã hủy buổi học.",
+      "attendance_recorded": "Đã ghi điểm danh.",
+      "attendance_bulk": "Đã cập nhật điểm danh hàng loạt.",
+      "observation_saved": "Đã lưu nhận xét."
+    }
+  },
+  "observationIndicators": {
+    "concentration": "Tập trung",
+    "engagement": "Hứng thú",
+    "participation": "Tham gia"
+  },
+  "observationRatings": {
+    "low": "Thấp",
+    "medium": "Trung bình",
+    "high": "Cao"
   },
   "common": {
     "loading": "Đang tải…",

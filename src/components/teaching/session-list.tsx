@@ -1,5 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { SessionActions } from "@/components/teaching/session-actions";
+import Link from "next/link";
 import { formatDateTime } from "@/lib/formatting";
 import type { SessionItem } from "@/lib/teaching/query-class-teaching";
 import type { Locale } from "@/i18n/config";
@@ -7,7 +7,7 @@ import type { Locale } from "@/i18n/config";
 type Props = {
   classId: string;
   sessions: SessionItem[];
-  canUpdate: boolean;
+  canOpenExecution: boolean;
 };
 
 function partitionSessions(sessions: SessionItem[]) {
@@ -16,8 +16,11 @@ function partitionSessions(sessions: SessionItem[]) {
   const historical: SessionItem[] = [];
   for (const session of sessions) {
     const start = new Date(session.scheduledStartAt).getTime();
-    if (start >= now && session.status === "scheduled") upcoming.push(session);
-    else historical.push(session);
+    if (session.status === "in_progress" || (start >= now && session.status === "scheduled")) {
+      upcoming.push(session);
+    } else {
+      historical.push(session);
+    }
   }
   upcoming.sort(
     (a, b) =>
@@ -30,7 +33,7 @@ function partitionSessions(sessions: SessionItem[]) {
   return { upcoming, historical };
 }
 
-export async function SessionList({ classId, sessions, canUpdate }: Props) {
+export async function SessionList({ classId, sessions, canOpenExecution }: Props) {
   const t = await getTranslations("teaching");
   const tStatus = await getTranslations("status.session");
   const locale = (await getLocale()) as Locale;
@@ -65,9 +68,14 @@ export async function SessionList({ classId, sessions, canUpdate }: Props) {
           {tStatus(session.status)}
         </span>
       </div>
-      {canUpdate ? (
+      {canOpenExecution ? (
         <div className="mt-3">
-          <SessionActions classId={classId} sessionId={session.id} status={session.status} />
+          <Link
+            href={`/classes/${classId}/teaching/sessions/${session.id}`}
+            className="text-sm font-medium text-slate-900 underline"
+          >
+            {t("openSession")}
+          </Link>
         </div>
       ) : null}
     </article>
@@ -87,7 +95,7 @@ export async function SessionList({ classId, sessions, canUpdate }: Props) {
                   <th className="px-4 py-3 text-left font-medium text-slate-700">{t("teacher")}</th>
                   <th className="px-4 py-3 text-left font-medium text-slate-700">{t("room")}</th>
                   <th className="px-4 py-3 text-left font-medium text-slate-700">{t("status")}</th>
-                  {canUpdate ? (
+                  {canOpenExecution ? (
                     <th className="px-4 py-3 text-left font-medium text-slate-700">
                       <span className="sr-only">{t("actions")}</span>
                     </th>
@@ -109,13 +117,14 @@ export async function SessionList({ classId, sessions, canUpdate }: Props) {
                         {tStatus(session.status)}
                       </span>
                     </td>
-                    {canUpdate ? (
+                    {canOpenExecution ? (
                       <td className="px-4 py-3">
-                        <SessionActions
-                          classId={classId}
-                          sessionId={session.id}
-                          status={session.status}
-                        />
+                        <Link
+                          href={`/classes/${classId}/teaching/sessions/${session.id}`}
+                          className="text-sm font-medium text-slate-900 underline"
+                        >
+                          {t("openSession")}
+                        </Link>
                       </td>
                     ) : null}
                   </tr>
@@ -139,6 +148,11 @@ export async function SessionList({ classId, sessions, canUpdate }: Props) {
                   <th className="px-4 py-3 text-left font-medium text-slate-700">{t("teacher")}</th>
                   <th className="px-4 py-3 text-left font-medium text-slate-700">{t("room")}</th>
                   <th className="px-4 py-3 text-left font-medium text-slate-700">{t("status")}</th>
+                  {canOpenExecution ? (
+                    <th className="px-4 py-3 text-left font-medium text-slate-700">
+                      <span className="sr-only">{t("actions")}</span>
+                    </th>
+                  ) : null}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 bg-white">
@@ -156,6 +170,16 @@ export async function SessionList({ classId, sessions, canUpdate }: Props) {
                         {tStatus(session.status)}
                       </span>
                     </td>
+                    {canOpenExecution ? (
+                      <td className="px-4 py-3">
+                        <Link
+                          href={`/classes/${classId}/teaching/sessions/${session.id}`}
+                          className="text-sm font-medium text-slate-900 underline"
+                        >
+                          {t("openSession")}
+                        </Link>
+                      </td>
+                    ) : null}
                   </tr>
                 ))}
               </tbody>

@@ -31,6 +31,7 @@ M1 is **not** admissions CRM, LMS, enrollment workflow, or guardian portal acces
 | 11 | [M1-T05 Implementation](./11-m1-t05-implementation.md) | Course/Class CRUD, lifecycle, list/search, permissions, boundaries |
 | 12 | [M1-T06 Implementation](./12-m1-t06-implementation.md) | Enrollment, roster, transfer/withdraw/complete, capacity, history |
 | 13 | [M1-T07 Implementation](./13-m1-t07-implementation.md) | Teaching schedule, room master, session generation, teacher assignment |
+| 14 | [M1-T08 Implementation](./14-m1-t08-implementation.md) | Session execution, attendance, learner observations |
 
 ---
 
