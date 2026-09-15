@@ -36,6 +36,8 @@ export default async function ClassesPage({ searchParams }: Props) {
   const canViewRoster = hasRead;
   const canViewTeaching = hasRead;
   const canViewAssessments = await can("assessment.read");
+  const canViewReports =
+    canViewAssessments || (await can("attendance.read")) || hasRead;
   const successParam = rawParams.success;
   const success =
     successParam === "created" || successParam === "updated" ? successParam : null;
@@ -124,6 +126,7 @@ export default async function ClassesPage({ searchParams }: Props) {
             canViewRoster={canViewRoster}
             canViewTeaching={canViewTeaching}
             canViewAssessments={canViewAssessments}
+            canViewReports={canViewReports}
           />
           <ClassListCards
             items={items}
@@ -131,6 +134,7 @@ export default async function ClassesPage({ searchParams }: Props) {
             canViewRoster={canViewRoster}
             canViewTeaching={canViewTeaching}
             canViewAssessments={canViewAssessments}
+            canViewReports={canViewReports}
           />
           <ClassListPagination params={params} totalCount={totalCount} />
         </>

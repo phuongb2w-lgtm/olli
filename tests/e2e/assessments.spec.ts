@@ -41,7 +41,11 @@ test.describe("M1-T09 assessments", () => {
     await signIn(page, adminEmail);
     await page.goto("/students");
     await page.getByRole("link", { name: /enrollment|ghi danh/i }).first().click();
-    await page.getByRole("link", { name: /academic progress|tiến độ học tập/i }).click();
-    await expect(page.getByRole("heading", { level: 1, name: /academic progress|tiến độ học tập/i })).toBeVisible();
+    await page
+      .getByRole("link", { name: /learner progress report|báo cáo tiến độ học viên/i })
+      .click();
+    await expect(
+      page.getByRole("heading", { level: 1, name: /learner progress report|báo cáo tiến độ học viên/i }),
+    ).toBeVisible();
   });
 });

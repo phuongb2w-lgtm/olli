@@ -16,7 +16,7 @@ type Props = {
 
 export default async function StudentEnrollmentsPage({ params, searchParams }: Props) {
   const t = await getTranslations("enrollments");
-  const tAssess = await getTranslations("assessments");
+  const tReports = await getTranslations("reports");
   const { id: studentId } = await params;
   const rawParams = await searchParams;
   const hasRead = await can("enrollment.read");
@@ -33,7 +33,11 @@ export default async function StudentEnrollmentsPage({ params, searchParams }: P
   }
 
   const hasCreate = await can("enrollment.create");
-  const canViewProgress = await can("assessment.read");
+  const [canViewProgressAssessment, canViewProgressAttendance] = await Promise.all([
+    can("assessment.read"),
+    can("attendance.read"),
+  ]);
+  const canViewProgress = canViewProgressAssessment || canViewProgressAttendance;
   const success = rawParams.success === "created" ? "created" : null;
 
   const supabase = await createClient();
@@ -81,10 +85,10 @@ export default async function StudentEnrollmentsPage({ params, searchParams }: P
         ) : null}
         {canViewProgress ? (
           <Link
-            href={`/students/${studentId}/progress`}
+            href={`/students/${studentId}/reports/progress`}
             className="inline-block rounded border border-slate-300 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
           >
-            {tAssess("academicProgress")}
+            {tReports("learnerProgressReport")}
           </Link>
         ) : null}
       </div>

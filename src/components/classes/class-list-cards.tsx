@@ -8,6 +8,7 @@ type Props = {
   canViewRoster: boolean;
   canViewTeaching: boolean;
   canViewAssessments: boolean;
+  canViewReports: boolean;
 };
 
 export async function ClassListCards({
@@ -16,11 +17,13 @@ export async function ClassListCards({
   canViewRoster,
   canViewTeaching,
   canViewAssessments,
+  canViewReports,
 }: Props) {
   const t = await getTranslations("classes");
   const tEnroll = await getTranslations("enrollments");
   const tTeach = await getTranslations("teaching");
   const tAssess = await getTranslations("assessments");
+  const tReports = await getTranslations("reports");
   const tStatus = await getTranslations("status.class");
   const placeholder = t("emptyValue");
 
@@ -53,7 +56,7 @@ export async function ClassListCards({
               <dd className="text-slate-800">{item.termEndDate ?? placeholder}</dd>
             </div>
           </dl>
-          {canUpdate || canViewRoster || canViewTeaching || canViewAssessments ? (
+          {canUpdate || canViewRoster || canViewTeaching || canViewAssessments || canViewReports ? (
             <div className="mt-3 flex flex-wrap gap-3">
               {canViewRoster ? (
                 <Link
@@ -77,6 +80,14 @@ export async function ClassListCards({
                   className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
                 >
                   {tAssess("title")}
+                </Link>
+              ) : null}
+              {canViewReports ? (
+                <Link
+                  href={`/classes/${item.id}/reports`}
+                  className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                >
+                  {tReports("title")}
                 </Link>
               ) : null}
               {canUpdate ? (

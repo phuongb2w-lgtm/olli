@@ -33,6 +33,7 @@ M1 is **not** admissions CRM, LMS, enrollment workflow, or guardian portal acces
 | 13 | [M1-T07 Implementation](./13-m1-t07-implementation.md) | Teaching schedule, room master, session generation, teacher assignment |
 | 14 | [M1-T08 Implementation](./14-m1-t08-implementation.md) | Session execution, attendance, learner observations |
 | 15 | [M1-T09 Implementation](./15-m1-t09-implementation.md) | Assessments, test scores, academic progress, observation read hardening |
+| 16 | [M1-T10 Implementation](./16-m1-t10-implementation.md) | Academic reporting read models, bilingual print-ready UI, permission-safe reports |
 
 ---
 

@@ -7,3 +7,29 @@
 body {
   @apply bg-slate-50 text-slate-900 antialiased;
 }
+
+@media print {
+  .report-no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  .report-content {
+    color: black;
+  }
+
+  .report-content table {
+    page-break-inside: auto;
+  }
+
+  .report-content tr {
+    page-break-inside: avoid;
+  }
+
+  .break-before-page {
+    break-before: page;
+  }
+}
