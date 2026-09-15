@@ -471,7 +471,7 @@ Order driven by **physical dependencies** and **accounting integrity** (configur
 | ~~**M2-T02**~~ | **DONE** — `cost_domain_code` on `cost_group`, four domains, baseline categories, snapshot preserved | M0 cost_group |
 | ~~**M2-T03**~~ | **DONE** — Cost A: `capital_asset`, `depreciation_entry`, quick/detailed convergence, immutability | T02 |
 | ~~**M2-T04**~~ | **DONE** — Enrollment financial terms, payment schedule, charge generation with provenance | M1 enrollment |
-| **M2-T05** | Payment & adjustment application layer (Server Actions, charge status sync, no new debt entities) | T04 |
+| ~~**M2-T05**~~ | **DONE** — Payment recording, allocation workflow, reversals, enrollment cash summary | T04 |
 | **M2-T06** | Revenue recognition: policy config, recognition events, prepaid/deferred derivation | T05, M1 sessions/attendance/assessments |
 | **M2-T07** | Personnel cost templates & welfare fund category (Cost B2 completion) | T02 |
 | **M2-T08** | Class cost allocation rules + contribution report (read models) | T02–T07 |
@@ -1062,4 +1062,145 @@ Reuses `charge.read` / `charge.create`. RLS ENABLE + FORCE on new tables. RPCs S
 
 ---
 
-*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04.*
+## Appendix F — M2-T05 Payment Recording & Allocation (after `bcdb0db`)
+
+**Migration:** `20260914141800_m2_t05_payment_recording_allocation.sql`
+
+### Canonical payment meaning
+
+A `payment` row represents **cash/value received** by the center. It is not revenue. Receiving tuition upfront creates a cash asset and, via allocation, reduces receivable — it does not recognize earned revenue (deferred to M2-T06).
+
+```text
+                   ┌──────────── Charge A
+                   │
+Payment ─ Allocation
+                   │
+                   └──────────── Charge B
+
+Payment amount
+   │
+   ├── Allocated amount (Σ posted payment_allocation)
+   │
+   └── Unallocated amount (derived: amount − allocated)
+```
+
+### Payment vs allocation
+
+| Concept | Table | Meaning |
+|---------|-------|---------|
+| Cash received | `payment` | Money entered the center |
+| Assignment to debt | `payment_allocation` | Which obligation the cash settles |
+| Remaining obligation | `charge_balance.outstanding_balance` | Derived |
+
+### Partial payment, multi-charge, multi-payment
+
+All are native `payment_allocation` behavior — no charge mutation required:
+
+- **Partial:** one payment allocates less than charge effective obligation.
+- **One payment → many charges:** single `record_payment` or `allocate_payment` with allocation array.
+- **Many payments → one charge:** multiple payments each allocate to the same `charge_id`.
+
+### Unapplied cash
+
+When `payment.amount > Σ(posted allocations)`, the remainder is **unallocated** (derived). No second deposit ledger. Future refunds may consume unapplied amounts; full refund engine deferred.
+
+### Allocation strategy
+
+`suggest_payment_allocation(payment_id, enrollment_id?, student_id?)` returns a **deterministic suggestion only** — oldest `due_date` outstanding charge first within scope. Callers must explicitly post via `record_payment` / `allocate_payment`; suggestions are never silently applied.
+
+**Cross-enrollment rule:** One payment may allocate across multiple enrollments **within the same organization** and compatible currency. Cross-organization allocation is rejected. Same-enrollment scope is optional filter, not a hard requirement.
+
+### Allocation idempotency
+
+| Level | Mechanism |
+|-------|-----------|
+| Payment recording | `payment.idempotency_key` UNIQUE per organization; retry returns existing payment |
+| Batch allocation | `payment_allocation_batch.operation_key` UNIQUE per organization; retry returns existing batch result |
+
+Do not rely on payment date + amount for uniqueness.
+
+### Overpayment behavior
+
+If outstanding charges total less than payment amount, valid allocations stop at outstanding balances; excess remains **unallocated**. No negative/fake charges created.
+
+### Reversal / correction strategy
+
+| Event | Approach |
+|-------|----------|
+| Wrong payment | `reverse_payment` → status `reversed`, void all posted allocations; original row preserved |
+| Wrong allocation | `reverse_payment_allocation` → allocation status `void`; original row preserved |
+| Wrong amount after posting | Reverse + new corrected payment (do not UPDATE historical amount) |
+
+**Payment reversal ≠ refund:** reversal corrects a mistaken receipt; refund is a future outgoing cash event against legitimately received funds.
+
+Effective allocation totals count only `payment_allocation.status = 'posted'`.
+
+### Effective charge obligation after adjustments
+
+Allocation cap uses:
+
+```text
+effective_obligation = charge.amount + Σ(posted financial_adjustment.amount_delta)
+allocated_total      = Σ(posted payment_allocation.amount)
+outstanding_balance  = effective_obligation − allocated_total
+```
+
+`validate_charge_allocation_cap` trigger locks charge + payment rows and rejects over-settlement. `validate_payment_allocations` ensures Σ allocations ≤ payment.amount.
+
+### Charge collection state derivation
+
+Stored `charge.status` (`open`, `partially_paid`, `paid`, `void`) is **operational lifecycle** synced after allocation changes. Derived collection labels (`unpaid`, `partially_paid`, `paid`, `overdue`) come from `_charge_collection_status()` using `charge_balance` + `due_date`. No competing stored balance fields.
+
+### Payer semantics
+
+Reuse existing `Student ↔ StudentGuardian ↔ Guardian` model:
+
+- `payment.guardian_id` — payer link (required)
+- `payment.student_id` — optional learner context
+- `payment.payer_name_snapshot` — historical label at receipt time (survives relationship changes)
+
+Do not create a parallel payer-person subsystem.
+
+### Revenue-recognition boundary
+
+Payment processing **must not** create recognition events or mutate `recognition_basis_code`. Cash received ≠ revenue earned.
+
+### Extended `charge_balance` view
+
+Preserves `security_invoker = true`. Adds derived columns: `original_amount`, `adjustments_total`, `effective_obligation`, `allocated_total`, `outstanding_balance`.
+
+### RPCs (SECURITY INVOKER)
+
+| RPC | Permission |
+|-----|------------|
+| `record_payment` | `payment.record` |
+| `allocate_payment` | `payment.record` |
+| `suggest_payment_allocation` | `payment.read` |
+| `get_payment_details` | `payment.read` |
+| `get_enrollment_outstanding_charges` | `charge.read` |
+| `reverse_payment` | `payment.reverse` |
+| `reverse_payment_allocation` | `payment.reverse` |
+| `get_enrollment_financial_summary` | `charge.read` (extended) |
+
+### Application layer (no UI)
+
+- `src/lib/payments/` — validation, constants
+- `src/app/actions/payments.ts` — server actions
+
+### i18n
+
+`payment.*`, `paymentMethod.*`, `paymentAllocation.*`, `collectionStatus.*` in EN/VI.
+
+### Tests
+
+`supabase/tests/m2_payment_allocation_tests.sql` — 41 scenarios.
+
+### Future handoff
+
+- **Refunds:** outgoing cash events; may consume unapplied payment amounts
+- **Revenue recognition (M2-T06):** separate engine consuming academic facts
+- **Finance UI (M2-T10):** surfaces built on these RPCs
+
+---
+
+*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04. Updated for M2-T05.*

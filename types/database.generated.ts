@@ -1451,11 +1451,17 @@ export type Database = {
           currency_code: string
           guardian_id: string
           id: string
+          idempotency_key: string | null
           method_code: string
+          notes: string | null
           organization_id: string
           paid_at: string
+          payer_name_snapshot: string | null
           reference_number: string | null
+          reversal_of_payment_id: string | null
+          reversed_at: string | null
           status: string
+          student_id: string | null
         }
         Insert: {
           amount: number
@@ -1464,11 +1470,17 @@ export type Database = {
           currency_code?: string
           guardian_id: string
           id?: string
+          idempotency_key?: string | null
           method_code?: string
+          notes?: string | null
           organization_id: string
           paid_at?: string
+          payer_name_snapshot?: string | null
           reference_number?: string | null
+          reversal_of_payment_id?: string | null
+          reversed_at?: string | null
           status?: string
+          student_id?: string | null
         }
         Update: {
           amount?: number
@@ -1477,11 +1489,17 @@ export type Database = {
           currency_code?: string
           guardian_id?: string
           id?: string
+          idempotency_key?: string | null
           method_code?: string
+          notes?: string | null
           organization_id?: string
           paid_at?: string
+          payer_name_snapshot?: string | null
           reference_number?: string | null
+          reversal_of_payment_id?: string | null
+          reversed_at?: string | null
           status?: string
+          student_id?: string | null
         }
         Relationships: [
           {
@@ -1498,34 +1516,70 @@ export type Database = {
             referencedRelation: "guardian"
             referencedColumns: ["organization_id", "id"]
           },
+          {
+            foreignKeyName: "payment_reversal_of_fk"
+            columns: ["organization_id", "reversal_of_payment_id"]
+            isOneToOne: false
+            referencedRelation: "payment"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "payment_student_fk"
+            columns: ["organization_id", "student_id"]
+            isOneToOne: false
+            referencedRelation: "student"
+            referencedColumns: ["organization_id", "id"]
+          },
         ]
       }
       payment_allocation: {
         Row: {
           allocated_at: string
+          allocation_batch_id: string | null
           amount: number
           charge_id: string
           id: string
+          notes: string | null
           organization_id: string
           payment_id: string
+          reversal_of_allocation_id: string | null
+          reversed_at: string | null
+          status: string
         }
         Insert: {
           allocated_at?: string
+          allocation_batch_id?: string | null
           amount: number
           charge_id: string
           id?: string
+          notes?: string | null
           organization_id: string
           payment_id: string
+          reversal_of_allocation_id?: string | null
+          reversed_at?: string | null
+          status?: string
         }
         Update: {
           allocated_at?: string
+          allocation_batch_id?: string | null
           amount?: number
           charge_id?: string
           id?: string
+          notes?: string | null
           organization_id?: string
           payment_id?: string
+          reversal_of_allocation_id?: string | null
+          reversed_at?: string | null
+          status?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "payment_allocation_batch_fk"
+            columns: ["organization_id", "allocation_batch_id"]
+            isOneToOne: false
+            referencedRelation: "payment_allocation_batch"
+            referencedColumns: ["organization_id", "id"]
+          },
           {
             foreignKeyName: "payment_allocation_organization_id_charge_id_fkey"
             columns: ["organization_id", "charge_id"]
@@ -1542,6 +1596,62 @@ export type Database = {
           },
           {
             foreignKeyName: "payment_allocation_organization_id_payment_id_fkey"
+            columns: ["organization_id", "payment_id"]
+            isOneToOne: false
+            referencedRelation: "payment"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "payment_allocation_reversal_of_fk"
+            columns: ["organization_id", "reversal_of_allocation_id"]
+            isOneToOne: false
+            referencedRelation: "payment_allocation"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      payment_allocation_batch: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          operation_key: string
+          organization_id: string
+          payment_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          operation_key: string
+          organization_id: string
+          payment_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          operation_key?: string
+          organization_id?: string
+          payment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_allocation_batch_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "payment_allocation_batch_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_allocation_batch_organization_id_payment_id_fkey"
             columns: ["organization_id", "payment_id"]
             isOneToOne: false
             referencedRelation: "payment"
@@ -2288,30 +2398,51 @@ export type Database = {
     Views: {
       charge_balance: {
         Row: {
+          adjustments_total: number | null
+          allocated_total: number | null
           charge_id: string | null
+          effective_obligation: number | null
           organization_id: string | null
+          original_amount: number | null
           outstanding_balance: number | null
         }
         Insert: {
+          adjustments_total?: never
+          allocated_total?: never
           charge_id?: string | null
+          effective_obligation?: never
           organization_id?: string | null
+          original_amount?: number | null
           outstanding_balance?: never
         }
         Update: {
+          adjustments_total?: never
+          allocated_total?: never
           charge_id?: string | null
+          effective_obligation?: never
           organization_id?: string | null
+          original_amount?: number | null
           outstanding_balance?: never
         }
         Relationships: []
       }
     }
     Functions: {
+      _build_payment_details: { Args: { p_payment_id: string }; Returns: Json }
       _cb_as_anon: { Args: never; Returns: undefined }
       _cb_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _cb_as_super: { Args: never; Returns: undefined }
       _cb_record: {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
+      }
+      _charge_collection_status: {
+        Args: { p_charge_id: string }
+        Returns: string
+      }
+      _insert_payment_allocations: {
+        Args: { p_allocations: Json; p_batch_id?: string; p_payment_id: string }
+        Returns: Json
       }
       _loc_as_anon: { Args: never; Returns: undefined }
       _loc_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
@@ -2320,9 +2451,21 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _payment_allocation_status: {
+        Args: { p_payment_id: string }
+        Returns: string
+      }
       _replace_enrollment_payment_schedule: {
         Args: { p_items: Json; p_mode: string; p_terms_id: string }
         Returns: undefined
+      }
+      _resolve_payer_name_snapshot: {
+        Args: {
+          p_guardian_id: string
+          p_override: string
+          p_student_id: string
+        }
+        Returns: string
       }
       _sec_as_anon: { Args: never; Returns: undefined }
       _sec_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
@@ -2334,6 +2477,14 @@ export type Database = {
       activate_enrollment_financial_terms: {
         Args: { p_terms_id: string }
         Returns: undefined
+      }
+      allocate_payment: {
+        Args: {
+          p_allocations: Json
+          p_operation_key?: string
+          p_payment_id: string
+        }
+        Returns: Json
       }
       apply_enrollment_tuition_correction: {
         Args: {
@@ -2347,6 +2498,14 @@ export type Database = {
       capital_asset_period_month: {
         Args: { p_period_number: number; p_placed_in_service: string }
         Returns: string
+      }
+      charge_allocated_amount: {
+        Args: { p_charge_id: string }
+        Returns: number
+      }
+      charge_effective_obligation: {
+        Args: { p_charge_id: string }
+        Returns: number
       }
       create_capital_asset: {
         Args: {
@@ -2407,6 +2566,11 @@ export type Database = {
         Args: { p_enrollment_id: string }
         Returns: Json
       }
+      get_enrollment_outstanding_charges: {
+        Args: { p_enrollment_id: string }
+        Returns: Json
+      }
+      get_payment_details: { Args: { p_payment_id: string }; Returns: Json }
       has_permission: { Args: { p_code: string }; Returns: boolean }
       installment_schedule_amount: {
         Args: {
@@ -2417,9 +2581,28 @@ export type Database = {
         Returns: number
       }
       is_active_app_user: { Args: never; Returns: boolean }
+      payment_allocated_amount: {
+        Args: { p_payment_id: string }
+        Returns: number
+      }
       post_depreciation_through: {
         Args: { p_capital_asset_id: string; p_through_month: string }
         Returns: number
+      }
+      record_payment: {
+        Args: {
+          p_allocations?: Json
+          p_amount: number
+          p_guardian_id: string
+          p_idempotency_key?: string
+          p_method_code?: string
+          p_notes?: string
+          p_paid_at?: string
+          p_payer_name_snapshot?: string
+          p_reference_number?: string
+          p_student_id?: string
+        }
+        Returns: Json
       }
       resolve_capital_cost_group_id: {
         Args: { p_organization_id: string }
@@ -2432,6 +2615,14 @@ export type Database = {
       retire_capital_asset: {
         Args: { p_capital_asset_id: string; p_retired_at?: string }
         Returns: undefined
+      }
+      reverse_payment: {
+        Args: { p_notes?: string; p_payment_id: string }
+        Returns: Json
+      }
+      reverse_payment_allocation: {
+        Args: { p_allocation_id: string; p_notes?: string }
+        Returns: Json
       }
       seed_organization_cost_categories: {
         Args: { p_organization_id: string }
@@ -2473,6 +2664,14 @@ export type Database = {
           p_useful_life_months: number
         }
         Returns: number
+      }
+      suggest_payment_allocation: {
+        Args: {
+          p_enrollment_id?: string
+          p_payment_id: string
+          p_student_id?: string
+        }
+        Returns: Json
       }
       transfer_enrollment: {
         Args: {

@@ -719,6 +719,41 @@
     "amount": "Số tiền khấu hao",
     "straight_line": "Đường thẳng"
   },
+  "payment": {
+    "title": "Thanh toán",
+    "cash": "Tiền mặt đã nhận",
+    "paymentDate": "Ngày thanh toán",
+    "reference": "Số tham chiếu",
+    "amountReceived": "Số tiền nhận",
+    "allocated": "Đã phân bổ",
+    "unallocated": "Chưa phân bổ",
+    "outstanding": "Còn nợ",
+    "reversePayment": "Hoàn tác thanh toán",
+    "recordPayment": "Ghi nhận thanh toán",
+    "allocatePayment": "Phân bổ thanh toán",
+    "notes": "Ghi chú",
+    "payer": "Người nộp tiền"
+  },
+  "paymentMethod": {
+    "cash": "Tiền mặt",
+    "bank_transfer": "Chuyển khoản",
+    "card": "Thẻ",
+    "other": "Khác"
+  },
+  "paymentAllocation": {
+    "title": "Phân bổ thanh toán",
+    "unallocated": "Chưa phân bổ",
+    "partially_allocated": "Phân bổ một phần",
+    "fully_allocated": "Đã phân bổ đủ",
+    "reverseAllocation": "Hoàn tác phân bổ"
+  },
+  "collectionStatus": {
+    "unpaid": "Chưa thanh toán",
+    "partially_paid": "Thanh toán một phần",
+    "paid": "Đã thanh toán",
+    "overdue": "Quá hạn",
+    "void": "Đã hủy"
+  },
   "expenseCategory": {
     "rent": "Thuê mặt bằng",
     "electricity": "Điện",

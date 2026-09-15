@@ -719,6 +719,41 @@
     "amount": "Depreciation amount",
     "straight_line": "Straight-line"
   },
+  "payment": {
+    "title": "Payment",
+    "cash": "Cash received",
+    "paymentDate": "Payment date",
+    "reference": "Reference",
+    "amountReceived": "Amount received",
+    "allocated": "Allocated",
+    "unallocated": "Unallocated",
+    "outstanding": "Outstanding",
+    "reversePayment": "Reverse payment",
+    "recordPayment": "Record payment",
+    "allocatePayment": "Allocate payment",
+    "notes": "Notes",
+    "payer": "Payer"
+  },
+  "paymentMethod": {
+    "cash": "Cash",
+    "bank_transfer": "Bank transfer",
+    "card": "Card",
+    "other": "Other"
+  },
+  "paymentAllocation": {
+    "title": "Payment allocation",
+    "unallocated": "Unallocated",
+    "partially_allocated": "Partially allocated",
+    "fully_allocated": "Fully allocated",
+    "reverseAllocation": "Reverse allocation"
+  },
+  "collectionStatus": {
+    "unpaid": "Unpaid",
+    "partially_paid": "Partially paid",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "void": "Void"
+  },
   "expenseCategory": {
     "rent": "Rent",
     "electricity": "Electricity",
