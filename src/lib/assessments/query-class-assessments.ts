@@ -89,12 +89,24 @@ export async function fetchClassAssessments(
     .select("id, start_date, end_date, status")
     .eq("class_id", classId);
 
+  const assessmentIds = assessments.map((row) => row.id);
+  const scoredCountByAssessment = new Map<string, number>();
+  if (assessmentIds.length > 0) {
+    const { data: resultRows } = await supabase
+      .from("assessment_result")
+      .select("assessment_id")
+      .in("assessment_id", assessmentIds);
+    for (const result of resultRows ?? []) {
+      scoredCountByAssessment.set(
+        result.assessment_id,
+        (scoredCountByAssessment.get(result.assessment_id) ?? 0) + 1,
+      );
+    }
+  }
+
   const items: AssessmentListItem[] = [];
   for (const row of assessments) {
-    const { count: scoredCount } = await supabase
-      .from("assessment_result")
-      .select("id", { count: "exact", head: true })
-      .eq("assessment_id", row.id);
+    const scoredCount = scoredCountByAssessment.get(row.id) ?? 0;
 
     const eligibleCount = (enrollments ?? []).filter((enr) => {
       if (enr.start_date > row.assessed_on) return false;
@@ -110,7 +122,7 @@ export async function fetchClassAssessments(
       maxScore: Number(row.max_score),
       status: row.status as AssessmentStatus,
       assessmentTypeCode: row.assessment_type_code as AssessmentTypeCode,
-      scoredCount: scoredCount ?? 0,
+      scoredCount,
       eligibleCount,
     });
   }

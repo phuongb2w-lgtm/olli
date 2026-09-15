@@ -117,12 +117,6 @@ function canCreateAssessmentForClass(classStatus) {
   return classStatus !== "closed";
 }
 
-function countResultProgress(rows) {
-  const total = rows.length;
-  const scored = rows.filter((r) => r.resultId !== null).length;
-  return { total, scored, notScored: total - scored };
-}
-
 async function deriveAssessmentResults(admin, assessment) {
   const [{ data: enrollments }, { data: resultRows }] = await Promise.all([
     admin

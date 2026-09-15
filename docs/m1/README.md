@@ -1,16 +1,16 @@
-# M1 — Student & Guardian Operations
+# M1 — Academic Operations
 
 **Milestone:** M1  
-**Baseline:** M0 closed at `d356e1d`  
-**Task:** M1-T01 — design and readiness (no CRUD implementation)
+**Status:** **CLOSED** (M1-T11 acceptance at `8ed07f0` baseline)  
+**Baseline:** M0 closed at `d356e1d`
 
 ---
 
 ## Purpose
 
-M1 establishes the operational master record for people served by a language center: **Student**, **Guardian**, and the **StudentGuardian** relationship. This folder locks product and data contracts before production CRUD work begins.
+M1 establishes end-to-end academic operations for a language center: people (Student, Guardian), structure (Course, Class), participation (Enrollment), delivery (TeachingSession), evidence (Attendance, Observation, Assessment), and reporting (live read models).
 
-M1 is **not** admissions CRM, LMS, enrollment workflow, or guardian portal access.
+M1 is **not** finance, parent portal, PDF export, or admissions CRM.
 
 ---
 
@@ -18,64 +18,53 @@ M1 is **not** admissions CRM, LMS, enrollment workflow, or guardian portal acces
 
 | # | Document | Contents |
 |---|----------|----------|
-| 01 | [Student & Guardian Product Contract](./01-student-guardian-product-contract.md) | Scope, boundaries, bilingual terms, accessibility/responsive standards |
-| 02 | [Existing Schema Audit](./02-existing-schema-audit.md) | Physical model vs M0 logical model vs generated types; drift report |
-| 03 | [Student Field Contract](./03-student-field-contract.md) | Field classification, name model, student code, lifecycle, DOB |
-| 04 | [Guardian & Relationship Contract](./04-guardian-relationship-contract.md) | Guardian fields, relationship types, primary/billing contact, duplicate/phone/email policy |
-| 05 | [Student List & Search Contract](./05-student-list-search-contract.md) | List columns, search, filters, sort, pagination |
-| 06 | [Student & Guardian Workflows](./06-student-guardian-workflows.md) | Create/edit flows, validation, errors, audit, Server Action architecture |
-| 07 | [M1 Data Gap Analysis](./07-m1-data-gap-analysis.md) | Data-gap matrix, schema change recommendations, M1-T02+ task breakdown |
-| 08 | [M1-T02 Implementation](./08-m1-t02-implementation.md) | Student list read model, permissions, URL contract, tests |
-| 09 | [M1-T03 Implementation](./09-m1-t03-implementation.md) | Student create/edit, code uniqueness, validation, duplicates, lifecycle |
-| 10 | [M1-T04 Implementation](./10-m1-t04-implementation.md) | Guardian create/edit, linking, primary/billing contact, audit |
-| 11 | [M1-T05 Implementation](./11-m1-t05-implementation.md) | Course/Class CRUD, lifecycle, list/search, permissions, boundaries |
-| 12 | [M1-T06 Implementation](./12-m1-t06-implementation.md) | Enrollment, roster, transfer/withdraw/complete, capacity, history |
-| 13 | [M1-T07 Implementation](./13-m1-t07-implementation.md) | Teaching schedule, room master, session generation, teacher assignment |
-| 14 | [M1-T08 Implementation](./14-m1-t08-implementation.md) | Session execution, attendance, learner observations |
-| 15 | [M1-T09 Implementation](./15-m1-t09-implementation.md) | Assessments, test scores, academic progress, observation read hardening |
-| 16 | [M1-T10 Implementation](./16-m1-t10-implementation.md) | Academic reporting read models, bilingual print-ready UI, permission-safe reports |
+| 01 | [Student & Guardian Product Contract](./01-student-guardian-product-contract.md) | Scope, boundaries, bilingual terms |
+| 02 | [Existing Schema Audit](./02-existing-schema-audit.md) | Physical model vs M0 |
+| 03 | [Student Field Contract](./03-student-field-contract.md) | Field classification, lifecycle |
+| 04 | [Guardian & Relationship Contract](./04-guardian-relationship-contract.md) | Guardian fields, primary/billing |
+| 05 | [Student List & Search Contract](./05-student-list-search-contract.md) | List, search, pagination |
+| 06 | [Student & Guardian Workflows](./06-student-guardian-workflows.md) | Create/edit flows |
+| 07 | [M1 Data Gap Analysis](./07-m1-data-gap-analysis.md) | Gap matrix, task breakdown |
+| 08 | [M1-T02 Implementation](./08-m1-t02-implementation.md) | Student list |
+| 09 | [M1-T03 Implementation](./09-m1-t03-implementation.md) | Student CRUD |
+| 10 | [M1-T04 Implementation](./10-m1-t04-implementation.md) | Guardian relationships |
+| 11 | [M1-T05 Implementation](./11-m1-t05-implementation.md) | Course/Class |
+| 12 | [M1-T06 Implementation](./12-m1-t06-implementation.md) | Enrollment, transfer |
+| 13 | [M1-T07 Implementation](./13-m1-t07-implementation.md) | Teaching operations |
+| 14 | [M1-T08 Implementation](./14-m1-t08-implementation.md) | Attendance, observations |
+| 15 | [M1-T09 Implementation](./15-m1-t09-implementation.md) | Assessments, progress |
+| 16 | [M1-T10 Implementation](./16-m1-t10-implementation.md) | Academic reporting |
+| 17 | [M1 Acceptance Closeout](./17-m1-acceptance-closeout.md) | **Final acceptance, architecture audit, M1 CLOSED** |
+
+---
+
+## Task status (T01–T11)
+
+| Task | Description | Status |
+|------|-------------|--------|
+| T01 | Design & readiness | CLOSED |
+| T02 | Student list | CLOSED |
+| T03 | Student CRUD | CLOSED |
+| T04 | Guardian relationships | CLOSED |
+| T05 | Course/Class | CLOSED |
+| T06 | Enrollment/roster/transfer | CLOSED |
+| T07 | Teaching operations | CLOSED |
+| T08 | Session execution | CLOSED |
+| T09 | Assessments | CLOSED |
+| T10 | Academic reporting | CLOSED |
+| T11 | Acceptance & closeout | CLOSED |
 
 ---
 
 ## M0 References
 
-Do not duplicate M0 foundation docs. Canonical sources:
-
-- [M0 canonical domain model](../m0/07-canonical-domain-model.md) — Student, Guardian, StudentGuardian entities
-- [M0 physical data model](../m0/13-physical-data-model.md) — table inventory, naming
-- [M0 permission model](../m0/19-permission-model.md) — 34 permission codes
-- [M0 RLS policy matrix](../m0/20-rls-policy-matrix.md) — access control posture
-- [M0 status code registry](../m0/31-status-code-registry.md) — machine statuses (M1 clarifies Student lifecycle semantics)
-- [M0 auth application flow](../m0/24-auth-application-flow.md) — identity and org resolution
+- [M0 canonical domain model](../m0/07-canonical-domain-model.md)
+- [M0 physical data model](../m0/13-physical-data-model.md)
+- [M0 permission model](../m0/19-permission-model.md)
+- [M0 RLS policy matrix](../m0/20-rls-policy-matrix.md)
 
 ---
 
-## M1-T01 Completion Gates
+## Next step
 
-- [x] M0 baseline remains 80/80 PASS
-- [x] Actual Student schema audited
-- [x] Actual Guardian schema audited
-- [x] StudentGuardian schema audited
-- [x] Required vs optional Student fields defined
-- [x] Required vs optional Guardian fields defined
-- [x] Lifecycle semantics defined
-- [x] Guardian reuse semantics defined
-- [x] Relationship type strategy defined
-- [x] Primary-contact strategy decided
-- [x] Duplicate strategy defined
-- [x] List columns defined
-- [x] Search contract defined
-- [x] Filters/sort/pagination defined
-- [x] Create/edit workflows defined
-- [x] Authorization mapped to existing permissions
-- [x] Bilingual terminology defined
-- [x] Data-gap matrix complete
-- [x] No unreviewed schema migration created
-- [x] No Student CRUD implemented
-- [x] Next M1 tasks proposed
-
----
-
-## Recommended Next Step
-
-**Stop for product/data review** before M1-T02. See [07-m1-data-gap-analysis.md](./07-m1-data-gap-analysis.md) for proposed task breakdown and required schema decisions.
+**M2 Finance/Cost Foundation** — see [17-m1-acceptance-closeout.md](./17-m1-acceptance-closeout.md) §16 for deferred scope. Do not begin M2 until explicitly requested.

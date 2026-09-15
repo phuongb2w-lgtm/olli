@@ -37,14 +37,21 @@ test.describe("M1-T07 teaching operations", () => {
 
   test("schedule section shows localized weekday labels when slots exist", async ({ page }) => {
     await signIn(page, adminEmail);
-    await page.goto("/classes");
-    await page.getByRole("link", { name: /teaching|giảng dạy/i }).first().click();
-    const weekdayPattern = /monday|tuesday|thứ/i;
-    const hasSchedule = await page.getByText(weekdayPattern).count();
+    for (const className of ["Class A1", "Renamed Seed Class"]) {
+      await page.goto(`/classes?q=${encodeURIComponent(className)}`);
+      const row = page.getByRole("row").filter({ hasText: className });
+      if ((await row.count()) === 0) continue;
+      await row.getByRole("link", { name: /teaching|giảng dạy/i }).click();
+      break;
+    }
+    await expect(page.getByRole("heading", { name: /recurring schedule|lịch học định kỳ/i })).toBeVisible();
+    const weekdayPattern = /monday|tuesday|wednesday|thursday|friday|saturday|sunday|thứ/i;
+    const scheduleList = page.getByRole("heading", { name: /recurring schedule|lịch học định kỳ/i }).locator("..").locator("..");
+    const hasSchedule = await scheduleList.getByText(weekdayPattern).count();
     if (hasSchedule > 0) {
-      await expect(page.getByText(weekdayPattern).first()).toBeVisible();
+      await expect(scheduleList.getByText(weekdayPattern).first()).toBeVisible();
     } else {
-      await expect(page.getByText(/no recurring schedule|chưa có lịch học định kỳ/i)).toBeVisible();
+      await expect(page.getByText(/no recurring schedule yet|chưa có lịch học định kỳ/i)).toBeVisible();
     }
   });
 });

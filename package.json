@@ -27,6 +27,7 @@
     "test:session-execution": "node scripts/session-execution-smoke.mjs",
     "test:assessments": "node scripts/assessment-smoke.mjs",
     "test:reporting": "node scripts/reports-smoke.mjs",
+    "test:m1-acceptance": "node scripts/m1-acceptance-scenario.mjs",
     "test:app": "playwright test",
     "test:app:install": "playwright install chromium",
     "test:locale": "powershell -ExecutionPolicy Bypass -Command \"Get-Content supabase/tests/m0_locale_tests.sql -Raw | docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1\"",
@@ -35,7 +36,7 @@
     "test:types:stale": "node scripts/check-generated-types.mjs",
     "db:inventory": "node scripts/generate-security-inventory.mjs",
     "test:foundation": "npm run db:verify && npm run test:api && npm run test:app",
-    "verify": "npm run db:verify && npm run test:i18n && npm run test:env && npm run lint && npm run typecheck && npm run build && npm run test:api && npm run test:students && npm run test:guardians && npm run test:academic && npm run test:enrollments && npm run test:teaching && npm run test:session-execution && npm run test:assessments && npm run test:reporting && npm run test:app"
+    "verify": "npm run db:verify && npm run test:i18n && npm run test:env && npm run lint && npm run typecheck && npm run build && npm run test:api && npm run test:students && npm run test:guardians && npm run test:academic && npm run test:enrollments && npm run test:teaching && npm run test:session-execution && npm run test:assessments && npm run test:reporting && npm run test:m1-acceptance && npm run test:app"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

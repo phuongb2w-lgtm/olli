@@ -159,14 +159,36 @@ export async function buildStudentProgressReport(
         .sort((a, b) => b.sessionDate.localeCompare(a.sessionDate));
     }
   } else {
+    const overlappingEnrollments = enrollments.filter((enr) =>
+      enrollmentOverlapsPeriod(enr.startDate, enr.endDate, period),
+    );
+    const classIds = [...new Set(overlappingEnrollments.map((enr) => enr.classId))];
+    const assessmentsByClass = new Map<
+      string,
+      Awaited<ReturnType<typeof fetchAssessmentsInPeriod>>
+    >();
+    const resultsByClass = new Map<
+      string,
+      Awaited<ReturnType<typeof fetchAssessmentResults>>
+    >();
+    await Promise.all(
+      classIds.map(async (classId) => {
+        const rows = await fetchAssessmentsInPeriod(supabase, classId, period);
+        assessmentsByClass.set(classId, rows);
+        resultsByClass.set(
+          classId,
+          await fetchAssessmentResults(
+            supabase,
+            rows.map((a) => a.id),
+          ),
+        );
+      }),
+    );
+
     const allAssessments: StudentProgressReport["assessments"] = [];
-    for (const enr of enrollments) {
-      if (!enrollmentOverlapsPeriod(enr.startDate, enr.endDate, period)) continue;
-      const rows = await fetchAssessmentsInPeriod(supabase, enr.classId, period);
-      const results = await fetchAssessmentResults(
-        supabase,
-        rows.map((a) => a.id),
-      );
+    for (const enr of overlappingEnrollments) {
+      const rows = assessmentsByClass.get(enr.classId) ?? [];
+      const results = resultsByClass.get(enr.classId) ?? [];
       const resultByAssessment = new Map(
         results.filter((r) => r.enrollmentId === enr.id).map((r) => [r.assessmentId, r]),
       );

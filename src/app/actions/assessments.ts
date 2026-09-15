@@ -273,7 +273,7 @@ export async function recordScoreAction(
   }
 
   revalidateAssessment(classId, assessmentId);
-  revalidatePath(`/students/${enrollmentCheck.enrollment.student_id}/progress`);
+  revalidatePath(`/students/${enrollmentCheck.enrollment.student_id}/reports/progress`);
   redirect(`/classes/${classId}/assessments/${assessmentId}?success=results_updated`);
 }
 

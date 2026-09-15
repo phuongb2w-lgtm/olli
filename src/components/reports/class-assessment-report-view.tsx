@@ -94,7 +94,7 @@ export function ClassAssessmentReportView({ report, locale, labels }: Props) {
                           {cell.hasScore ? (
                             <>
                               <span className="block">
-                                {formatReportScore(cell.rawScore, cell.maxScore, locale)}
+                                {formatReportScore(cell.rawScore, cell.maxScore)}
                               </span>
                               <span className="text-xs text-slate-500">
                                 {formatReportPercentage(cell.percentage, locale)}

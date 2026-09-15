@@ -129,7 +129,7 @@ export function StudentProgressReportView({
                     <td className="px-3 py-2">{formatReportDate(a.assessedOn, locale)}</td>
                     <td className="px-3 py-2">
                       {a.rawScore !== null
-                        ? formatReportScore(a.rawScore, a.maxScore, locale)
+                        ? formatReportScore(a.rawScore, a.maxScore)
                         : labels.noScoreRecorded}
                     </td>
                     <td className="px-3 py-2">

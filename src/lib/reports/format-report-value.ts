@@ -10,11 +10,7 @@ export function formatReportDate(value: string, locale: Locale): string {
   return formatDate(value, locale);
 }
 
-export function formatReportScore(
-  rawScore: number | null,
-  maxScore: number | null,
-  locale: Locale,
-): string {
+export function formatReportScore(rawScore: number | null, maxScore: number | null): string {
   if (rawScore === null || maxScore === null) return "—";
   return `${rawScore} / ${maxScore}`;
 }

@@ -25,7 +25,6 @@ const SERVICE_ROLE_KEY =
   process.env.SUPABASE_SECRET_KEY ?? statusEnv.SECRET_KEY;
 
 const ORG_A = "a0000000-0000-4000-8000-000000000001";
-const ORG_B = "b0000000-0000-4000-8000-000000000001";
 const APP_A_ADMIN = "a1000000-0000-4000-8000-000000000001";
 
 const ATTENDANCE_OPPORTUNITY_STATUSES = new Set(["completed", "in_progress"]);
@@ -1221,12 +1220,6 @@ async function main() {
   const { count: chargeCountBefore } = await admin
     .from("charge")
     .select("id", { count: "exact", head: true });
-  const { count: attendanceCountBefore } = await admin
-    .from("attendance")
-    .select("id", { count: "exact", head: true });
-  const { count: assessmentResultCountBefore } = await admin
-    .from("assessment_result")
-    .select("id", { count: "exact", head: true });
   const { count: enrollmentCountBefore } = await admin
     .from("enrollment")
     .select("id", { count: "exact", head: true });
@@ -1614,13 +1607,6 @@ async function main() {
     endDate: period.endDate,
     includeObservations: false,
   });
-  const eocReportWithObs = await buildClassEndOfCourseReport(admin, {
-    classId: asmtFixture.classRow.id,
-    startDate: period.startDate,
-    endDate: period.endDate,
-    includeObservations: true,
-  });
-
   record(
     19,
     "end-of-course combines attendance and assessment aggregates",
