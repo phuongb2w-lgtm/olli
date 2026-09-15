@@ -32,7 +32,7 @@ test.describe("M1-T02 student list", () => {
 
   test("1. student.read can access student list", async ({ page }) => {
     await signIn(page, adminEmail);
-    await page.goto("/students");
+    await page.goto("/students?q=HV001");
     await expect(page.getByRole("table").getByText("HV001")).toBeVisible();
   });
 
@@ -47,7 +47,7 @@ test.describe("M1-T02 student list", () => {
 
   test("3. student.read without guardian.read hides primary contact data", async ({ page }) => {
     await signIn(page, readerEmail);
-    await page.goto("/students");
+    await page.goto("/students?q=HV001");
     const table = page.getByRole("table");
     await expect(table.getByText("HV001")).toBeVisible();
     await expect(table.getByText("0912345678")).toHaveCount(0);
@@ -56,7 +56,7 @@ test.describe("M1-T02 student list", () => {
 
   test("5. with guardian.read primary contact is visible", async ({ page }) => {
     await signIn(page, adminEmail);
-    await page.goto("/students");
+    await page.goto("/students?q=HV001");
     await expect(page.getByRole("table").getByText("0912345678")).toBeVisible();
   });
 

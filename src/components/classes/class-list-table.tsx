@@ -5,10 +5,12 @@ import type { ClassListItem } from "@/lib/academic/query-class-list";
 type Props = {
   items: ClassListItem[];
   canUpdate: boolean;
+  canViewRoster: boolean;
 };
 
-export async function ClassListTable({ items, canUpdate }: Props) {
+export async function ClassListTable({ items, canUpdate, canViewRoster }: Props) {
   const t = await getTranslations("classes");
+  const tEnroll = await getTranslations("enrollments");
   const tStatus = await getTranslations("status.class");
   const placeholder = t("emptyValue");
 
@@ -32,7 +34,7 @@ export async function ClassListTable({ items, canUpdate }: Props) {
             <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
               {t("termEndColumn")}
             </th>
-            {canUpdate ? (
+            {canUpdate || canViewRoster ? (
               <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
                 <span className="sr-only">{t("actionsColumn")}</span>
               </th>
@@ -54,14 +56,26 @@ export async function ClassListTable({ items, canUpdate }: Props) {
               </td>
               <td className="px-4 py-3 text-slate-700">{item.termStartDate ?? placeholder}</td>
               <td className="px-4 py-3 text-slate-700">{item.termEndDate ?? placeholder}</td>
-              {canUpdate ? (
+              {canUpdate || canViewRoster ? (
                 <td className="px-4 py-3">
-                  <Link
-                    href={`/classes/${item.id}/edit`}
-                    className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
-                  >
-                    {t("editClass")}
-                  </Link>
+                  <div className="flex flex-col gap-1">
+                    {canViewRoster ? (
+                      <Link
+                        href={`/classes/${item.id}/roster`}
+                        className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                      >
+                        {tEnroll("classRoster")}
+                      </Link>
+                    ) : null}
+                    {canUpdate ? (
+                      <Link
+                        href={`/classes/${item.id}/edit`}
+                        className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                      >
+                        {t("editClass")}
+                      </Link>
+                    ) : null}
+                  </div>
                 </td>
               ) : null}
             </tr>

@@ -32,6 +32,7 @@ export default async function StudentsPage({ searchParams }: Props) {
   }
 
   const hasGuardianRead = await can("guardian.read");
+  const hasEnrollmentRead = await can("enrollment.read");
   const hasCreate = await can("student.create");
   const hasUpdate = await can("student.update");
   const successParam = rawParams.success;
@@ -103,12 +104,14 @@ export default async function StudentsPage({ searchParams }: Props) {
             showPrimaryContact={hasGuardianRead}
             canUpdate={hasUpdate}
             canViewGuardians={hasGuardianRead}
+            canViewEnrollments={hasEnrollmentRead}
           />
           <StudentListCards
             items={items}
             showPrimaryContact={hasGuardianRead}
             canUpdate={hasUpdate}
             canViewGuardians={hasGuardianRead}
+            canViewEnrollments={hasEnrollmentRead}
           />
           <StudentListPagination params={params} totalCount={totalCount} />
         </>

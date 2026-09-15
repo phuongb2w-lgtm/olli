@@ -636,6 +636,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "enrollment_created_by_fk"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
             foreignKeyName: "enrollment_organization_id_class_id_fkey"
             columns: ["organization_id", "class_id"]
             isOneToOne: false
@@ -647,6 +654,13 @@ export type Database = {
             columns: ["organization_id", "student_id"]
             isOneToOne: false
             referencedRelation: "student"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "enrollment_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
             referencedColumns: ["organization_id", "id"]
           },
         ]
@@ -1786,6 +1800,15 @@ export type Database = {
       set_own_preferred_locale: {
         Args: { p_locale: string }
         Returns: undefined
+      }
+      transfer_enrollment: {
+        Args: {
+          p_destination_class_id: string
+          p_destination_start_date: string
+          p_destination_status: string
+          p_source_enrollment_id: string
+        }
+        Returns: string
       }
     }
     Enums: {

@@ -7,6 +7,7 @@ type Props = {
   showPrimaryContact: boolean;
   canUpdate: boolean;
   canViewGuardians: boolean;
+  canViewEnrollments: boolean;
 };
 
 export async function StudentListTable({
@@ -14,9 +15,11 @@ export async function StudentListTable({
   showPrimaryContact,
   canUpdate,
   canViewGuardians,
+  canViewEnrollments,
 }: Props) {
   const t = await getTranslations("students");
   const tGuardians = await getTranslations("guardians");
+  const tEnroll = await getTranslations("enrollments");
   const tStatus = await getTranslations("status.student");
   const placeholder = t("emptyValue");
 
@@ -39,7 +42,7 @@ export async function StudentListTable({
             <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
               {t("statusColumn")}
             </th>
-            {canUpdate || canViewGuardians ? (
+            {canUpdate || canViewGuardians || canViewEnrollments ? (
               <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
                 <span className="sr-only">{t("actionsColumn")}</span>
               </th>
@@ -72,9 +75,17 @@ export async function StudentListTable({
                   {tStatus(item.status)}
                 </span>
               </td>
-              {canUpdate || canViewGuardians ? (
+              {canUpdate || canViewGuardians || canViewEnrollments ? (
                 <td className="px-4 py-3">
                   <div className="flex flex-col gap-1">
+                    {canViewEnrollments ? (
+                      <Link
+                        href={`/students/${item.id}/enrollments`}
+                        className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                      >
+                        {tEnroll("enrollmentHistory")}
+                      </Link>
+                    ) : null}
                     {canViewGuardians ? (
                       <Link
                         href={`/students/${item.id}/guardians`}

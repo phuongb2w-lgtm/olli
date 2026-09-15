@@ -5,10 +5,12 @@ import type { ClassListItem } from "@/lib/academic/query-class-list";
 type Props = {
   items: ClassListItem[];
   canUpdate: boolean;
+  canViewRoster: boolean;
 };
 
-export async function ClassListCards({ items, canUpdate }: Props) {
+export async function ClassListCards({ items, canUpdate, canViewRoster }: Props) {
   const t = await getTranslations("classes");
+  const tEnroll = await getTranslations("enrollments");
   const tStatus = await getTranslations("status.class");
   const placeholder = t("emptyValue");
 
@@ -41,14 +43,24 @@ export async function ClassListCards({ items, canUpdate }: Props) {
               <dd className="text-slate-800">{item.termEndDate ?? placeholder}</dd>
             </div>
           </dl>
-          {canUpdate ? (
-            <div className="mt-3">
-              <Link
-                href={`/classes/${item.id}/edit`}
-                className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
-              >
-                {t("editClass")}
-              </Link>
+          {canUpdate || canViewRoster ? (
+            <div className="mt-3 flex flex-wrap gap-3">
+              {canViewRoster ? (
+                <Link
+                  href={`/classes/${item.id}/roster`}
+                  className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                >
+                  {tEnroll("classRoster")}
+                </Link>
+              ) : null}
+              {canUpdate ? (
+                <Link
+                  href={`/classes/${item.id}/edit`}
+                  className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                >
+                  {t("editClass")}
+                </Link>
+              ) : null}
             </div>
           ) : null}
         </li>

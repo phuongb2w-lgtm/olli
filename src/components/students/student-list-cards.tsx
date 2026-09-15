@@ -7,6 +7,7 @@ type Props = {
   showPrimaryContact: boolean;
   canUpdate: boolean;
   canViewGuardians: boolean;
+  canViewEnrollments: boolean;
 };
 
 export async function StudentListCards({
@@ -14,9 +15,11 @@ export async function StudentListCards({
   showPrimaryContact,
   canUpdate,
   canViewGuardians,
+  canViewEnrollments,
 }: Props) {
   const t = await getTranslations("students");
   const tGuardians = await getTranslations("guardians");
+  const tEnroll = await getTranslations("enrollments");
   const tStatus = await getTranslations("status.student");
   const placeholder = t("emptyValue");
 
@@ -58,8 +61,16 @@ export async function StudentListCards({
               </div>
             ) : null}
           </dl>
-          {canUpdate || canViewGuardians ? (
+          {canUpdate || canViewGuardians || canViewEnrollments ? (
             <div className="mt-3 flex flex-wrap gap-3">
+              {canViewEnrollments ? (
+                <Link
+                  href={`/students/${item.id}/enrollments`}
+                  className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                >
+                  {tEnroll("enrollmentHistory")}
+                </Link>
+              ) : null}
               {canViewGuardians ? (
                 <Link
                   href={`/students/${item.id}/guardians`}
