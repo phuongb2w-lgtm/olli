@@ -1301,6 +1301,7 @@ export type Database = {
       student_guardian: {
         Row: {
           created_at: string
+          created_by: string | null
           guardian_id: string
           id: string
           is_billing_contact: boolean
@@ -1310,9 +1311,11 @@ export type Database = {
           status: string
           student_id: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           guardian_id: string
           id?: string
           is_billing_contact?: boolean
@@ -1322,9 +1325,11 @@ export type Database = {
           status?: string
           student_id: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           guardian_id?: string
           id?: string
           is_billing_contact?: boolean
@@ -1334,8 +1339,16 @@ export type Database = {
           status?: string
           student_id?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "student_guardian_created_by_fk"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
           {
             foreignKeyName: "student_guardian_organization_id_guardian_id_fkey"
             columns: ["organization_id", "guardian_id"]
@@ -1348,6 +1361,13 @@ export type Database = {
             columns: ["organization_id", "student_id"]
             isOneToOne: false
             referencedRelation: "student"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "student_guardian_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
             referencedColumns: ["organization_id", "id"]
           },
         ]

@@ -102,11 +102,13 @@ export default async function StudentsPage({ searchParams }: Props) {
             items={items}
             showPrimaryContact={hasGuardianRead}
             canUpdate={hasUpdate}
+            canViewGuardians={hasGuardianRead}
           />
           <StudentListCards
             items={items}
             showPrimaryContact={hasGuardianRead}
             canUpdate={hasUpdate}
+            canViewGuardians={hasGuardianRead}
           />
           <StudentListPagination params={params} totalCount={totalCount} />
         </>

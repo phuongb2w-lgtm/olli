@@ -6,10 +6,17 @@ type Props = {
   items: StudentListItem[];
   showPrimaryContact: boolean;
   canUpdate: boolean;
+  canViewGuardians: boolean;
 };
 
-export async function StudentListCards({ items, showPrimaryContact, canUpdate }: Props) {
+export async function StudentListCards({
+  items,
+  showPrimaryContact,
+  canUpdate,
+  canViewGuardians,
+}: Props) {
   const t = await getTranslations("students");
+  const tGuardians = await getTranslations("guardians");
   const tStatus = await getTranslations("status.student");
   const placeholder = t("emptyValue");
 
@@ -51,14 +58,24 @@ export async function StudentListCards({ items, showPrimaryContact, canUpdate }:
               </div>
             ) : null}
           </dl>
-          {canUpdate ? (
-            <div className="mt-3">
-              <Link
-                href={`/students/${item.id}/edit`}
-                className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
-              >
-                {t("editStudent")}
-              </Link>
+          {canUpdate || canViewGuardians ? (
+            <div className="mt-3 flex flex-wrap gap-3">
+              {canViewGuardians ? (
+                <Link
+                  href={`/students/${item.id}/guardians`}
+                  className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                >
+                  {tGuardians("manageGuardians")}
+                </Link>
+              ) : null}
+              {canUpdate ? (
+                <Link
+                  href={`/students/${item.id}/edit`}
+                  className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                >
+                  {t("editStudent")}
+                </Link>
+              ) : null}
             </div>
           ) : null}
         </li>
