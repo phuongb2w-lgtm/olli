@@ -374,27 +374,33 @@ DECLARE
 BEGIN
   INSERT INTO organization (id, name) VALUES (org, 'CostB');
   SELECT count(*) INTO slots FROM cost_group WHERE organization_id = org;
-  PERFORM _m0_record(19, 'org has only group slots 1 and 2', slots = 2);
+  PERFORM _m0_record(19, 'org has four canonical cost domains', slots = 4);
 END $$;
 
 SELECT _m0_expect_fail(
   20,
   'duplicate group slot rejected',
   $$
-    INSERT INTO cost_group (organization_id, group_slot)
-    SELECT id, 1 FROM organization LIMIT 1;
+    INSERT INTO cost_group (organization_id, group_slot, cost_domain_code, code)
+    SELECT id, 1, 'marketing_sales', 'dup_slot' FROM organization LIMIT 1;
   $$
 );
 
 DO $$
 DECLARE
   org uuid := gen_random_uuid();
-  s1 smallint; s2 smallint;
+  domains text[];
 BEGIN
-  INSERT INTO organization (id, name) VALUES (org, 'BothSlots');
-  SELECT group_slot INTO s1 FROM cost_group WHERE organization_id = org ORDER BY group_slot LIMIT 1;
-  SELECT group_slot INTO s2 FROM cost_group WHERE organization_id = org ORDER BY group_slot DESC LIMIT 1;
-  PERFORM _m0_record(21, 'initialized org has both slots', s1 = 1 AND s2 = 2);
+  INSERT INTO organization (id, name) VALUES (org, 'FourDomains');
+  SELECT array_agg(cost_domain_code ORDER BY cost_domain_code)
+    INTO domains
+  FROM cost_group
+  WHERE organization_id = org;
+  PERFORM _m0_record(
+    21,
+    'initialized org has four canonical domains',
+    domains = ARRAY['capital', 'marketing_sales', 'operating_overhead', 'personnel']::text[]
+  );
 END $$;
 
 SELECT _m0_expect_fail(
@@ -405,8 +411,8 @@ SELECT _m0_expect_fail(
     DECLARE org uuid := gen_random_uuid(); g1 uuid; g2 uuid; cat uuid;
     BEGIN
       INSERT INTO organization (id, name) VALUES (org, 'CatReparent');
-      SELECT id INTO g1 FROM cost_group WHERE organization_id = org AND group_slot = 1;
-      SELECT id INTO g2 FROM cost_group WHERE organization_id = org AND group_slot = 2;
+      SELECT id INTO g1 FROM cost_group WHERE organization_id = org AND cost_domain_code = 'operating_overhead';
+      SELECT id INTO g2 FROM cost_group WHERE organization_id = org AND cost_domain_code = 'personnel';
       INSERT INTO expense_category (organization_id, cost_group_id, display_name)
         VALUES (org, g1, 'Supplies') RETURNING id INTO cat;
       INSERT INTO expense (organization_id, expense_category_id, cost_group_id, amount, incurred_date)
@@ -424,8 +430,8 @@ SELECT _m0_expect_fail(
     DECLARE org uuid := gen_random_uuid(); g1 uuid; g2 uuid; cat uuid;
     BEGIN
       INSERT INTO organization (id, name) VALUES (org, 'ExpMismatch');
-      SELECT id INTO g1 FROM cost_group WHERE organization_id = org AND group_slot = 1;
-      SELECT id INTO g2 FROM cost_group WHERE organization_id = org AND group_slot = 2;
+      SELECT id INTO g1 FROM cost_group WHERE organization_id = org AND cost_domain_code = 'operating_overhead';
+      SELECT id INTO g2 FROM cost_group WHERE organization_id = org AND cost_domain_code = 'personnel';
       INSERT INTO expense_category (organization_id, cost_group_id, display_name)
         VALUES (org, g1, 'Supplies') RETURNING id INTO cat;
       INSERT INTO expense (organization_id, expense_category_id, cost_group_id, amount, incurred_date)

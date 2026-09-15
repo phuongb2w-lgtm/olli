@@ -162,9 +162,9 @@ BEGIN
   WHERE s.organization_id = v_org_b AND s.given_name = 'Student'
   LIMIT 1;
 
-  INSERT INTO expense_category (organization_id, cost_group_id, display_name)
-  SELECT v_org_a, cg.id, 'Dev Supplies' FROM cost_group cg
-  WHERE cg.organization_id = v_org_a AND cg.group_slot = 1;
+  INSERT INTO expense_category (organization_id, cost_group_id, code, display_name)
+  SELECT v_org_a, cg.id, 'dev_supplies', 'Dev Supplies' FROM cost_group cg
+  WHERE cg.organization_id = v_org_a AND cg.cost_domain_code = 'operating_overhead';
 
   INSERT INTO expense (organization_id, expense_category_id, cost_group_id, amount, incurred_date)
   SELECT v_org_a, ec.id, ec.cost_group_id, 50000, CURRENT_DATE

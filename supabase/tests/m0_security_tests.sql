@@ -416,11 +416,11 @@ BEGIN
   FROM expense_category ec
   JOIN cost_group cg ON cg.id = ec.cost_group_id
   WHERE ec.organization_id = 'a0000000-0000-4000-8000-000000000001'
-    AND cg.group_slot = 2
+    AND cg.cost_domain_code = 'personnel'
   LIMIT 1;
   BEGIN
     INSERT INTO expense (organization_id, expense_category_id, cost_group_id, amount, incurred_date)
-    VALUES ('a0000000-0000-4000-8000-000000000001', v_cat, (SELECT id FROM cost_group WHERE organization_id = 'a0000000-0000-4000-8000-000000000001' AND group_slot = 1), 1000, CURRENT_DATE);
+    VALUES ('a0000000-0000-4000-8000-000000000001', v_cat, (SELECT id FROM cost_group WHERE organization_id = 'a0000000-0000-4000-8000-000000000001' AND cost_domain_code = 'operating_overhead'), 1000, CURRENT_DATE);
     PERFORM _sec_record(29, 'expense group mismatch denied', false);
   EXCEPTION WHEN OTHERS THEN
     PERFORM _sec_record(29, 'expense group mismatch denied', true);

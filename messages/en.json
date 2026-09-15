@@ -653,5 +653,28 @@
   },
   "permissions": {
     "student.read": "Read students"
+  },
+  "costDomain": {
+    "capital": "Capital investment",
+    "operating_overhead": "Operating overhead",
+    "personnel": "Personnel",
+    "marketing_sales": "Marketing & sales"
+  },
+  "expenseCategory": {
+    "rent": "Rent",
+    "electricity": "Electricity",
+    "water": "Water",
+    "internet": "Internet",
+    "service_fees": "Service fees",
+    "other_operating_overhead": "Other operating overhead",
+    "teacher_compensation": "Teacher compensation",
+    "administrative_personnel": "Administrative personnel",
+    "other_personnel": "Other personnel",
+    "welfare_fund": "Welfare fund",
+    "advertising": "Advertising",
+    "marketing_campaigns": "Marketing campaigns",
+    "counselor_sales_salary": "Counselor / sales salary",
+    "sales_commission": "Sales commission",
+    "other_marketing_sales": "Other marketing & sales"
   }
 }

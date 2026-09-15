@@ -42,6 +42,9 @@ Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m0_charge_b
 Write-Host "==> M0-T06 locale persistence tests (6)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m0_locale_tests.sql")
 
+Write-Host "==> M2-T02 cost domain tests (12)..."
+Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m2_cost_domain_tests.sql")
+
 Write-Host "==> Generating TypeScript types..."
 New-Item -ItemType Directory -Force -Path (Join-Path $ProjectRoot "types") | Out-Null
 npx supabase gen types typescript --local | Set-Content -Path (Join-Path $ProjectRoot "types\database.generated.ts") -Encoding utf8
@@ -49,4 +52,4 @@ npx supabase gen types typescript --local | Set-Content -Path (Join-Path $Projec
 if ($LASTEXITCODE -ne 0) { throw "Verification failed" }
 
 Write-Host ""
-Write-Host "SUCCESS: Supabase verification complete (25/25 integrity + 30/30 security + 5/5 charge_balance + 6/6 locale)."
+Write-Host "SUCCESS: Supabase verification complete (25/25 integrity + 30/30 security + 5/5 charge_balance + 6/6 locale + 12/12 cost_domain)."

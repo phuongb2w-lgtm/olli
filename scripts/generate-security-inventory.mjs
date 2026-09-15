@@ -72,6 +72,8 @@ SELECT json_build_object(
           'protect_charge_amount',
           'set_updated_at',
           'initialize_organization_cost_groups',
+          'seed_organization_cost_categories',
+          'protect_cost_group_domain_code',
           'prevent_expense_category_reparent',
           'validate_expense_cost_group',
           'protect_completed_session_teacher',

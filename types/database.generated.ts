@@ -609,6 +609,7 @@ export type Database = {
       cost_group: {
         Row: {
           code: string | null
+          cost_domain_code: string
           created_at: string
           group_slot: number
           id: string
@@ -618,6 +619,7 @@ export type Database = {
         }
         Insert: {
           code?: string | null
+          cost_domain_code: string
           created_at?: string
           group_slot: number
           id?: string
@@ -627,6 +629,7 @@ export type Database = {
         }
         Update: {
           code?: string | null
+          cost_domain_code?: string
           created_at?: string
           group_slot?: number
           id?: string
@@ -2021,6 +2024,10 @@ export type Database = {
       }
       has_permission: { Args: { p_code: string }; Returns: boolean }
       is_active_app_user: { Args: never; Returns: boolean }
+      seed_organization_cost_categories: {
+        Args: { p_organization_id: string }
+        Returns: undefined
+      }
       set_own_preferred_locale: {
         Args: { p_locale: string }
         Returns: undefined

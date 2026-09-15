@@ -53,23 +53,37 @@ flowchart TD
 
 **Derived view (allowed):** `charge_balance` computes per-charge outstanding from source rows only.
 
-### 1.3 Cost architecture today (partial)
+### 1.3 Cost architecture (M2-T02)
 
 ```mermaid
 flowchart LR
-    ORG[Organization] -->|trigger creates| CG1[cost_group slot 1]
-    ORG --> CG2[cost_group slot 2]
-    CG1 --> EC1[expense_category]
-    CG2 --> EC2[expense_category]
+    ORG[Organization] -->|trigger creates| CGA[cost_group capital]
+    ORG --> CGB1[cost_group operating_overhead]
+    ORG --> CGB2[cost_group personnel]
+    ORG --> CGC[cost_group marketing_sales]
+    CGB1 --> EC1[expense_category]
+    CGB2 --> EC2[expense_category]
+    CGC --> EC3[expense_category]
     EC1 --> EX[expense]
     EC2 --> EX
-    CG1 -.->|snapshot at post| EX
-    CG2 -.->|snapshot at post| EX
+    EC3 --> EX
+    CGB1 -.->|snapshot at post| EX
+    CGB2 -.->|snapshot at post| EX
+    CGC -.->|snapshot at post| EX
     TCH[teacher optional] -.-> EX
     CLS[class optional] -.-> EX
 ```
 
-**Cost A (capital/setup)** and **Cost C (marketing/sales)** have **no physical representation**. Existing `cost_group` is locked to **exactly two slots** per organization (`group_slot IN (1, 2)`), intended for Cost B operating structure only.
+Each organization owns **four `cost_group` rows** identified by immutable `cost_domain_code`:
+
+| Code | Management domain |
+|------|-------------------|
+| `capital` | Cost A — capital/setup (taxonomy only until M2-T03) |
+| `operating_overhead` | Cost B1 |
+| `personnel` | Cost B2 |
+| `marketing_sales` | Cost C |
+
+`group_slot` (1–4) is display order only; **semantic identity is `cost_domain_code`**, not slot position. Baseline B1/B2/C categories are seeded per org via `seed_organization_cost_categories()`. Cost A has no expense categories yet (M2-T03).
 
 ### 1.4 Tenant & currency model
 
@@ -193,16 +207,17 @@ Physical definitions: `supabase/migrations/20260914140000_m0_foundation.sql` (+ 
 
 | Attribute | Detail |
 |-----------|--------|
-| **Purpose** | Cost B top-level structure — **two fixed slots per org** |
+| **Purpose** | Organization-owned management cost domain anchor |
 | **PK** | `id` |
 | **Tenant** | `organization_id` NOT NULL |
-| **Key fields** | `group_slot smallint` CHECK `(1, 2)`; `code text` nullable; `status` |
+| **Key fields** | `cost_domain_code text NOT NULL` — `capital`, `operating_overhead`, `personnel`, `marketing_sales`; `group_slot smallint` CHECK `(1–4)` (display order); `code text` nullable mirror; `status` |
+| **Constraints** | `UNIQUE (organization_id, cost_domain_code)`; `UNIQUE (organization_id, group_slot)`; `protect_cost_group_domain_code` trigger (immutable domain) |
 | **Metadata** | `created_at`, `updated_at` |
-| **Initialization** | `initialize_organization_cost_groups` trigger on org insert |
+| **Initialization** | `initialize_organization_cost_groups` → 4 domains + `seed_organization_cost_categories()` |
 | **RLS** | ENABLE + FORCE; **SELECT only** (`expense.read`) — no INSERT/UPDATE policies |
-| **App usage** | Seed + integrity tests |
+| **App usage** | Seed + integrity/M2 cost-domain tests |
 
-**Semantic mapping (contractual, not yet seeded):** slot 1 → B1 Overhead; slot 2 → B2 Personnel.
+**Migration backfill (M2-T02):** legacy slot 1 → `operating_overhead`, slot 2 → `personnel`; added `capital` (slot 3) and `marketing_sales` (slot 4) without replacing existing row IDs.
 
 ---
 
@@ -333,7 +348,9 @@ M2 **must build upon** these; do not replace or duplicate:
 
 ### 5.1 Cost A — Setup / long-lived investment
 
-**Missing entirely.**
+**Taxonomy present (M2-T02); asset/depreciation engine missing (M2-T03).**
+
+`cost_domain_code = capital` exists per organization with no baseline expense categories.
 
 Required future structures (contractual):
 
@@ -351,15 +368,15 @@ Required future structures (contractual):
 
 | Sub-area | Existing | Gap |
 |----------|----------|-----|
-| B1 Overhead | Slot 1 + categories + expenses | Seed slot codes/names; recurring expense templates; org-wide allocation basis |
-| B2 Personnel | Slot 2; `expense.teacher_id`; `teacher.user_id`; `user_role` multi-role | No `personnel_cost_rate` or monthly payroll template; welfare fund = category under slot 2 (to be defined); no `app_user` direct expense FK |
+| B1 Overhead | `operating_overhead` domain + baseline categories | Recurring expense templates; org-wide allocation basis |
+| B2 Personnel | `personnel` domain + baseline categories; `expense.teacher_id`; `teacher.user_id` | No personnel rate engine; no `app_user` direct expense FK |
 | Class attribution | `expense.class_id` optional | Allocation rules for shared overhead/personnel not defined |
 
 ### 5.3 Cost C — Marketing & sales
 
-**Not supported.** Two-slot `cost_group` constraint blocks clean separation.
+**Domain and baseline categories present (M2-T02).** Attribution and class-level allocation remain future work.
 
-**Recommended migration strategy (do not force into Cost B):**
+**Implemented in M2-T02 (supersedes pre-migration recommendation below):**
 
 ```mermaid
 flowchart TD
@@ -452,7 +469,7 @@ Order driven by **physical dependencies** and **accounting integrity** (configur
 
 | Phase | Task focus | Depends on |
 |-------|------------|------------|
-| **M2-T02** | Cost domain extension: Cost C separation (`cost_domain_code`), seed B1/B2 slot semantics, welfare/marketing category templates | M0 cost_group |
+| ~~**M2-T02**~~ | **DONE** — `cost_domain_code` on `cost_group`, four domains, baseline categories, snapshot preserved | M0 cost_group |
 | **M2-T03** | Cost A schema: `capital_asset`, `depreciation_entry`, quick/detailed modes | T02 (reporting boundaries) |
 | **M2-T04** | Enrollment finance terms + charge generation contract (`enrollment_id` required, tuition snapshots on charge) | M1 enrollment |
 | **M2-T05** | Payment & adjustment application layer (Server Actions, charge status sync, no new debt entities) | T04 |
@@ -759,4 +776,18 @@ Enrollment financial fields      ✗ None on enrollment table (correct — separ
 
 ---
 
-*Document produced by M2-T01 audit at commit `2526990`. Implementation tasks M2-T02+ must reference this contract as the single canonical finance specification.*
+---
+
+## Appendix C — M2-T02 Cost Domain Implementation (commit after `e0c99e5`)
+
+**Migration:** `20260914141500_m2_t02_cost_domain_extension.sql`
+
+**Historical integrity:** `expense.cost_group_id` continues to snapshot the `cost_group.id` at post time. Domain backfill assigns semantic codes to existing groups without changing row IDs. Reparent and group/category mismatch triggers unchanged.
+
+**Cost A handoff to M2-T03:** `capital` domain exists as an empty `cost_group` per org. Capital assets and depreciation entries will attach to this domain — not to ordinary `expense` rows.
+
+**i18n:** `costDomain.*` and `expenseCategory.*` keys in `messages/en.json` and `messages/vi.json`.
+
+---
+
+*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 cost taxonomy at `e0c99e5`.*

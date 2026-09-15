@@ -653,5 +653,28 @@
   },
   "permissions": {
     "student.read": "Đọc học viên"
+  },
+  "costDomain": {
+    "capital": "Đầu tư thiết lập",
+    "operating_overhead": "Chi phí vận hành",
+    "personnel": "Nhân sự",
+    "marketing_sales": "Marketing & kinh doanh"
+  },
+  "expenseCategory": {
+    "rent": "Thuê mặt bằng",
+    "electricity": "Điện",
+    "water": "Nước",
+    "internet": "Internet",
+    "service_fees": "Phí dịch vụ",
+    "other_operating_overhead": "Chi phí vận hành khác",
+    "teacher_compensation": "Lương giáo viên",
+    "administrative_personnel": "Nhân sự hành chính",
+    "other_personnel": "Nhân sự khác",
+    "welfare_fund": "Quỹ phúc lợi",
+    "advertising": "Quảng cáo",
+    "marketing_campaigns": "Chiến dịch marketing",
+    "counselor_sales_salary": "Lương tư vấn / kinh doanh",
+    "sales_commission": "Hoa hồng bán hàng",
+    "other_marketing_sales": "Marketing & kinh doanh khác"
   }
 }
