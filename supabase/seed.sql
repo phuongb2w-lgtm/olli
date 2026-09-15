@@ -117,6 +117,14 @@ BEGIN
   INSERT INTO class (organization_id, course_id, name)
   SELECT v_org_b, c.id, 'Class B1' FROM course c WHERE c.organization_id = v_org_b AND c.code = 'EB1';
 
+  INSERT INTO teacher (organization_id, given_name, family_name, status) VALUES
+    (v_org_a, 'Mai', 'Nguyễn', 'active'),
+    (v_org_b, 'John', 'Smith', 'active');
+
+  INSERT INTO room (organization_id, code, name, capacity, status) VALUES
+    (v_org_a, 'A101', 'Room A101', 20, 'active'),
+    (v_org_b, 'B101', 'Room B101', 15, 'active');
+
   INSERT INTO enrollment (organization_id, student_id, class_id, start_date, status)
   SELECT v_org_a, s.id, c.id, CURRENT_DATE, 'active'
   FROM student s

@@ -6,11 +6,13 @@ type Props = {
   items: ClassListItem[];
   canUpdate: boolean;
   canViewRoster: boolean;
+  canViewTeaching: boolean;
 };
 
-export async function ClassListCards({ items, canUpdate, canViewRoster }: Props) {
+export async function ClassListCards({ items, canUpdate, canViewRoster, canViewTeaching }: Props) {
   const t = await getTranslations("classes");
   const tEnroll = await getTranslations("enrollments");
+  const tTeach = await getTranslations("teaching");
   const tStatus = await getTranslations("status.class");
   const placeholder = t("emptyValue");
 
@@ -43,7 +45,7 @@ export async function ClassListCards({ items, canUpdate, canViewRoster }: Props)
               <dd className="text-slate-800">{item.termEndDate ?? placeholder}</dd>
             </div>
           </dl>
-          {canUpdate || canViewRoster ? (
+          {canUpdate || canViewRoster || canViewTeaching ? (
             <div className="mt-3 flex flex-wrap gap-3">
               {canViewRoster ? (
                 <Link
@@ -51,6 +53,14 @@ export async function ClassListCards({ items, canUpdate, canViewRoster }: Props)
                   className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
                 >
                   {tEnroll("classRoster")}
+                </Link>
+              ) : null}
+              {canViewTeaching ? (
+                <Link
+                  href={`/classes/${item.id}/teaching`}
+                  className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                >
+                  {tTeach("title")}
                 </Link>
               ) : null}
               {canUpdate ? (

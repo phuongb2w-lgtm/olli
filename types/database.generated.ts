@@ -392,51 +392,91 @@ export type Database = {
         Row: {
           class_id: string
           created_at: string
+          created_by: string | null
           effective_from: string
           effective_to: string | null
           end_time: string
           id: string
           location: string | null
           organization_id: string
+          room_id: string | null
           start_time: string
           status: string
+          teacher_id: string | null
           updated_at: string
+          updated_by: string | null
           weekday_code: string
         }
         Insert: {
           class_id: string
           created_at?: string
+          created_by?: string | null
           effective_from: string
           effective_to?: string | null
           end_time: string
           id?: string
           location?: string | null
           organization_id: string
+          room_id?: string | null
           start_time: string
           status?: string
+          teacher_id?: string | null
           updated_at?: string
+          updated_by?: string | null
           weekday_code: string
         }
         Update: {
           class_id?: string
           created_at?: string
+          created_by?: string | null
           effective_from?: string
           effective_to?: string | null
           end_time?: string
           id?: string
           location?: string | null
           organization_id?: string
+          room_id?: string | null
           start_time?: string
           status?: string
+          teacher_id?: string | null
           updated_at?: string
+          updated_by?: string | null
           weekday_code?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "class_schedule_created_by_fk"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
           {
             foreignKeyName: "class_schedule_organization_id_class_id_fkey"
             columns: ["organization_id", "class_id"]
             isOneToOne: false
             referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_schedule_room_fk"
+            columns: ["organization_id", "room_id"]
+            isOneToOne: false
+            referencedRelation: "room"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_schedule_teacher_fk"
+            columns: ["organization_id", "teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teacher"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_schedule_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
             referencedColumns: ["organization_id", "id"]
           },
         ]
@@ -445,6 +485,7 @@ export type Database = {
         Row: {
           class_id: string
           created_at: string
+          created_by: string | null
           effective_from: string
           effective_to: string | null
           id: string
@@ -453,10 +494,12 @@ export type Database = {
           status: string
           teacher_id: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           class_id: string
           created_at?: string
+          created_by?: string | null
           effective_from: string
           effective_to?: string | null
           id?: string
@@ -465,10 +508,12 @@ export type Database = {
           status?: string
           teacher_id: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           class_id?: string
           created_at?: string
+          created_by?: string | null
           effective_from?: string
           effective_to?: string | null
           id?: string
@@ -477,8 +522,16 @@ export type Database = {
           status?: string
           teacher_id?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "class_teacher_assignment_created_by_fk"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
           {
             foreignKeyName: "class_teacher_assignment_organization_id_class_id_fkey"
             columns: ["organization_id", "class_id"]
@@ -491,6 +544,13 @@ export type Database = {
             columns: ["organization_id", "teacher_id"]
             isOneToOne: false
             referencedRelation: "teacher"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_teacher_assignment_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
             referencedColumns: ["organization_id", "id"]
           },
         ]
@@ -1276,6 +1336,67 @@ export type Database = {
           },
         ]
       }
+      room: {
+        Row: {
+          capacity: number | null
+          code: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          organization_id: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          capacity?: number | null
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          capacity?: number | null
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_created_by_fk"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "room_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       student: {
         Row: {
           created_at: string
@@ -1568,7 +1689,9 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          occurrence_date: string | null
           organization_id: string
+          room_id: string | null
           scheduled_end_at: string
           scheduled_start_at: string
           status: string
@@ -1584,7 +1707,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          occurrence_date?: string | null
           organization_id: string
+          room_id?: string | null
           scheduled_end_at: string
           scheduled_start_at: string
           status?: string
@@ -1600,7 +1725,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          occurrence_date?: string | null
           organization_id?: string
+          room_id?: string | null
           scheduled_end_at?: string
           scheduled_start_at?: string
           status?: string
@@ -1617,6 +1744,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "teaching_session_created_by_fk"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
             foreignKeyName: "teaching_session_organization_id_class_id_fkey"
             columns: ["organization_id", "class_id"]
             isOneToOne: false
@@ -1628,6 +1762,20 @@ export type Database = {
             columns: ["organization_id", "teacher_id"]
             isOneToOne: false
             referencedRelation: "teacher"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "teaching_session_room_fk"
+            columns: ["organization_id", "room_id"]
+            isOneToOne: false
+            referencedRelation: "room"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "teaching_session_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
             referencedColumns: ["organization_id", "id"]
           },
         ]
@@ -1795,6 +1943,14 @@ export type Database = {
       }
       current_app_user_id: { Args: never; Returns: string }
       current_organization_id: { Args: never; Returns: string }
+      generate_teaching_sessions: {
+        Args: {
+          p_class_schedule_id: string
+          p_range_end: string
+          p_range_start: string
+        }
+        Returns: number
+      }
       has_permission: { Args: { p_code: string }; Returns: boolean }
       is_active_app_user: { Args: never; Returns: boolean }
       set_own_preferred_locale: {

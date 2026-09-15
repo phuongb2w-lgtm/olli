@@ -6,11 +6,13 @@ type Props = {
   items: ClassListItem[];
   canUpdate: boolean;
   canViewRoster: boolean;
+  canViewTeaching: boolean;
 };
 
-export async function ClassListTable({ items, canUpdate, canViewRoster }: Props) {
+export async function ClassListTable({ items, canUpdate, canViewRoster, canViewTeaching }: Props) {
   const t = await getTranslations("classes");
   const tEnroll = await getTranslations("enrollments");
+  const tTeach = await getTranslations("teaching");
   const tStatus = await getTranslations("status.class");
   const placeholder = t("emptyValue");
 
@@ -34,7 +36,7 @@ export async function ClassListTable({ items, canUpdate, canViewRoster }: Props)
             <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
               {t("termEndColumn")}
             </th>
-            {canUpdate || canViewRoster ? (
+            {canUpdate || canViewRoster || canViewTeaching ? (
               <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
                 <span className="sr-only">{t("actionsColumn")}</span>
               </th>
@@ -56,7 +58,7 @@ export async function ClassListTable({ items, canUpdate, canViewRoster }: Props)
               </td>
               <td className="px-4 py-3 text-slate-700">{item.termStartDate ?? placeholder}</td>
               <td className="px-4 py-3 text-slate-700">{item.termEndDate ?? placeholder}</td>
-              {canUpdate || canViewRoster ? (
+              {canUpdate || canViewRoster || canViewTeaching ? (
                 <td className="px-4 py-3">
                   <div className="flex flex-col gap-1">
                     {canViewRoster ? (
@@ -65,6 +67,14 @@ export async function ClassListTable({ items, canUpdate, canViewRoster }: Props)
                         className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
                       >
                         {tEnroll("classRoster")}
+                      </Link>
+                    ) : null}
+                    {canViewTeaching ? (
+                      <Link
+                        href={`/classes/${item.id}/teaching`}
+                        className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                      >
+                        {tTeach("title")}
                       </Link>
                     ) : null}
                     {canUpdate ? (
