@@ -282,6 +282,95 @@ export type Database = {
           },
         ]
       }
+      capital_asset: {
+        Row: {
+          category_code: string | null
+          cost_group_id: string
+          created_at: string
+          created_by: string | null
+          depreciation_method_code: string
+          id: string
+          is_quick_mode: boolean
+          name: string
+          notes: string | null
+          organization_id: string
+          original_cost: number
+          placed_in_service_date: string
+          retired_at: string | null
+          status: string
+          updated_at: string
+          updated_by: string | null
+          useful_life_months: number
+        }
+        Insert: {
+          category_code?: string | null
+          cost_group_id: string
+          created_at?: string
+          created_by?: string | null
+          depreciation_method_code?: string
+          id?: string
+          is_quick_mode?: boolean
+          name: string
+          notes?: string | null
+          organization_id: string
+          original_cost: number
+          placed_in_service_date: string
+          retired_at?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          useful_life_months: number
+        }
+        Update: {
+          category_code?: string | null
+          cost_group_id?: string
+          created_at?: string
+          created_by?: string | null
+          depreciation_method_code?: string
+          id?: string
+          is_quick_mode?: boolean
+          name?: string
+          notes?: string | null
+          organization_id?: string
+          original_cost?: number
+          placed_in_service_date?: string
+          retired_at?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          useful_life_months?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capital_asset_organization_id_cost_group_id_fkey"
+            columns: ["organization_id", "cost_group_id"]
+            isOneToOne: false
+            referencedRelation: "cost_group"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "capital_asset_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "capital_asset_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capital_asset_organization_id_updated_by_fkey"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       charge: {
         Row: {
           amount: number
@@ -704,6 +793,50 @@ export type Database = {
             columns: ["organization_id", "updated_by"]
             isOneToOne: false
             referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      depreciation_entry: {
+        Row: {
+          amount: number
+          capital_asset_id: string
+          created_at: string
+          id: string
+          organization_id: string
+          period_month: string
+          period_number: number
+          posted_at: string | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          capital_asset_id: string
+          created_at?: string
+          id?: string
+          organization_id: string
+          period_month: string
+          period_number: number
+          posted_at?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          capital_asset_id?: string
+          created_at?: string
+          id?: string
+          organization_id?: string
+          period_month?: string
+          period_number?: number
+          posted_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "depreciation_entry_organization_id_capital_asset_id_fkey"
+            columns: ["organization_id", "capital_asset_id"]
+            isOneToOne: false
+            referencedRelation: "capital_asset"
             referencedColumns: ["organization_id", "id"]
           },
         ]
@@ -2012,8 +2145,37 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      capital_asset_period_month: {
+        Args: { p_period_number: number; p_placed_in_service: string }
+        Returns: string
+      }
+      create_capital_asset: {
+        Args: {
+          p_category_code?: string
+          p_is_quick_mode?: boolean
+          p_name: string
+          p_notes?: string
+          p_original_cost: number
+          p_placed_in_service_date: string
+          p_useful_life_months: number
+        }
+        Returns: string
+      }
+      create_quick_capital_asset: {
+        Args: {
+          p_name?: string
+          p_placed_in_service_date: string
+          p_total_investment: number
+          p_useful_life_months: number
+        }
+        Returns: string
+      }
       current_app_user_id: { Args: never; Returns: string }
       current_organization_id: { Args: never; Returns: string }
+      generate_depreciation_schedule: {
+        Args: { p_capital_asset_id: string }
+        Returns: undefined
+      }
       generate_teaching_sessions: {
         Args: {
           p_class_schedule_id: string
@@ -2024,6 +2186,18 @@ export type Database = {
       }
       has_permission: { Args: { p_code: string }; Returns: boolean }
       is_active_app_user: { Args: never; Returns: boolean }
+      post_depreciation_through: {
+        Args: { p_capital_asset_id: string; p_through_month: string }
+        Returns: number
+      }
+      resolve_capital_cost_group_id: {
+        Args: { p_organization_id: string }
+        Returns: string
+      }
+      retire_capital_asset: {
+        Args: { p_capital_asset_id: string; p_retired_at?: string }
+        Returns: undefined
+      }
       seed_organization_cost_categories: {
         Args: { p_organization_id: string }
         Returns: undefined
@@ -2031,6 +2205,14 @@ export type Database = {
       set_own_preferred_locale: {
         Args: { p_locale: string }
         Returns: undefined
+      }
+      straight_line_depreciation_amount: {
+        Args: {
+          p_original_cost: number
+          p_period_number: number
+          p_useful_life_months: number
+        }
+        Returns: number
       }
       transfer_enrollment: {
         Args: {

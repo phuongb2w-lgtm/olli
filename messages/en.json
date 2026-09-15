@@ -660,6 +660,39 @@
     "personnel": "Personnel",
     "marketing_sales": "Marketing & sales"
   },
+  "capitalAsset": {
+    "title": "Capital assets",
+    "quickMode": "Quick setup investment",
+    "detailedMode": "Detailed asset",
+    "name": "Asset name",
+    "totalInvestment": "Total investment",
+    "originalCost": "Original cost",
+    "usefulLifeMonths": "Useful life (months)",
+    "placedInServiceDate": "Placed in service",
+    "notes": "Notes",
+    "retire": "Retire asset",
+    "postDepreciation": "Post depreciation"
+  },
+  "assetCategory": {
+    "fit_out": "Fit-out",
+    "signage": "Signage",
+    "furniture": "Furniture",
+    "equipment": "Equipment",
+    "technology": "Technology",
+    "other_capital": "Other capital"
+  },
+  "assetStatus": {
+    "active": "Active",
+    "retired": "Retired"
+  },
+  "depreciation": {
+    "scheduled": "Scheduled",
+    "posted": "Posted",
+    "void": "Void",
+    "periodMonth": "Period month",
+    "amount": "Depreciation amount",
+    "straight_line": "Straight-line"
+  },
   "expenseCategory": {
     "rent": "Rent",
     "electricity": "Electricity",

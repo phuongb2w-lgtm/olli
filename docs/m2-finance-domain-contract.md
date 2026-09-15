@@ -22,7 +22,8 @@ M0 established a **transaction-chain finance foundation** in PostgreSQL (Supabas
 | Permissions (`charge.*`, `payment.*`, `expense.*`) | **Present** (reference migration) |
 | Integrity & security tests | **Present** (M0 suites) |
 | Application UI / Server Actions | **Absent** (M1 explicitly out of scope) |
-| Revenue recognition / depreciation / class profit | **Absent** |
+| Revenue recognition / class profit | **Absent** |
+| Cost A capital assets + depreciation | **Present** (M2-T03) |
 
 There is **no duplicate finance domain** in application code. Seed data includes minimal charge/expense fixtures for security and integrity tests only.
 
@@ -78,12 +79,12 @@ Each organization owns **four `cost_group` rows** identified by immutable `cost_
 
 | Code | Management domain |
 |------|-------------------|
-| `capital` | Cost A — capital/setup (taxonomy only until M2-T03) |
+| `capital` | Cost A — capital assets + monthly depreciation (M2-T03) |
 | `operating_overhead` | Cost B1 |
 | `personnel` | Cost B2 |
 | `marketing_sales` | Cost C |
 
-`group_slot` (1–4) is display order only; **semantic identity is `cost_domain_code`**, not slot position. Baseline B1/B2/C categories are seeded per org via `seed_organization_cost_categories()`. Cost A has no expense categories yet (M2-T03).
+`group_slot` (1–4) is display order only; **semantic identity is `cost_domain_code`**, not slot position. Baseline B1/B2/C categories are seeded per org via `seed_organization_cost_categories()`. Cost A uses `capital_asset` + `depreciation_entry` (not `expense_category`). Asset category codes are on `capital_asset.category_code`.
 
 ### 1.4 Tenant & currency model
 
@@ -326,7 +327,7 @@ M2 **must build upon** these; do not replace or duplicate:
 
 | M2 Requirement | M0/M1 Support | Gap |
 |----------------|---------------|-----|
-| **Cost A — setup / depreciation** | None | Full domain missing |
+| **Cost A — setup / depreciation** | `capital_asset`, `depreciation_entry`, RPCs (M2-T03) | Class allocation of depreciation; cash-flow bridge for acquisition |
 | **Cost B1 — overhead** | `cost_group` slot 1 + expense | Labels, UI, allocation rules |
 | **Cost B2 — personnel + staff link** | Slot 2 + `expense.teacher_id` + `teacher.user_id` | Salary rates, welfare fund category, multi-role costing |
 | **Cost C — marketing/sales** | None (2-slot limit) | Domain separation migration required |
@@ -348,19 +349,17 @@ M2 **must build upon** these; do not replace or duplicate:
 
 ### 5.1 Cost A — Setup / long-lived investment
 
-**Taxonomy present (M2-T02); asset/depreciation engine missing (M2-T03).**
+**Implemented in M2-T03** (see Appendix D). Summary:
 
-`cost_domain_code = capital` exists per organization with no baseline expense categories.
+| Concept | Implementation |
+|---------|----------------|
+| Capital asset register | `capital_asset` — org-scoped; snapshots `cost_group_id` where `cost_domain_code = 'capital'` |
+| Quick mode | `create_quick_capital_asset()` → one aggregated asset (`is_quick_mode = true`) |
+| Detailed mode | `create_capital_asset()` per item; later additions are independent rows |
+| Monthly depreciation | `depreciation_entry` — straight-line schedule; **not** duplicated as `expense` rows |
+| Cash vs management cost | Acquisition stored on asset; P/L impact via posted depreciation only |
 
-Required future structures (contractual):
-
-| Concept | Proposed direction |
-|---------|-------------------|
-| Capital asset register | `capital_asset` (or `fixed_asset`): name, acquisition_date, amount, useful_life_months, category, notes, organization_id |
-| Quick mode | Parent record with total_investment + depreciation_period → system generates schedule |
-| Detailed mode | Line items as individual asset rows; later additions append without rewriting history |
-| Monthly depreciation | `depreciation_entry` append-only: asset_id, period_month, amount, status — **not** mixed into `expense` without explicit policy |
-| Room/equipment link | Optional FK to `room` or free-text asset reference; **room table is academic ops**, not a capital register |
+**Deferred:** room/equipment FK, disposal gain/loss, acquisition payment linkage, class depreciation allocation.
 
 ### 5.2 Cost B — Monthly operations
 
@@ -470,7 +469,7 @@ Order driven by **physical dependencies** and **accounting integrity** (configur
 | Phase | Task focus | Depends on |
 |-------|------------|------------|
 | ~~**M2-T02**~~ | **DONE** — `cost_domain_code` on `cost_group`, four domains, baseline categories, snapshot preserved | M0 cost_group |
-| **M2-T03** | Cost A schema: `capital_asset`, `depreciation_entry`, quick/detailed modes | T02 (reporting boundaries) |
+| ~~**M2-T03**~~ | **DONE** — Cost A: `capital_asset`, `depreciation_entry`, quick/detailed convergence, immutability | T02 |
 | **M2-T04** | Enrollment finance terms + charge generation contract (`enrollment_id` required, tuition snapshots on charge) | M1 enrollment |
 | **M2-T05** | Payment & adjustment application layer (Server Actions, charge status sync, no new debt entities) | T04 |
 | **M2-T06** | Revenue recognition: policy config, recognition events, prepaid/deferred derivation | T05, M1 sessions/attendance/assessments |
@@ -644,7 +643,7 @@ Class Contribution =
 | Sessions delivered | ✓ | `teaching_session` |
 | Overhead pool | Partial | Expenses without class_id exist; no allocator |
 | Marketing pool | ✗ | Cost C missing |
-| Depreciation | ✗ | Cost A missing |
+| Depreciation | Partial | Cost A schedule exists; class allocation rules missing |
 | Recognized vs cash revenue | ✗ | Recognition missing |
 
 All outputs are **read models** — no stored `class_profit` column.
@@ -713,7 +712,8 @@ No simulation entity, no draft/proforma persistence contract, no API — define 
 | `tuition_plan.amount` | Soft rule (not trigger) | New plan row / effective window | Referenced by `charge.tuition_plan_id` |
 | `expense_category` | Reparent blocked if posted expenses | Archive + new category | Expense keeps category FK |
 | Future: recognition events | Must be append-only | Reversal event | Policy ID + basis snapshot |
-| Future: depreciation entries | Monthly posted rows | Adjustment entry | Asset cost basis at creation |
+| `depreciation_entry` (posted) | ✓ (trigger) | Void + explicit correction (future); no silent UPDATE | Asset `cost_group_id` snapshot |
+| `capital_asset` core fields | After posted depreciation (trigger) | Retire asset; no cost/life rewrite | `cost_group_id` at creation |
 
 **Configuration edits** (category rename, plan price change) must not alter historical transaction meaning.
 
@@ -790,4 +790,160 @@ Enrollment financial fields      ✗ None on enrollment table (correct — separ
 
 ---
 
-*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 cost taxonomy at `e0c99e5`.*
+---
+
+## Appendix D — M2-T03 Capital Assets & Depreciation (after `316dc53`)
+
+**Migration:** `20260914141600_m2_t03_capital_assets_depreciation.sql`
+
+### Physical model
+
+```mermaid
+flowchart TD
+    ORG[organization] --> CG[cost_group cost_domain_code=capital]
+    ORG --> CA[capital_asset]
+    CG -.->|snapshot cost_group_id| CA
+    CA --> DE[depreciation_entry]
+    ORG --> DE
+```
+
+**Tables:**
+
+| Table | Purpose |
+|-------|---------|
+| `capital_asset` | Long-lived investment register (quick or detailed) |
+| `depreciation_entry` | Monthly straight-line allocation into management cost |
+
+**Not used for Cost A:** `expense`, `expense_category` — operating expenditure remains separate.
+
+### Quick vs detailed mode
+
+Both modes persist **`capital_asset`** rows and share **`generate_depreciation_schedule`** (trigger on INSERT).
+
+| Mode | Entry point | Semantics |
+|------|-------------|-----------|
+| Quick | `create_quick_capital_asset(total, months, placed_in_service_date, name?)` | Aggregated “initial setup investment”; `is_quick_mode = true`; default category `other_capital` |
+| Detailed | `create_capital_asset(name, cost, date, months, category?, notes?)` | One real-world asset per row |
+
+No parallel `quick_capital_cost` table.
+
+### Depreciation method
+
+- Persisted code: `depreciation_method_code = 'straight_line'` (CHECK-constrained).
+- Amount function: `straight_line_depreciation_amount(cost, N, period_number)`.
+
+### Start period rule
+
+First depreciation period = **calendar month of `placed_in_service_date`** (normalized to month-start via `capital_asset_period_month`).
+
+Period *k* month = `date_trunc('month', placed_in_service_date) + (k - 1) months`.
+
+**Not** derived from `created_at`.
+
+### Remainder handling (integer integrity)
+
+For cost `C` and life `N` months:
+
+- Periods `1 .. N-1`: `floor(C / N)` minor units each.
+- Period `N`: `C - floor(C/N) × (N-1)` — absorbs remainder.
+
+**Invariant:** `SUM(all depreciation_entry.amount) = original_cost` exactly.
+
+### Schedule generation architecture (Option A)
+
+Full schedule of `scheduled` rows created on asset INSERT via `trg_capital_asset_generate_schedule`.
+
+- If only `scheduled` rows exist, asset cost/life/date edits delete and regenerate scheduled rows.
+- If any `posted` row exists, regeneration is blocked; core asset fields are immutable (trigger).
+
+**Posting:** `post_depreciation_through(asset_id, through_month)` transitions `scheduled` → `posted` for periods ≤ through_month.
+
+### Recognition states
+
+| Status | Meaning |
+|--------|---------|
+| `scheduled` | Future/unposted plan row; may be regenerated or voided on retirement |
+| `posted` | Historical management cost; immutable (trigger) |
+| `void` | Explicitly cancelled period (retirement voids future scheduled) |
+
+### Historical integrity
+
+1. Posted depreciation rows cannot be UPDATEd (amount, period, status).
+2. After posted depreciation, `capital_asset` original_cost, useful_life_months, placed_in_service_date, cost_group_id cannot change.
+3. Corrections are explicit (future: adjustment entries) — no silent rewrite.
+4. `UNIQUE (capital_asset_id, period_number)` and `UNIQUE (capital_asset_id, period_month)` prevent duplicate periods.
+
+### Retirement
+
+`retire_capital_asset(asset_id, retired_at)` sets `status = 'retired'`, records `retired_at`, voids **scheduled** entries with `period_month > month(retired_at)`.
+
+No disposal gain/loss accounting in M2-T03.
+
+### Cash vs management cost
+
+| Event | Representation |
+|-------|----------------|
+| Capital purchase (cash outflow) | `capital_asset.original_cost` + `placed_in_service_date` — **not** an `expense` row |
+| Monthly management P/L | `depreciation_entry` where `status = 'posted'` |
+
+Future cash-flow reporting may link acquisition to payments; M2-T03 does not force AP or expense duplication.
+
+### Cost A reporting resolution
+
+```text
+capital_asset.cost_group_id → cost_group.cost_domain_code = 'capital'
+```
+
+Monthly Cost A management cost for period P:
+
+```sql
+SELECT SUM(amount) FROM depreciation_entry
+WHERE organization_id = :org
+  AND status = 'posted'
+  AND period_month = :P;
+```
+
+Join to `capital_asset` for per-asset breakdown. **No dependency on `group_slot`.**
+
+Accumulated depreciation and book value are **derived**:
+
+- `SUM(posted depreciation_entry.amount)`
+- `original_cost - accumulated`
+
+### Security
+
+| Object | RLS | Permissions |
+|--------|-----|-------------|
+| `capital_asset` | ENABLE + FORCE | `asset.read`, `asset.create`, `asset.update` |
+| `depreciation_entry` | ENABLE + FORCE | `asset.read`; writes via RPC/triggers |
+
+RPCs (`create_capital_asset`, `create_quick_capital_asset`, `post_depreciation_through`, `retire_capital_asset`) are **SECURITY INVOKER** with `has_permission` checks.
+
+### Application layer (no UI)
+
+- `src/lib/capital-assets/` — validation, constants
+- `src/app/actions/capital-assets.ts` — server actions calling RPCs
+
+### i18n
+
+`capitalAsset.*`, `assetCategory.*`, `assetStatus.*`, `depreciation.*` in EN/VI.
+
+### Tests
+
+`supabase/tests/m2_capital_depreciation_tests.sql` — 20 scenarios.
+
+### Handoff to class economics (deferred)
+
+Class P&L will consume posted depreciation via allocation rules (M2-T08). Per-class shares of Cost A are not computed in T03.
+
+### Intentional simplifications
+
+- Straight-line only
+- No acquisition payment / AP linkage
+- No depreciation → `expense` auto-bridge
+- No stored accumulated_depreciation or book_value columns
+- No cron; posting is explicit RPC
+
+---
+
+*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 Cost A implementation.*

@@ -72,14 +72,14 @@ BEGIN
   INSERT INTO role_permission (role_id, permission_id)
   SELECT v_role_a_staff, p.id FROM permission p
   WHERE p.code IN (
-    'student.read', 'enrollment.read', 'charge.read', 'expense.read', 'observation.read',
+    'student.read', 'enrollment.read', 'charge.read', 'expense.read', 'asset.read', 'observation.read',
     'permission.read', 'role.read', 'organization.read', 'user.read', 'assessment.read',
     'attendance.read', 'payment.read', 'guardian.read', 'teacher.read'
   );
   INSERT INTO role_permission (role_id, permission_id)
   SELECT v_role_b_staff, p.id FROM permission p
   WHERE p.code IN (
-    'student.read', 'enrollment.read', 'charge.read', 'expense.read', 'observation.read',
+    'student.read', 'enrollment.read', 'charge.read', 'expense.read', 'asset.read', 'observation.read',
     'permission.read', 'role.read', 'organization.read', 'user.read', 'assessment.read',
     'attendance.read', 'payment.read', 'guardian.read', 'teacher.read'
   );

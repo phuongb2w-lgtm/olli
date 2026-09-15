@@ -660,6 +660,39 @@
     "personnel": "Nhân sự",
     "marketing_sales": "Marketing & kinh doanh"
   },
+  "capitalAsset": {
+    "title": "Tài sản cố định",
+    "quickMode": "Đầu tư thiết lập nhanh",
+    "detailedMode": "Tài sản chi tiết",
+    "name": "Tên tài sản",
+    "totalInvestment": "Tổng đầu tư",
+    "originalCost": "Nguyên giá",
+    "usefulLifeMonths": "Thời gian sử dụng (tháng)",
+    "placedInServiceDate": "Ngày đưa vào sử dụng",
+    "notes": "Ghi chú",
+    "retire": "Ngừng sử dụng tài sản",
+    "postDepreciation": "Ghi nhận khấu hao"
+  },
+  "assetCategory": {
+    "fit_out": "Thi công nội thất",
+    "signage": "Biển bảng",
+    "furniture": "Nội thất",
+    "equipment": "Thiết bị",
+    "technology": "Công nghệ",
+    "other_capital": "Tài sản cố định khác"
+  },
+  "assetStatus": {
+    "active": "Đang sử dụng",
+    "retired": "Đã ngừng"
+  },
+  "depreciation": {
+    "scheduled": "Dự kiến",
+    "posted": "Đã ghi nhận",
+    "void": "Đã hủy",
+    "periodMonth": "Tháng kế toán",
+    "amount": "Số tiền khấu hao",
+    "straight_line": "Đường thẳng"
+  },
   "expenseCategory": {
     "rent": "Thuê mặt bằng",
     "electricity": "Điện",
