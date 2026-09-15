@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { AttendanceButtons } from "@/components/session-execution/attendance-buttons";
 import { MarkAllPresentForm } from "@/components/session-execution/mark-all-present-form";
 import { ObservationForm } from "@/components/session-execution/observation-form";
+import { ObservationSummary } from "@/components/session-execution/observation-summary";
 import type {
   ObservationIndicator,
   SessionRosterItem,
@@ -15,6 +16,7 @@ type Props = {
   roster: SessionRosterItem[];
   indicators: ObservationIndicator[];
   canRecordAttendance: boolean;
+  canReadObservation: boolean;
   canRecordObservation: boolean;
 };
 
@@ -25,6 +27,7 @@ export async function SessionRoster({
   roster,
   indicators,
   canRecordAttendance,
+  canReadObservation,
   canRecordObservation,
 }: Props) {
   const t = await getTranslations("sessionExecution");
@@ -32,6 +35,7 @@ export async function SessionRoster({
   const disabled = sessionStatus === "cancelled";
   const canMark = canRecordAttendance && !disabled;
   const canObserve = canRecordObservation && !disabled;
+  const showObservationColumn = canReadObservation || canRecordObservation;
 
   const hasNonPresentRecorded = roster.some(
     (row) =>
@@ -43,6 +47,31 @@ export async function SessionRoster({
   if (roster.length === 0) {
     return <p className="text-sm text-slate-600">{t("emptyRoster")}</p>;
   }
+
+  const renderObservationCell = (row: SessionRosterItem) => {
+    if (canObserve) {
+      return (
+        <ObservationForm
+          classId={classId}
+          sessionId={sessionId}
+          enrollmentId={row.enrollmentId}
+          indicators={indicators}
+          initialComment={row.observationComment}
+          initialRatings={row.ratings}
+        />
+      );
+    }
+    if (canReadObservation) {
+      return (
+        <ObservationSummary
+          comment={row.observationComment}
+          ratings={row.ratings}
+          indicators={indicators}
+        />
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="space-y-4">
@@ -61,7 +90,9 @@ export async function SessionRoster({
               <th className="px-4 py-3 text-left font-medium text-slate-700">{t("student")}</th>
               <th className="px-4 py-3 text-left font-medium text-slate-700">{t("studentCode")}</th>
               <th className="px-4 py-3 text-left font-medium text-slate-700">{t("attendance")}</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-700">{t("observation")}</th>
+              {showObservationColumn ? (
+                <th className="px-4 py-3 text-left font-medium text-slate-700">{t("observation")}</th>
+              ) : null}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 bg-white">
@@ -85,22 +116,9 @@ export async function SessionRoster({
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-3">
-                  {canObserve ? (
-                    <ObservationForm
-                      classId={classId}
-                      sessionId={sessionId}
-                      enrollmentId={row.enrollmentId}
-                      indicators={indicators}
-                      initialComment={row.observationComment}
-                      initialRatings={row.ratings}
-                    />
-                  ) : row.observationId ? (
-                    <span className="text-slate-600">{t("observationRecorded")}</span>
-                  ) : (
-                    <span className="text-slate-500">{t("noObservation")}</span>
-                  )}
-                </td>
+                {showObservationColumn ? (
+                  <td className="px-4 py-3">{renderObservationCell(row)}</td>
+                ) : null}
               </tr>
             ))}
           </tbody>
@@ -135,15 +153,8 @@ export async function SessionRoster({
                 </p>
               )}
             </div>
-            {canObserve ? (
-              <ObservationForm
-                classId={classId}
-                sessionId={sessionId}
-                enrollmentId={row.enrollmentId}
-                indicators={indicators}
-                initialComment={row.observationComment}
-                initialRatings={row.ratings}
-              />
+            {showObservationColumn ? (
+              <div className="mt-3">{renderObservationCell(row)}</div>
             ) : null}
           </li>
         ))}

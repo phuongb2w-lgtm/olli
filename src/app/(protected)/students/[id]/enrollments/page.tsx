@@ -16,6 +16,7 @@ type Props = {
 
 export default async function StudentEnrollmentsPage({ params, searchParams }: Props) {
   const t = await getTranslations("enrollments");
+  const tAssess = await getTranslations("assessments");
   const { id: studentId } = await params;
   const rawParams = await searchParams;
   const hasRead = await can("enrollment.read");
@@ -32,6 +33,7 @@ export default async function StudentEnrollmentsPage({ params, searchParams }: P
   }
 
   const hasCreate = await can("enrollment.create");
+  const canViewProgress = await can("assessment.read");
   const success = rawParams.success === "created" ? "created" : null;
 
   const supabase = await createClient();
@@ -68,14 +70,24 @@ export default async function StudentEnrollmentsPage({ params, searchParams }: P
         <p className="mt-1 text-sm text-slate-600">{studentName}</p>
       </div>
 
-      {hasCreate ? (
-        <Link
-          href={`/students/${studentId}/enrollments/enroll`}
-          className="inline-block rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
-        >
-          {t("enrollStudent")}
-        </Link>
-      ) : null}
+      <div className="flex flex-wrap gap-3">
+        {hasCreate ? (
+          <Link
+            href={`/students/${studentId}/enrollments/enroll`}
+            className="inline-block rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          >
+            {t("enrollStudent")}
+          </Link>
+        ) : null}
+        {canViewProgress ? (
+          <Link
+            href={`/students/${studentId}/progress`}
+            className="inline-block rounded border border-slate-300 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
+          >
+            {tAssess("academicProgress")}
+          </Link>
+        ) : null}
+      </div>
 
       {success === "created" ? (
         <p className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800" role="status">

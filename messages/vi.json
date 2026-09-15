@@ -292,6 +292,11 @@
       "absent": "Vắng mặt",
       "late": "Đi muộn",
       "excused": "Vắng có phép"
+    },
+    "assessment": {
+      "draft": "Nháp",
+      "open": "Đang mở",
+      "closed": "Đã đóng"
     }
   },
   "teaching": {
@@ -435,6 +440,57 @@
       "attendance_bulk": "Đã cập nhật điểm danh hàng loạt.",
       "observation_saved": "Đã lưu nhận xét."
     }
+  },
+  "assessments": {
+    "title": "Đánh giá",
+    "subtitle": "Bài kiểm tra và nhập điểm của lớp này.",
+    "assessmentsList": "Các bài đánh giá",
+    "assessment": "Đánh giá",
+    "test": "Bài kiểm tra",
+    "testScore": "Điểm kiểm tra",
+    "score": "Điểm",
+    "maximumScore": "Điểm tối đa",
+    "percentage": "Tỷ lệ %",
+    "noScoreRecorded": "Chưa có điểm",
+    "recordScores": "Nhập điểm",
+    "updateScore": "Sửa điểm",
+    "academicProgress": "Tiến độ học tập",
+    "assessmentDate": "Ngày đánh giá",
+    "createAssessment": "Tạo bài đánh giá",
+    "editAssessment": "Sửa bài đánh giá",
+    "saveAssessment": "Lưu bài đánh giá",
+    "results": "Kết quả",
+    "viewResults": "Xem kết quả",
+    "learnersScored": "Đã chấm {scored}/{total}",
+    "invalidScore": "Điểm không hợp lệ",
+    "scoreExceedsMaximum": "Điểm vượt điểm tối đa",
+    "classClosed": "Không thể tạo bài đánh giá mới cho lớp đã đóng.",
+    "denied": "Bạn không có quyền xem đánh giá.",
+    "permissionDenied": "Bạn không có quyền thực hiện thao tác này.",
+    "backToClasses": "Quay lại lớp học",
+    "backToAssessments": "Quay lại đánh giá",
+    "backToEnrollments": "Quay lại lịch sử ghi danh",
+    "noAssessments": "Chưa có bài đánh giá cho lớp này.",
+    "emptyRoster": "Không có học viên đủ điều kiện cho ngày đánh giá này.",
+    "noProgress": "Chưa có kết quả đánh giá.",
+    "simpleAveragePercentage": "Tỷ lệ trung bình đơn giản (tham khảo): {value}%",
+    "student": "Học viên",
+    "studentCode": "Mã học viên",
+    "class": "Lớp",
+    "titleField": "Tiêu đề",
+    "status": "Trạng thái",
+    "assessmentType": "Loại đánh giá",
+    "actions": "Thao tác",
+    "success": {
+      "assessment_created": "Đã lưu bài đánh giá.",
+      "assessment_updated": "Đã cập nhật bài đánh giá.",
+      "results_updated": "Đã cập nhật điểm."
+    }
+  },
+  "assessmentTypes": {
+    "progress_test": "Kiểm tra tiến độ",
+    "checkpoint": "Kiểm tra giữa kỳ",
+    "end_of_course": "Kiểm tra cuối khóa"
   },
   "observationIndicators": {
     "concentration": "Tập trung",

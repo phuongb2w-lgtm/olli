@@ -292,6 +292,11 @@
       "absent": "Absent",
       "late": "Late",
       "excused": "Excused"
+    },
+    "assessment": {
+      "draft": "Draft",
+      "open": "Open",
+      "closed": "Closed"
     }
   },
   "teaching": {
@@ -435,6 +440,57 @@
       "attendance_bulk": "Bulk attendance updated.",
       "observation_saved": "Observation saved."
     }
+  },
+  "assessments": {
+    "title": "Assessments",
+    "subtitle": "Class tests and score entry for this class.",
+    "assessmentsList": "Assessments",
+    "assessment": "Assessment",
+    "test": "Test",
+    "testScore": "Test score",
+    "score": "Score",
+    "maximumScore": "Maximum score",
+    "percentage": "Percentage",
+    "noScoreRecorded": "No score recorded",
+    "recordScores": "Record scores",
+    "updateScore": "Update score",
+    "academicProgress": "Academic progress",
+    "assessmentDate": "Assessment date",
+    "createAssessment": "Create assessment",
+    "editAssessment": "Edit assessment",
+    "saveAssessment": "Save assessment",
+    "results": "Results",
+    "viewResults": "View results",
+    "learnersScored": "{scored}/{total} scored",
+    "invalidScore": "Invalid score",
+    "scoreExceedsMaximum": "Score exceeds maximum",
+    "classClosed": "New assessments cannot be created for a closed class.",
+    "denied": "You do not have permission to view assessments.",
+    "permissionDenied": "You do not have permission for this action.",
+    "backToClasses": "Back to classes",
+    "backToAssessments": "Back to assessments",
+    "backToEnrollments": "Back to enrollment history",
+    "noAssessments": "No assessments for this class yet.",
+    "emptyRoster": "No eligible learners for this assessment date.",
+    "noProgress": "No assessment results recorded yet.",
+    "simpleAveragePercentage": "Simple average percentage (informational): {value}%",
+    "student": "Student",
+    "studentCode": "Student code",
+    "class": "Class",
+    "titleField": "Title",
+    "status": "Status",
+    "assessmentType": "Assessment type",
+    "actions": "Actions",
+    "success": {
+      "assessment_created": "Assessment saved.",
+      "assessment_updated": "Assessment updated.",
+      "results_updated": "Results updated."
+    }
+  },
+  "assessmentTypes": {
+    "progress_test": "Progress test",
+    "checkpoint": "Checkpoint",
+    "end_of_course": "End-of-course test"
   },
   "observationIndicators": {
     "concentration": "Concentration",

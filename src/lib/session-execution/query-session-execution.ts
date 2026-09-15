@@ -127,30 +127,34 @@ export async function fetchObservationIndicators(
 export async function fetchSessionRoster(
   supabase: SupabaseClient,
   session: SessionExecutionContext,
+  options: { includeObservations?: boolean } = {},
 ): Promise<SessionRosterItem[]> {
   const sessionDate = session.occurrenceDate;
+  const includeObservations = options.includeObservations ?? false;
 
-  const [{ data: enrollments }, { data: attendances }, { data: observations }] =
-    await Promise.all([
-      supabase
-        .from("enrollment")
-        .select(
-          "id, student_id, start_date, end_date, status, student:student(given_name, family_name, student_code)",
-        )
-        .eq("class_id", session.classId)
-        .order("start_date"),
-      supabase
-        .from("attendance")
-        .select("id, enrollment_id, status")
-        .eq("teaching_session_id", session.id),
-      supabase
+  const enrollmentQuery = supabase
+    .from("enrollment")
+    .select(
+      "id, student_id, start_date, end_date, status, student:student(given_name, family_name, student_code)",
+    )
+    .eq("class_id", session.classId)
+    .order("start_date");
+  const attendanceQuery = supabase
+    .from("attendance")
+    .select("id, enrollment_id, status")
+    .eq("teaching_session_id", session.id);
+  const observationQuery = includeObservations
+    ? supabase
         .from("teacher_observation")
         .select(
           "id, enrollment_id, comment, observation_rating(indicator_code, rating_code)",
         )
         .eq("teaching_session_id", session.id)
-        .neq("status", "void"),
-    ]);
+        .neq("status", "void")
+    : Promise.resolve({ data: [] as never[], error: null });
+
+  const [{ data: enrollments }, { data: attendances }, { data: observations }] =
+    await Promise.all([enrollmentQuery, attendanceQuery, observationQuery]);
 
   const attendanceByEnrollment = new Map(
     (attendances ?? []).map((a) => [a.enrollment_id, a]),

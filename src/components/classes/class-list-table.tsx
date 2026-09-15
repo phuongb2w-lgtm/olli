@@ -7,12 +7,20 @@ type Props = {
   canUpdate: boolean;
   canViewRoster: boolean;
   canViewTeaching: boolean;
+  canViewAssessments: boolean;
 };
 
-export async function ClassListTable({ items, canUpdate, canViewRoster, canViewTeaching }: Props) {
+export async function ClassListTable({
+  items,
+  canUpdate,
+  canViewRoster,
+  canViewTeaching,
+  canViewAssessments,
+}: Props) {
   const t = await getTranslations("classes");
   const tEnroll = await getTranslations("enrollments");
   const tTeach = await getTranslations("teaching");
+  const tAssess = await getTranslations("assessments");
   const tStatus = await getTranslations("status.class");
   const placeholder = t("emptyValue");
 
@@ -36,7 +44,7 @@ export async function ClassListTable({ items, canUpdate, canViewRoster, canViewT
             <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
               {t("termEndColumn")}
             </th>
-            {canUpdate || canViewRoster || canViewTeaching ? (
+            {canUpdate || canViewRoster || canViewTeaching || canViewAssessments ? (
               <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
                 <span className="sr-only">{t("actionsColumn")}</span>
               </th>
@@ -58,7 +66,7 @@ export async function ClassListTable({ items, canUpdate, canViewRoster, canViewT
               </td>
               <td className="px-4 py-3 text-slate-700">{item.termStartDate ?? placeholder}</td>
               <td className="px-4 py-3 text-slate-700">{item.termEndDate ?? placeholder}</td>
-              {canUpdate || canViewRoster || canViewTeaching ? (
+              {canUpdate || canViewRoster || canViewTeaching || canViewAssessments ? (
                 <td className="px-4 py-3">
                   <div className="flex flex-col gap-1">
                     {canViewRoster ? (
@@ -75,6 +83,14 @@ export async function ClassListTable({ items, canUpdate, canViewRoster, canViewT
                         className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
                       >
                         {tTeach("title")}
+                      </Link>
+                    ) : null}
+                    {canViewAssessments ? (
+                      <Link
+                        href={`/classes/${item.id}/assessments`}
+                        className="text-sm font-medium text-slate-900 underline hover:text-slate-700"
+                      >
+                        {tAssess("title")}
                       </Link>
                     ) : null}
                     {canUpdate ? (

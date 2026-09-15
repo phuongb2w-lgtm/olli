@@ -86,6 +86,7 @@ export type Database = {
           status: string
           title: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           assessed_on: string
@@ -99,6 +100,7 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           assessed_on?: string
@@ -112,13 +114,28 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "assessment_created_by_fk"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
           {
             foreignKeyName: "assessment_organization_id_class_id_fkey"
             columns: ["organization_id", "class_id"]
             isOneToOne: false
             referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "assessment_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
             referencedColumns: ["organization_id", "id"]
           },
         ]
@@ -136,6 +153,7 @@ export type Database = {
           recorded_by: string | null
           status: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           assessment_id: string
@@ -149,6 +167,7 @@ export type Database = {
           recorded_by?: string | null
           status?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           assessment_id?: string
@@ -162,6 +181,7 @@ export type Database = {
           recorded_by?: string | null
           status?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -176,6 +196,20 @@ export type Database = {
             columns: ["organization_id", "enrollment_id"]
             isOneToOne: false
             referencedRelation: "enrollment"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "assessment_result_recorded_by_fk"
+            columns: ["organization_id", "recorded_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "assessment_result_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
             referencedColumns: ["organization_id", "id"]
           },
         ]

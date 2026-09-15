@@ -41,6 +41,7 @@ export default async function SessionExecutionPage({ params, searchParams }: Pro
   }
 
   const canRecordAttendance = await can("attendance.record");
+  const canReadObservation = await can("observation.read");
   const canRecordObservation = await can("observation.record");
   const canManageSession = await can("enrollment.update");
 
@@ -48,10 +49,13 @@ export default async function SessionExecutionPage({ params, searchParams }: Pro
   const context = await fetchSessionExecutionContext(supabase, classId, sessionId);
   if (!context) notFound();
 
-  const [roster, indicators] = await Promise.all([
-    fetchSessionRoster(supabase, context),
-    fetchObservationIndicators(supabase),
-  ]);
+  const roster = await fetchSessionRoster(supabase, context, {
+    includeObservations: canReadObservation || canRecordObservation,
+  });
+  const indicators =
+    canReadObservation || canRecordObservation
+      ? await fetchObservationIndicators(supabase)
+      : [];
   const progress = countAttendanceProgress(roster);
 
   const success = rawParams.success;
@@ -144,6 +148,7 @@ export default async function SessionExecutionPage({ params, searchParams }: Pro
           roster={roster}
           indicators={indicators}
           canRecordAttendance={canRecordAttendance}
+          canReadObservation={canReadObservation}
           canRecordObservation={canRecordObservation}
         />
       </section>
