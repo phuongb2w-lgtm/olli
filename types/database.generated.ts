@@ -359,6 +359,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "class_created_by_fk"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
             foreignKeyName: "class_organization_id_course_id_fkey"
             columns: ["organization_id", "course_id"]
             isOneToOne: false
@@ -371,6 +378,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "organization"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
           },
         ]
       }
@@ -558,11 +572,25 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "course_created_by_fk"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
             foreignKeyName: "course_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organization"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
           },
         ]
       }

@@ -30,7 +30,9 @@ test.describe("M0-T05 application smoke", () => {
 
   test("4. unmapped Auth user is denied", async ({ page }) => {
     await signIn(page, unmappedEmail);
-    await expect(page.getByText(/access denied|truy cập bị từ chối/i)).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /access denied|truy cập bị từ chối/i }),
+    ).toBeVisible();
   });
 
   test("5. organization name shown is server-resolved", async ({ page }) => {
