@@ -18,6 +18,16 @@ export type LeadMutationState = {
     | "due_at_required"
     | "follow_up_not_pending"
     | "invalid_assignee"
+    | "lead_lost"
+    | "lead_converted"
+    | "invalid_candidate"
+    | "invalid_class"
+    | "class_not_eligible"
+    | "invalid_teaching_session"
+    | "session_class_mismatch"
+    | "schedule_required"
+    | "invalid_schedule"
+    | "trial_not_scheduled"
     | "mutation_error";
 };
 
@@ -31,9 +41,26 @@ function mapRpcError(message: string): LeadMutationState["error"] {
   if (message.includes("due_at_required")) return "due_at_required";
   if (message.includes("follow_up_not_pending")) return "follow_up_not_pending";
   if (message.includes("invalid_assignee")) return "invalid_assignee";
+  if (message.includes("lead_lost")) return "lead_lost";
+  if (message.includes("lead_converted")) return "lead_converted";
+  if (message.includes("invalid_candidate")) return "invalid_candidate";
+  if (message.includes("invalid_class")) return "invalid_class";
+  if (message.includes("class_not_eligible")) return "class_not_eligible";
+  if (message.includes("invalid_teaching_session")) return "invalid_teaching_session";
+  if (message.includes("session_class_mismatch")) return "session_class_mismatch";
+  if (message.includes("schedule_required")) return "schedule_required";
+  if (message.includes("invalid_schedule")) return "invalid_schedule";
+  if (message.includes("trial_not_scheduled")) return "trial_not_scheduled";
   if (message.includes("lead_lifecycle_protected")) return "invalid_transition";
   if (message.includes("Lead assignment must")) return "permission_denied";
+  if (message.includes("Lead trial")) return "permission_denied";
   return "mutation_error";
+}
+
+function parseOptionalDateTime(raw: string): string | undefined {
+  const trimmed = raw.trim();
+  if (!trimmed) return undefined;
+  return new Date(trimmed).toISOString();
 }
 
 export async function transitionLeadStatusAction(
@@ -206,6 +233,193 @@ export async function assignLeadAction(
   const { error } = await supabase.rpc("assign_lead", {
     p_lead_id: leadId,
     p_assigned_user_id: assignedUserId ?? undefined,
+    p_note: note,
+  });
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/leads");
+  revalidatePath(`/crm/leads/${leadId}`);
+  return {};
+}
+
+export async function scheduleLeadTrialAction(
+  _prev: LeadMutationState,
+  formData: FormData,
+): Promise<LeadMutationState> {
+  if (!(await can("lead.update"))) {
+    return { error: "permission_denied" };
+  }
+  if (!(await getCurrentAppUser())) {
+    return { error: "permission_denied" };
+  }
+
+  const leadId = String(formData.get("leadId") ?? "");
+  const candidateId = String(formData.get("candidateId") ?? "");
+  const classId = String(formData.get("classId") ?? "");
+  const teachingSessionId = String(formData.get("teachingSessionId") ?? "") || undefined;
+  const scheduledStartAt = parseOptionalDateTime(String(formData.get("scheduledStartAt") ?? ""));
+  const scheduledEndAt = parseOptionalDateTime(String(formData.get("scheduledEndAt") ?? ""));
+  const note = String(formData.get("note") ?? "") || undefined;
+
+  if (!leadId || !candidateId || !classId) {
+    return { error: "mutation_error" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("schedule_lead_trial", {
+    p_lead_id: leadId,
+    p_lead_candidate_id: candidateId,
+    p_class_id: classId,
+    p_teaching_session_id: teachingSessionId,
+    p_scheduled_start_at: scheduledStartAt,
+    p_scheduled_end_at: scheduledEndAt,
+    p_note: note,
+  });
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/leads");
+  revalidatePath(`/crm/leads/${leadId}`);
+  return {};
+}
+
+export async function rescheduleLeadTrialAction(
+  _prev: LeadMutationState,
+  formData: FormData,
+): Promise<LeadMutationState> {
+  if (!(await can("lead.update"))) {
+    return { error: "permission_denied" };
+  }
+  if (!(await getCurrentAppUser())) {
+    return { error: "permission_denied" };
+  }
+
+  const leadId = String(formData.get("leadId") ?? "");
+  const trialId = String(formData.get("trialId") ?? "");
+  const classId = String(formData.get("classId") ?? "") || undefined;
+  const teachingSessionId = String(formData.get("teachingSessionId") ?? "") || undefined;
+  const scheduledStartAt = parseOptionalDateTime(String(formData.get("scheduledStartAt") ?? ""));
+  const scheduledEndAt = parseOptionalDateTime(String(formData.get("scheduledEndAt") ?? ""));
+  const note = String(formData.get("note") ?? "") || undefined;
+
+  if (!leadId || !trialId) {
+    return { error: "mutation_error" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("reschedule_lead_trial", {
+    p_trial_id: trialId,
+    p_class_id: classId,
+    p_teaching_session_id: teachingSessionId,
+    p_scheduled_start_at: scheduledStartAt,
+    p_scheduled_end_at: scheduledEndAt,
+    p_note: note,
+  });
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/leads");
+  revalidatePath(`/crm/leads/${leadId}`);
+  return {};
+}
+
+export async function completeLeadTrialAction(
+  _prev: LeadMutationState,
+  formData: FormData,
+): Promise<LeadMutationState> {
+  if (!(await can("lead.update"))) {
+    return { error: "permission_denied" };
+  }
+  if (!(await getCurrentAppUser())) {
+    return { error: "permission_denied" };
+  }
+
+  const leadId = String(formData.get("leadId") ?? "");
+  const trialId = String(formData.get("trialId") ?? "");
+  const outcomeNote = String(formData.get("outcomeNote") ?? "") || undefined;
+
+  if (!leadId || !trialId) {
+    return { error: "mutation_error" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("complete_lead_trial", {
+    p_trial_id: trialId,
+    p_outcome_note: outcomeNote,
+  });
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/leads");
+  revalidatePath(`/crm/leads/${leadId}`);
+  return {};
+}
+
+export async function cancelLeadTrialAction(
+  _prev: LeadMutationState,
+  formData: FormData,
+): Promise<LeadMutationState> {
+  if (!(await can("lead.update"))) {
+    return { error: "permission_denied" };
+  }
+  if (!(await getCurrentAppUser())) {
+    return { error: "permission_denied" };
+  }
+
+  const leadId = String(formData.get("leadId") ?? "");
+  const trialId = String(formData.get("trialId") ?? "");
+  const note = String(formData.get("note") ?? "") || undefined;
+
+  if (!leadId || !trialId) {
+    return { error: "mutation_error" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("cancel_lead_trial", {
+    p_trial_id: trialId,
+    p_note: note,
+  });
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/leads");
+  revalidatePath(`/crm/leads/${leadId}`);
+  return {};
+}
+
+export async function markLeadTrialNoShowAction(
+  _prev: LeadMutationState,
+  formData: FormData,
+): Promise<LeadMutationState> {
+  if (!(await can("lead.update"))) {
+    return { error: "permission_denied" };
+  }
+  if (!(await getCurrentAppUser())) {
+    return { error: "permission_denied" };
+  }
+
+  const leadId = String(formData.get("leadId") ?? "");
+  const trialId = String(formData.get("trialId") ?? "");
+  const note = String(formData.get("note") ?? "") || undefined;
+
+  if (!leadId || !trialId) {
+    return { error: "mutation_error" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("mark_lead_trial_no_show", {
+    p_trial_id: trialId,
     p_note: note,
   });
 

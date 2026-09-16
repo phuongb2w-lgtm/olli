@@ -22,6 +22,8 @@ export type LeadListItem = {
   nextFollowUpAt: string | null;
   lastActivityAt: string | null;
   lastActivityType: string | null;
+  nextTrialAt: string | null;
+  hasScheduledTrial: boolean;
 };
 
 export type LeadListResult = {
@@ -64,6 +66,9 @@ export async function queryLeadList(
 
   try {
     const matchingIds = await resolveMatchingLeadIds(supabase, params.q);
+    const scheduledTrialLeadIds =
+      params.trial === "scheduled" ? await resolveScheduledTrialLeadIds(supabase) : null;
+
     if (matchingIds !== null && matchingIds.size === 0) {
       return {
         result: { items: [], totalCount: 0, params: { ...params, page: 1 } },
@@ -78,6 +83,15 @@ export async function queryLeadList(
     countQuery = applyOwnershipFilter(countQuery, params, currentUserId);
     if (matchingIds !== null) {
       countQuery = countQuery.in("id", [...matchingIds]);
+    }
+    if (scheduledTrialLeadIds !== null) {
+      if (scheduledTrialLeadIds.size === 0) {
+        return {
+          result: { items: [], totalCount: 0, params: { ...params, page: 1 } },
+          error: false,
+        };
+      }
+      countQuery = countQuery.in("id", [...scheduledTrialLeadIds]);
     }
     const { count, error: countError } = await countQuery;
 
@@ -102,6 +116,9 @@ export async function queryLeadList(
     if (matchingIds !== null) {
       pageQuery = pageQuery.in("id", [...matchingIds]);
     }
+    if (scheduledTrialLeadIds !== null) {
+      pageQuery = pageQuery.in("id", [...scheduledTrialLeadIds]);
+    }
     const { data: leads, error: pageError } = await pageQuery;
     if (pageError || !leads) {
       return { result: null, error: true };
@@ -120,6 +137,14 @@ export async function queryLeadList(
   } catch {
     return { result: null, error: true };
   }
+}
+
+async function resolveScheduledTrialLeadIds(supabase: DbClient): Promise<Set<string>> {
+  const { data } = await supabase
+    .from("lead_trial")
+    .select("lead_id")
+    .eq("status", "scheduled");
+  return new Set((data ?? []).map((row) => row.lead_id));
 }
 
 async function resolveMatchingLeadIds(
@@ -164,7 +189,7 @@ async function enrichLeadListItems(
   const sourceIds = [...new Set(leads.map((l) => l.lead_source_id).filter(Boolean))] as string[];
   const userIds = [...new Set(leads.map((l) => l.assigned_user_id).filter(Boolean))] as string[];
 
-  const [sources, users, candidates, contacts, followUps, activities] = await Promise.all([
+  const [sources, users, candidates, contacts, followUps, activities, trials] = await Promise.all([
     sourceIds.length
       ? supabase.from("lead_source").select("id, code, display_name").in("id", sourceIds)
       : Promise.resolve({ data: [] }),
@@ -192,6 +217,12 @@ async function enrichLeadListItems(
       .select("lead_id, occurred_at, activity_type_code")
       .in("lead_id", leadIds)
       .order("occurred_at", { ascending: false }),
+    supabase
+      .from("lead_trial")
+      .select("lead_id, scheduled_start_at, status")
+      .in("lead_id", leadIds)
+      .eq("status", "scheduled")
+      .order("scheduled_start_at", { ascending: true }),
   ]);
 
   const sourceMap = new Map((sources.data ?? []).map((s) => [s.id, s.display_name]));
@@ -226,8 +257,16 @@ async function enrichLeadListItems(
     }
   }
 
+  const nextTrial = new Map<string, string>();
+  for (const trial of trials.data ?? []) {
+    if (!nextTrial.has(trial.lead_id)) {
+      nextTrial.set(trial.lead_id, trial.scheduled_start_at);
+    }
+  }
+
   return leads.map((lead) => {
     const activity = lastActivity.get(lead.id);
+    const trialAt = nextTrial.get(lead.id) ?? null;
     return {
       id: lead.id,
       status: lead.status as LeadStatus,
@@ -239,6 +278,8 @@ async function enrichLeadListItems(
       nextFollowUpAt: nextFollowUp.get(lead.id) ?? null,
       lastActivityAt: activity?.at ?? null,
       lastActivityType: activity?.type ?? null,
+      nextTrialAt: trialAt,
+      hasScheduledTrial: trialAt !== null,
     };
   });
 }

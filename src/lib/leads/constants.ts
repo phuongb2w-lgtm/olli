@@ -66,6 +66,29 @@ export const LEAD_OWNERSHIP_FILTERS = [
 
 export type LeadOwnershipFilter = (typeof LEAD_OWNERSHIP_FILTERS)[number];
 
+export const LEAD_TRIAL_STATUSES = [
+  "scheduled",
+  "completed",
+  "cancelled",
+  "no_show",
+] as const;
+
+export type LeadTrialStatus = (typeof LEAD_TRIAL_STATUSES)[number];
+
+export const LEAD_TRIAL_EVENT_TYPES = [
+  "scheduled",
+  "rescheduled",
+  "completed",
+  "cancelled",
+  "no_show",
+] as const;
+
+export type LeadTrialEventType = (typeof LEAD_TRIAL_EVENT_TYPES)[number];
+
+export const LEAD_TRIAL_FILTERS = ["all", "scheduled"] as const;
+
+export type LeadTrialFilter = (typeof LEAD_TRIAL_FILTERS)[number];
+
 export const LEAD_TRANSITION_TARGETS: Partial<Record<LeadStatus, LeadStatus[]>> = {
   new: ["contacted", "qualified", "trial_scheduled", "lost"],
   contacted: ["qualified", "trial_scheduled", "lost"],

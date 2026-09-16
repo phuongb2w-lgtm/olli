@@ -4,6 +4,8 @@ import type {
   LeadActivityType,
   LeadFollowUpStatus,
   LeadStatus,
+  LeadTrialEventType,
+  LeadTrialStatus,
 } from "@/lib/leads/constants";
 import type { Database } from "@/types/database";
 
@@ -67,10 +69,34 @@ export type LeadAssignmentHistoryDetail = {
   note: string | null;
 };
 
+export type LeadTrialDetail = {
+  id: string;
+  candidateId: string;
+  classId: string;
+  className: string;
+  teachingSessionId: string | null;
+  status: LeadTrialStatus;
+  scheduledStartAt: string;
+  scheduledEndAt: string;
+  operationalNote: string | null;
+  outcomeNote: string | null;
+  createdAt: string;
+};
+
+export type LeadTrialEventDetail = {
+  id: string;
+  trialId: string;
+  eventType: LeadTrialEventType;
+  occurredAt: string;
+  changedByName: string | null;
+  note: string | null;
+};
+
 export type LeadTimelineEntry =
   | { kind: "activity"; occurredAt: string; activity: LeadActivityDetail }
   | { kind: "status"; occurredAt: string; status: LeadStatusHistoryDetail }
-  | { kind: "assignment"; occurredAt: string; assignment: LeadAssignmentHistoryDetail };
+  | { kind: "assignment"; occurredAt: string; assignment: LeadAssignmentHistoryDetail }
+  | { kind: "trial"; occurredAt: string; trialEvent: LeadTrialEventDetail };
 
 export type LeadDetail = {
   id: string;
@@ -90,6 +116,8 @@ export type LeadDetail = {
   activities: LeadActivityDetail[];
   statusHistory: LeadStatusHistoryDetail[];
   followUps: LeadFollowUpDetail[];
+  trials: LeadTrialDetail[];
+  trialEvents: LeadTrialEventDetail[];
   timeline: LeadTimelineEntry[];
   lostReasons: { id: string; code: string; displayName: string }[];
 };
@@ -125,6 +153,8 @@ export async function queryLeadDetail(
     statusHistory,
     followUps,
     assignmentHistory,
+    trials,
+    eligibleClasses,
   ] = await Promise.all([
     lead.lead_source_id
       ? supabase.from("lead_source").select("display_name").eq("id", lead.lead_source_id).maybeSingle()
@@ -179,7 +209,24 @@ export async function queryLeadDetail(
       )
       .eq("lead_id", leadId)
       .order("changed_at", { ascending: false }),
+    supabase
+      .from("lead_trial")
+      .select(
+        "id, lead_candidate_id, class_id, teaching_session_id, status, scheduled_start_at, scheduled_end_at, operational_note, outcome_note, created_at",
+      )
+      .eq("lead_id", leadId)
+      .order("created_at", { ascending: false }),
+    supabase.rpc("list_eligible_trial_classes"),
   ]);
+
+  const trialIds = (trials.data ?? []).map((t) => t.id);
+  const { data: trialEvents } = trialIds.length
+    ? await supabase
+        .from("lead_trial_event")
+        .select("id, lead_trial_id, event_type, occurred_at, changed_by, note")
+        .in("lead_trial_id", trialIds)
+        .order("occurred_at", { ascending: false })
+    : { data: [] as { id: string; lead_trial_id: string; event_type: string; occurred_at: string; changed_by: string; note: string | null }[] };
 
   const actorIds = new Set<string>();
   for (const row of activities.data ?? []) {
@@ -192,6 +239,9 @@ export async function queryLeadDetail(
     actorIds.add(row.changed_by);
     if (row.previous_assigned_user_id) actorIds.add(row.previous_assigned_user_id);
     if (row.new_assigned_user_id) actorIds.add(row.new_assigned_user_id);
+  }
+  for (const row of trialEvents ?? []) {
+    if (row.changed_by) actorIds.add(row.changed_by);
   }
   const assigneeIds = (followUps.data ?? [])
     .map((f) => f.assigned_user_id)
@@ -267,6 +317,33 @@ export async function queryLeadDetail(
     note: a.note,
   }));
 
+  const classNameMap = new Map(
+    (eligibleClasses.data ?? []).map((c) => [c.class_id, c.class_name]),
+  );
+
+  const trialDetails: LeadTrialDetail[] = (trials.data ?? []).map((trial) => ({
+    id: trial.id,
+    candidateId: trial.lead_candidate_id,
+    classId: trial.class_id,
+    className: classNameMap.get(trial.class_id) ?? trial.class_id,
+    teachingSessionId: trial.teaching_session_id,
+    status: trial.status as LeadTrialStatus,
+    scheduledStartAt: trial.scheduled_start_at,
+    scheduledEndAt: trial.scheduled_end_at,
+    operationalNote: trial.operational_note,
+    outcomeNote: trial.outcome_note,
+    createdAt: trial.created_at,
+  }));
+
+  const trialEventDetails: LeadTrialEventDetail[] = (trialEvents ?? []).map((event) => ({
+    id: event.id,
+    trialId: event.lead_trial_id,
+    eventType: event.event_type as LeadTrialEventType,
+    occurredAt: event.occurred_at,
+    changedByName: event.changed_by ? actorMap.get(event.changed_by) ?? null : null,
+    note: event.note,
+  }));
+
   const followUpDetails: LeadFollowUpDetail[] = (followUps.data ?? []).map((f) => ({
     id: f.id,
     dueAt: f.due_at,
@@ -292,10 +369,15 @@ export async function queryLeadDetail(
       occurredAt: assignment.changedAt,
       assignment,
     })),
+    ...trialEventDetails.map((trialEvent) => ({
+      kind: "trial" as const,
+      occurredAt: trialEvent.occurredAt,
+      trialEvent,
+    })),
   ].sort((a, b) => {
     const timeCompare = b.occurredAt.localeCompare(a.occurredAt);
     if (timeCompare !== 0) return timeCompare;
-    const kindOrder = { assignment: 0, status: 1, activity: 2 };
+    const kindOrder = { trial: 0, assignment: 1, status: 2, activity: 3 };
     return kindOrder[a.kind] - kindOrder[b.kind];
   });
 
@@ -318,6 +400,8 @@ export async function queryLeadDetail(
       activities: activityDetails,
       statusHistory: statusHistoryDetails,
       followUps: followUpDetails,
+      trials: trialDetails,
+      trialEvents: trialEventDetails,
       timeline,
       lostReasons: (lostReasons.data ?? []).map((r) => ({
         id: r.id,

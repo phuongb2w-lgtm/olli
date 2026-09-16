@@ -2587,6 +2587,242 @@ export type Database = {
           },
         ]
       }
+      lead_trial: {
+        Row: {
+          cancelled_at: string | null
+          cancelled_by: string | null
+          class_id: string
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          created_by: string
+          id: string
+          lead_candidate_id: string
+          lead_id: string
+          no_show_at: string | null
+          no_show_by: string | null
+          operational_note: string | null
+          organization_id: string
+          outcome_note: string | null
+          scheduled_end_at: string
+          scheduled_start_at: string
+          status: string
+          teaching_session_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          class_id: string
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          lead_candidate_id: string
+          lead_id: string
+          no_show_at?: string | null
+          no_show_by?: string | null
+          operational_note?: string | null
+          organization_id: string
+          outcome_note?: string | null
+          scheduled_end_at: string
+          scheduled_start_at: string
+          status?: string
+          teaching_session_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          class_id?: string
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          lead_candidate_id?: string
+          lead_id?: string
+          no_show_at?: string | null
+          no_show_by?: string | null
+          operational_note?: string | null
+          organization_id?: string
+          outcome_note?: string | null
+          scheduled_end_at?: string
+          scheduled_start_at?: string
+          status?: string
+          teaching_session_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_trial_organization_id_cancelled_by_fkey"
+            columns: ["organization_id", "cancelled_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_organization_id_class_id_fkey"
+            columns: ["organization_id", "class_id"]
+            isOneToOne: false
+            referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_organization_id_completed_by_fkey"
+            columns: ["organization_id", "completed_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_organization_id_lead_candidate_id_fkey"
+            columns: ["organization_id", "lead_candidate_id"]
+            isOneToOne: false
+            referencedRelation: "lead_candidate"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_organization_id_lead_id_fkey"
+            columns: ["organization_id", "lead_id"]
+            isOneToOne: false
+            referencedRelation: "lead"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_organization_id_no_show_by_fkey"
+            columns: ["organization_id", "no_show_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_organization_id_teaching_session_id_fkey"
+            columns: ["organization_id", "teaching_session_id"]
+            isOneToOne: false
+            referencedRelation: "teaching_session"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_organization_id_updated_by_fkey"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_trial_event: {
+        Row: {
+          changed_by: string
+          event_type: string
+          id: string
+          lead_trial_id: string
+          new_class_id: string | null
+          new_scheduled_end_at: string | null
+          new_scheduled_start_at: string | null
+          new_teaching_session_id: string | null
+          note: string | null
+          occurred_at: string
+          organization_id: string
+          outcome_snapshot: Json | null
+          previous_class_id: string | null
+          previous_scheduled_end_at: string | null
+          previous_scheduled_start_at: string | null
+          previous_teaching_session_id: string | null
+        }
+        Insert: {
+          changed_by: string
+          event_type: string
+          id?: string
+          lead_trial_id: string
+          new_class_id?: string | null
+          new_scheduled_end_at?: string | null
+          new_scheduled_start_at?: string | null
+          new_teaching_session_id?: string | null
+          note?: string | null
+          occurred_at?: string
+          organization_id: string
+          outcome_snapshot?: Json | null
+          previous_class_id?: string | null
+          previous_scheduled_end_at?: string | null
+          previous_scheduled_start_at?: string | null
+          previous_teaching_session_id?: string | null
+        }
+        Update: {
+          changed_by?: string
+          event_type?: string
+          id?: string
+          lead_trial_id?: string
+          new_class_id?: string | null
+          new_scheduled_end_at?: string | null
+          new_scheduled_start_at?: string | null
+          new_teaching_session_id?: string | null
+          note?: string | null
+          occurred_at?: string
+          organization_id?: string
+          outcome_snapshot?: Json | null
+          previous_class_id?: string | null
+          previous_scheduled_end_at?: string | null
+          previous_scheduled_start_at?: string | null
+          previous_teaching_session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_trial_event_organization_id_changed_by_fkey"
+            columns: ["organization_id", "changed_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_event_organization_id_lead_trial_id_fkey"
+            columns: ["organization_id", "lead_trial_id"]
+            isOneToOne: false
+            referencedRelation: "lead_trial"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_event_organization_id_new_class_id_fkey"
+            columns: ["organization_id", "new_class_id"]
+            isOneToOne: false
+            referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_event_organization_id_new_teaching_session_id_fkey"
+            columns: ["organization_id", "new_teaching_session_id"]
+            isOneToOne: false
+            referencedRelation: "teaching_session"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_event_organization_id_previous_class_id_fkey"
+            columns: ["organization_id", "previous_class_id"]
+            isOneToOne: false
+            referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_trial_event_organization_id_previous_teaching_session_fkey"
+            columns: ["organization_id", "previous_teaching_session_id"]
+            isOneToOne: false
+            referencedRelation: "teaching_session"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       observation_indicator: {
         Row: {
           code: string
@@ -4292,6 +4528,16 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m3_tr_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_tr_as_super: { Args: never; Returns: undefined }
+      _m3_tr_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_tr_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -4349,6 +4595,23 @@ export type Database = {
         Args: { p_period_month: string }
         Returns: string
       }
+      append_lead_trial_event: {
+        Args: {
+          p_event_type: string
+          p_new_class?: string
+          p_new_end?: string
+          p_new_session?: string
+          p_new_start?: string
+          p_note?: string
+          p_outcome_snapshot?: Json
+          p_previous_class?: string
+          p_previous_end?: string
+          p_previous_session?: string
+          p_previous_start?: string
+          p_trial_id: string
+        }
+        Returns: string
+      }
       apply_enrollment_tuition_correction: {
         Args: {
           p_new_net_tuition: number
@@ -4373,6 +4636,10 @@ export type Database = {
       cancel_lead_follow_up: {
         Args: { p_follow_up_id: string; p_note?: string }
         Returns: string
+      }
+      cancel_lead_trial: {
+        Args: { p_note?: string; p_trial_id: string }
+        Returns: Json
       }
       capital_asset_period_month: {
         Args: { p_period_number: number; p_placed_in_service: string }
@@ -4413,6 +4680,10 @@ export type Database = {
       complete_lead_follow_up: {
         Args: { p_follow_up_id: string; p_note?: string }
         Returns: string
+      }
+      complete_lead_trial: {
+        Args: { p_outcome_note?: string; p_trial_id: string }
+        Returns: Json
       }
       compute_break_even_learner_count: {
         Args: { p_total_cost: number; p_tuition_per_learner: number }
@@ -4650,12 +4921,37 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: boolean
       }
+      is_eligible_trial_class: {
+        Args: { p_class_id: string }
+        Returns: boolean
+      }
       list_eligible_lead_assignees: {
         Args: never
         Returns: {
           display_name: string
           user_id: string
         }[]
+      }
+      list_eligible_trial_classes: {
+        Args: never
+        Returns: {
+          class_id: string
+          class_name: string
+          class_status: string
+        }[]
+      }
+      list_trial_teaching_sessions: {
+        Args: { p_class_id: string }
+        Returns: {
+          scheduled_end_at: string
+          scheduled_start_at: string
+          session_id: string
+          status: string
+        }[]
+      }
+      mark_lead_trial_no_show: {
+        Args: { p_note?: string; p_trial_id: string }
+        Returns: Json
       }
       normalize_accounting_period: { Args: { p_date: string }; Returns: string }
       normalize_email_key: { Args: { p_email: string }; Returns: string }
@@ -4703,6 +4999,17 @@ export type Database = {
         }
         Returns: Json
       }
+      reschedule_lead_trial: {
+        Args: {
+          p_class_id?: string
+          p_note?: string
+          p_scheduled_end_at?: string
+          p_scheduled_start_at?: string
+          p_teaching_session_id?: string
+          p_trial_id: string
+        }
+        Returns: Json
+      }
       resolve_allocation_rule: {
         Args: {
           p_organization_id: string
@@ -4718,6 +5025,18 @@ export type Database = {
       resolve_enrollment_billing_guardian_id: {
         Args: { p_enrollment_id: string }
         Returns: string
+      }
+      resolve_lead_trial_schedule: {
+        Args: {
+          p_class_id: string
+          p_scheduled_end_at: string
+          p_scheduled_start_at: string
+          p_teaching_session_id: string
+        }
+        Returns: {
+          o_end: string
+          o_start: string
+        }[]
       }
       resolve_scenario_per_session_rate: {
         Args: {
@@ -4739,6 +5058,18 @@ export type Database = {
       }
       run_class_cost_allocation: {
         Args: { p_period_month: string }
+        Returns: Json
+      }
+      schedule_lead_trial: {
+        Args: {
+          p_class_id: string
+          p_lead_candidate_id: string
+          p_lead_id: string
+          p_note?: string
+          p_scheduled_end_at?: string
+          p_scheduled_start_at?: string
+          p_teaching_session_id?: string
+        }
         Returns: Json
       }
       seed_organization_cost_categories: {
@@ -4816,6 +5147,15 @@ export type Database = {
         }
         Returns: string
       }
+      try_advance_lead_lifecycle_for_trial: {
+        Args: {
+          p_from_status: string
+          p_lead_id: string
+          p_notes?: string
+          p_to_status: string
+        }
+        Returns: undefined
+      }
       update_class_financial_scenario: {
         Args: {
           p_assumed_net_tuition_per_learner?: number
@@ -4843,6 +5183,15 @@ export type Database = {
           p_recognition_basis_code?: string
           p_terms_id: string
           p_tuition_plan_id?: string
+        }
+        Returns: undefined
+      }
+      validate_lead_trial_academic_refs: {
+        Args: {
+          p_candidate_id: string
+          p_class_id: string
+          p_lead_id: string
+          p_teaching_session_id?: string
         }
         Returns: undefined
       }

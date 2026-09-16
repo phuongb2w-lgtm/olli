@@ -236,6 +236,82 @@ async function main() {
     .single();
   record(21, "assignment does not change status", assignedLead?.status === "new");
 
+  const { data: trialLeadRow } = await admin
+    .from("lead")
+    .insert({ organization_id: ORG_A, status: "qualified", notes_summary: "Trial smoke lead" })
+    .select("id")
+    .single();
+  const trialLeadId = trialLeadRow?.id;
+  const { data: trialCandidate } = await admin
+    .from("lead_candidate")
+    .insert({
+      organization_id: ORG_A,
+      lead_id: trialLeadId,
+      given_name: "Smoke",
+      family_name: "Trial",
+      is_primary_candidate: true,
+    })
+    .select("id")
+    .single();
+  const { data: trialClass } = await admin.rpc("list_eligible_trial_classes");
+  const classId = trialClass?.[0]?.class_id;
+  const { error: scheduleTrialErr, data: scheduleTrialResult } = await admin.rpc(
+    "schedule_lead_trial",
+    {
+      p_lead_id: trialLeadId,
+      p_lead_candidate_id: trialCandidate?.id,
+      p_class_id: classId,
+      p_teaching_session_id: null,
+      p_scheduled_start_at: new Date(Date.now() + 86400000 * 3).toISOString(),
+      p_scheduled_end_at: new Date(Date.now() + 86400000 * 3 + 5400000).toISOString(),
+      p_note: "Smoke trial",
+    },
+  );
+  record(22, "schedule trial via RPC", !scheduleTrialErr && Boolean(scheduleTrialResult?.trial_id));
+
+  const trialId = scheduleTrialResult?.trial_id;
+  const { count: trialEventCount } = await admin
+    .from("lead_trial_event")
+    .select("*", { count: "exact", head: true })
+    .eq("lead_trial_id", trialId);
+  record(23, "trial scheduling appends event", (trialEventCount ?? 0) === 1);
+
+  const { data: trialLeadStatus } = await admin
+    .from("lead")
+    .select("status")
+    .eq("id", trialLeadId)
+    .single();
+  record(24, "trial scheduling advances lifecycle", trialLeadStatus?.status === "trial_scheduled");
+
+  const beforeEnroll = await admin.from("enrollment").select("id", { count: "exact", head: true });
+  const beforeAttend = await admin.from("attendance").select("id", { count: "exact", head: true });
+  await admin.rpc("complete_lead_trial", { p_trial_id: trialId, p_outcome_note: "Smoke complete" });
+  const afterEnroll = await admin.from("enrollment").select("id", { count: "exact", head: true });
+  const afterAttend = await admin.from("attendance").select("id", { count: "exact", head: true });
+  record(
+    25,
+    "trial completion has no enrollment side effect",
+    beforeEnroll.count === afterEnroll.count && beforeAttend.count === afterAttend.count,
+  );
+
+  const { error: trialBypassErr, data: trialBypassRows } = await admin
+    .from("lead_trial")
+    .update({ status: "scheduled" })
+    .eq("id", trialId)
+    .select("id");
+  const { data: trialAfterBypass } = await admin
+    .from("lead_trial")
+    .select("status")
+    .eq("id", trialId)
+    .single();
+  record(
+    26,
+    "direct trial status update blocked",
+    Boolean(trialBypassErr) ||
+      (trialBypassRows?.length ?? 0) === 0 ||
+      trialAfterBypass?.status === "completed",
+  );
+
   const failed = results.filter((r) => !r.passed);
   console.log(`\nCRM leads smoke: ${results.length - failed.length}/${results.length} passed`);
   if (failed.length > 0) process.exit(1);

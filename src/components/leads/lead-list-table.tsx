@@ -15,6 +15,7 @@ function formatDate(value: string | null): string {
 export async function LeadListTable({ items }: Props) {
   const t = await getTranslations("crm.leads");
   const tAssignment = await getTranslations("crm.assignment");
+  const tTrial = await getTranslations("crm.trial");
 
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
@@ -37,6 +38,9 @@ export async function LeadListTable({ items }: Props) {
               {t("sourceColumn")}
             </th>
             <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
+              {tTrial("nextTrialColumn")}
+            </th>
+            <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
               {t("nextFollowUpColumn")}
             </th>
             <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
@@ -57,12 +61,20 @@ export async function LeadListTable({ items }: Props) {
               </td>
               <td className="px-4 py-3 text-slate-700">{item.primaryContactName ?? t("emptyValue")}</td>
               <td className="px-4 py-3">
-                <LeadStatusBadge status={item.status} />
+                <div className="flex flex-wrap items-center gap-2">
+                  <LeadStatusBadge status={item.status} />
+                  {item.hasScheduledTrial ? (
+                    <span className="rounded bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-800">
+                      {tTrial("scheduledBadge")}
+                    </span>
+                  ) : null}
+                </div>
               </td>
               <td className="px-4 py-3 text-slate-700">
                 {item.assignedUserName ?? tAssignment("unassignedLabel")}
               </td>
               <td className="px-4 py-3 text-slate-700">{item.sourceLabel ?? t("emptyValue")}</td>
+              <td className="px-4 py-3 text-slate-700">{formatDate(item.nextTrialAt)}</td>
               <td className="px-4 py-3 text-slate-700">{formatDate(item.nextFollowUpAt)}</td>
               <td className="px-4 py-3 text-slate-700">{formatDate(item.lastActivityAt)}</td>
               <td className="px-4 py-3 text-slate-700">{formatDate(item.createdAt)}</td>

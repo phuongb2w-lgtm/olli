@@ -2,7 +2,12 @@ import { getTranslations } from "next-intl/server";
 import { LeadAssignmentPanel } from "@/components/leads/lead-assignment-panel";
 import { LeadDetailActions } from "@/components/leads/lead-detail-actions";
 import { LeadStatusBadge } from "@/components/leads/lead-status-badge";
+import { LeadTrialPanel } from "@/components/leads/lead-trial-panel";
 import type { EligibleAssignee } from "@/lib/leads/query-eligible-assignees";
+import type {
+  EligibleTrialClass,
+  TrialTeachingSession,
+} from "@/lib/leads/query-eligible-trial-classes";
 import type { LeadDetail } from "@/lib/leads/query-lead-detail";
 
 type Props = {
@@ -10,6 +15,8 @@ type Props = {
   canUpdate: boolean;
   canAssign: boolean;
   assignees: EligibleAssignee[];
+  eligibleClasses: EligibleTrialClass[];
+  sessionsByClass: Record<string, TrialTeachingSession[]>;
 };
 
 function formatDateTime(value: string | null): string {
@@ -17,12 +24,20 @@ function formatDateTime(value: string | null): string {
   return new Date(value).toLocaleString();
 }
 
-export async function LeadDetailView({ detail, canUpdate, canAssign, assignees }: Props) {
+export async function LeadDetailView({
+  detail,
+  canUpdate,
+  canAssign,
+  assignees,
+  eligibleClasses,
+  sessionsByClass,
+}: Props) {
   const t = await getTranslations("crm.detail");
   const tActivity = await getTranslations("activity.lead");
   const tStatus = await getTranslations("status.lead");
   const tAssignment = await getTranslations("crm.assignment");
   const tFollowUp = await getTranslations("crm.followUp");
+  const tTrialEvent = await getTranslations("event.trial");
 
   const pendingFollowUps = detail.followUps
     .filter((f) => f.status === "pending")
@@ -115,6 +130,16 @@ export async function LeadDetailView({ detail, canUpdate, canAssign, assignees }
         canAssign={canAssign}
       />
 
+      <LeadTrialPanel
+        leadId={detail.id}
+        candidates={detail.candidates}
+        trials={detail.trials}
+        trialEvents={detail.trialEvents}
+        eligibleClasses={eligibleClasses}
+        sessionsByClass={sessionsByClass}
+        canUpdate={canUpdate}
+      />
+
       <LeadDetailActions
         leadId={detail.id}
         status={detail.status}
@@ -136,7 +161,9 @@ export async function LeadDetailView({ detail, canUpdate, canAssign, assignees }
                     ? entry.activity.id
                     : entry.kind === "status"
                       ? entry.status.id
-                      : entry.assignment.id
+                      : entry.kind === "assignment"
+                        ? entry.assignment.id
+                        : entry.trialEvent.id
                 }`}
                 className="border-l-2 border-slate-200 pl-4"
               >
@@ -152,6 +179,11 @@ export async function LeadDetailView({ detail, canUpdate, canAssign, assignees }
                       ? `${tStatus(entry.status.fromStatus)} → ${tStatus(entry.status.toStatus)}`
                       : tStatus(entry.status.toStatus)}
                     {entry.status.notes ? ` — ${entry.status.notes}` : ""}
+                  </p>
+                ) : entry.kind === "trial" ? (
+                  <p className="text-sm text-slate-900">
+                    {tTrialEvent(entry.trialEvent.eventType)}
+                    {entry.trialEvent.note ? ` — ${entry.trialEvent.note}` : ""}
                   </p>
                 ) : (
                   <p className="text-sm text-slate-900">

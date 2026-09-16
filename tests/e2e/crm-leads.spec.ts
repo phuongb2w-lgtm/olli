@@ -6,6 +6,7 @@ const readerEmail = "org-a-reader@olli.local";
 const password = "testpass123";
 const leadFixtureId = "a6100000-0000-4000-8000-000000000001";
 const transitionLeadFixtureId = "a6100000-0000-4000-8000-000000000002";
+const trialLeadFixtureId = "a6100000-0000-4000-8000-000000000002";
 
 async function signIn(page: import("@playwright/test").Page, email: string) {
   await page.goto("/login");
@@ -100,7 +101,44 @@ test.describe("M3 CRM leads", () => {
     await expect(page.locator(`a[href="/crm/leads/${leadFixtureId}"]`)).not.toBeVisible();
   });
 
-  test("9. Vietnamese CRM labels render", async ({ page }) => {
+  test("9. admin can schedule and complete a trial", async ({ page }) => {
+    await signIn(page, adminEmail);
+    await page.goto(`/crm/leads/${trialLeadFixtureId}`);
+    await expect(page.getByRole("heading", { name: /Trials|Học thử/i })).toBeVisible();
+
+    const trialSection = page
+      .locator("section")
+      .filter({ has: page.getByRole("heading", { name: /Trials|Học thử/i }) });
+
+    await page.locator("#trialCandidateId").selectOption({ index: 1 });
+    const classSelect = page.locator("#trialClassId");
+    const classOption = classSelect.locator("option").filter({ hasText: /Class A1|Renamed Seed Class/i });
+    const preferredClassValue = await classOption.first().getAttribute("value");
+    if (preferredClassValue) {
+      await classSelect.selectOption(preferredClassValue);
+    } else {
+      await classSelect.selectOption({ index: 1 });
+    }
+    const start = new Date(Date.now() + 86400000 * 5);
+    const end = new Date(start.getTime() + 90 * 60 * 1000);
+    const toLocal = (d: Date) => {
+      const pad = (n: number) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+    await page.locator("#trialStartAt").fill(toLocal(start));
+    await page.locator("#trialEndAt").fill(toLocal(end));
+    await page.getByRole("button", { name: /Schedule trial|Lên lịch học thử/i }).click();
+    await expect(trialSection.getByText(/Scheduled|Đã lên lịch/i).first()).toBeVisible({
+      timeout: 15_000,
+    });
+
+    const outcomeNote = `E2E trial outcome ${Date.now()}`;
+    await trialSection.getByPlaceholder(/Brief outcome|Kết quả ngắn gọn/i).first().fill(outcomeNote);
+    await trialSection.getByRole("button", { name: /Mark completed|Đánh dấu hoàn thành/i }).first().click();
+    await expect(page.getByText(outcomeNote).first()).toBeVisible({ timeout: 15_000 });
+  });
+
+  test("10. Vietnamese CRM labels render", async ({ page }) => {
     await signIn(page, adminEmail);
     await page.goto("/crm/leads");
     await page.getByLabel(/language|ngôn ngữ/i).selectOption("vi");

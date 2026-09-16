@@ -308,6 +308,21 @@
       "converted": "Đã chuyển đổi",
       "lost": "Đã mất",
       "reactivated": "Kích hoạt lại"
+    },
+    "trial": {
+      "scheduled": "Đã lên lịch",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "no_show": "Vắng mặt"
+    }
+  },
+  "event": {
+    "trial": {
+      "scheduled": "Đã lên lịch học thử",
+      "rescheduled": "Đổi lịch học thử",
+      "completed": "Hoàn thành học thử",
+      "cancelled": "Hủy học thử",
+      "no_show": "Vắng mặt học thử"
     }
   },
   "crm": {
@@ -343,6 +358,38 @@
       "workloadTitle": "Khối lượng lead đang xử lý",
       "unassignedWorkload": "Chưa phân công: {count}",
       "assigneeWorkload": "{name}: {count}"
+    },
+    "trial": {
+      "title": "Học thử",
+      "scheduleTitle": "Lên lịch học thử",
+      "rescheduleTitle": "Đổi lịch học thử",
+      "candidate": "Học viên tiềm năng",
+      "selectCandidate": "Chọn học viên tiềm năng",
+      "unknownCandidate": "Học viên không xác định",
+      "class": "Lớp",
+      "selectClass": "Chọn lớp",
+      "session": "Buổi học",
+      "sessionOptional": "Buổi học (tùy chọn)",
+      "noSession": "Không liên kết buổi học",
+      "sessionPrecedenceHint": "Khi chọn buổi học, thời gian của buổi học sẽ được dùng làm thời điểm học thử.",
+      "scheduledStart": "Bắt đầu",
+      "scheduledEnd": "Kết thúc",
+      "note": "Ghi chú (tùy chọn)",
+      "outcome": "Ghi chú kết quả",
+      "outcomePlaceholder": "Kết quả ngắn gọn (tùy chọn)",
+      "schedule": "Lên lịch học thử",
+      "reschedule": "Đổi lịch",
+      "complete": "Đánh dấu hoàn thành",
+      "cancel": "Hủy học thử",
+      "noShow": "Đánh dấu vắng mặt",
+      "saving": "Đang lưu…",
+      "historyTitle": "Lịch sử học thử",
+      "emptyTrials": "Chưa có học thử nào.",
+      "noEligibleClasses": "Không có lớp hợp lệ để lên lịch học thử.",
+      "listFilter": "Học thử",
+      "filterScheduled": "Có học thử đang lên lịch",
+      "nextTrialColumn": "Học thử tiếp theo",
+      "scheduledBadge": "Đã lên lịch học thử"
     },
     "assignment": {
       "title": "Phân công",
@@ -415,6 +462,16 @@
       "due_at_required": "Cần nhập thời hạn theo dõi.",
       "follow_up_not_pending": "Theo dõi này không còn ở trạng thái chờ.",
       "invalid_assignee": "Chọn người phụ trách hợp lệ trong tổ chức.",
+      "lead_lost": "Kích hoạt lại lead trước khi lên lịch học thử.",
+      "lead_converted": "Lead đã chuyển đổi không thể lên lịch học thử mới.",
+      "invalid_candidate": "Chọn học viên tiềm năng hợp lệ cho lead này.",
+      "invalid_class": "Chọn lớp hợp lệ trong tổ chức.",
+      "class_not_eligible": "Lớp này không thể nhận học thử mới.",
+      "invalid_teaching_session": "Chọn buổi học hợp lệ.",
+      "session_class_mismatch": "Buổi học không thuộc lớp đã chọn.",
+      "schedule_required": "Nhập thời gian bắt đầu và kết thúc.",
+      "invalid_schedule": "Thời gian kết thúc phải sau thời gian bắt đầu.",
+      "trial_not_scheduled": "Học thử này không còn ở trạng thái đã lên lịch.",
       "mutation_error": "Không thể hoàn thành thao tác."
     },
     "followUp": {

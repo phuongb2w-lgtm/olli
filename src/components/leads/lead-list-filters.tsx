@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { LEAD_LIST_STATUSES } from "@/lib/leads/constants";
+import { LEAD_LIST_STATUSES, LEAD_TRIAL_FILTERS } from "@/lib/leads/constants";
 import type { EligibleAssignee } from "@/lib/leads/query-eligible-assignees";
 import type { LeadListParams } from "@/lib/leads/parse-list-params";
 
@@ -13,6 +13,7 @@ type Props = {
 export function LeadListFilters({ params, assignees }: Props) {
   const t = useTranslations("crm.leads");
   const tStatus = useTranslations("status.lead");
+  const tTrial = useTranslations("crm.trial");
   const showUserPicker = params.owner === "user";
 
   return (
@@ -66,6 +67,23 @@ export function LeadListFilters({ params, assignees }: Props) {
           </select>
         </div>
       ) : null}
+      <div>
+        <label htmlFor="lead-trial" className="mb-1 block text-sm font-medium text-slate-700">
+          {tTrial("listFilter")}
+        </label>
+        <select
+          id="lead-trial"
+          name="trial"
+          defaultValue={params.trial}
+          className="rounded border border-slate-300 px-3 py-2 text-sm"
+        >
+          {LEAD_TRIAL_FILTERS.map((trial) => (
+            <option key={trial} value={trial}>
+              {trial === "all" ? t("filterAll") : tTrial("filterScheduled")}
+            </option>
+          ))}
+        </select>
+      </div>
       <div>
         <label htmlFor="lead-status" className="mb-1 block text-sm font-medium text-slate-700">
           {t("statusFilter")}

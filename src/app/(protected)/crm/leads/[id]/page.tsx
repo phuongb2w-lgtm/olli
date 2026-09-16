@@ -3,7 +3,12 @@ import { getTranslations } from "next-intl/server";
 import { LeadDetailView } from "@/components/leads/lead-detail-view";
 import { can } from "@/lib/permissions/can";
 import { queryEligibleAssignees } from "@/lib/leads/query-eligible-assignees";
+import {
+  queryEligibleTrialClasses,
+  queryTrialTeachingSessions,
+} from "@/lib/leads/query-eligible-trial-classes";
 import { queryLeadDetail } from "@/lib/leads/query-lead-detail";
+import type { TrialTeachingSession } from "@/lib/leads/query-eligible-trial-classes";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -31,10 +36,25 @@ export default async function LeadDetailPage({ params }: Props) {
   }
 
   const supabase = await createClient();
-  const [{ detail, error, notFound }, { assignees }] = await Promise.all([
-    queryLeadDetail(supabase, id),
-    hasAssign ? queryEligibleAssignees(supabase) : Promise.resolve({ assignees: [], error: false }),
-  ]);
+  const [{ detail, error, notFound }, { assignees }, { classes: eligibleClasses }] =
+    await Promise.all([
+      queryLeadDetail(supabase, id),
+      hasAssign ? queryEligibleAssignees(supabase) : Promise.resolve({ assignees: [], error: false }),
+      hasRead ? queryEligibleTrialClasses(supabase) : Promise.resolve({ classes: [], error: false }),
+    ]);
+
+  const sessionsByClass: Record<string, TrialTeachingSession[]> = {};
+  if (hasRead && eligibleClasses.length > 0) {
+    const sessionResults = await Promise.all(
+      eligibleClasses.map(async (c) => {
+        const { sessions } = await queryTrialTeachingSessions(supabase, c.classId);
+        return [c.classId, sessions] as const;
+      }),
+    );
+    for (const [classId, sessions] of sessionResults) {
+      sessionsByClass[classId] = sessions;
+    }
+  }
 
   if (error) {
     return (
@@ -68,6 +88,8 @@ export default async function LeadDetailPage({ params }: Props) {
         canUpdate={hasUpdate}
         canAssign={hasAssign}
         assignees={assignees}
+        eligibleClasses={eligibleClasses}
+        sessionsByClass={sessionsByClass}
       />
     </div>
   );

@@ -308,6 +308,21 @@
       "converted": "Converted",
       "lost": "Lost",
       "reactivated": "Reactivated"
+    },
+    "trial": {
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "no_show": "No-show"
+    }
+  },
+  "event": {
+    "trial": {
+      "scheduled": "Trial scheduled",
+      "rescheduled": "Trial rescheduled",
+      "completed": "Trial completed",
+      "cancelled": "Trial cancelled",
+      "no_show": "Trial no-show"
     }
   },
   "crm": {
@@ -343,6 +358,38 @@
       "workloadTitle": "Active lead workload",
       "unassignedWorkload": "Unassigned: {count}",
       "assigneeWorkload": "{name}: {count}"
+    },
+    "trial": {
+      "title": "Trials",
+      "scheduleTitle": "Schedule trial",
+      "rescheduleTitle": "Reschedule trial",
+      "candidate": "Candidate",
+      "selectCandidate": "Select candidate",
+      "unknownCandidate": "Unknown candidate",
+      "class": "Class",
+      "selectClass": "Select class",
+      "session": "Teaching session",
+      "sessionOptional": "Teaching session (optional)",
+      "noSession": "No linked session",
+      "sessionPrecedenceHint": "When a session is selected, its scheduled time is used as the trial snapshot.",
+      "scheduledStart": "Scheduled start",
+      "scheduledEnd": "Scheduled end",
+      "note": "Note (optional)",
+      "outcome": "Outcome note",
+      "outcomePlaceholder": "Brief outcome (optional)",
+      "schedule": "Schedule trial",
+      "reschedule": "Reschedule",
+      "complete": "Mark completed",
+      "cancel": "Cancel trial",
+      "noShow": "Mark no-show",
+      "saving": "Saving…",
+      "historyTitle": "Trial history",
+      "emptyTrials": "No trials recorded yet.",
+      "noEligibleClasses": "No eligible classes are available for trials.",
+      "listFilter": "Trial",
+      "filterScheduled": "Has scheduled trial",
+      "nextTrialColumn": "Next trial",
+      "scheduledBadge": "Trial scheduled"
     },
     "assignment": {
       "title": "Ownership",
@@ -415,6 +462,16 @@
       "due_at_required": "Follow-up due date is required.",
       "follow_up_not_pending": "This follow-up is no longer pending.",
       "invalid_assignee": "Select an eligible assignee in your organization.",
+      "lead_lost": "Reactivate this lead before scheduling a trial.",
+      "lead_converted": "Converted leads cannot receive new trials.",
+      "invalid_candidate": "Select a valid candidate for this lead.",
+      "invalid_class": "Select a valid class in your organization.",
+      "class_not_eligible": "This class cannot accept new trials.",
+      "invalid_teaching_session": "Select a valid teaching session.",
+      "session_class_mismatch": "The teaching session does not belong to the selected class.",
+      "schedule_required": "Enter a scheduled start and end time.",
+      "invalid_schedule": "Scheduled end must be after start.",
+      "trial_not_scheduled": "This trial is no longer scheduled.",
       "mutation_error": "Unable to complete this action."
     },
     "followUp": {
