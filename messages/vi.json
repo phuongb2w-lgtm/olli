@@ -771,6 +771,24 @@
     "posted": "Đã ghi nhận",
     "void": "Đã hủy"
   },
+  "personnelCost": {
+    "title": "Chi phí nhân sự",
+    "compensationRule": "Quy tắc lương thưởng",
+    "personnelCostEntry": "Bút toán chi phí nhân sự",
+    "directCost": "Chi phí lớp trực tiếp",
+    "sharedCost": "Chi phí nhân sự dùng chung",
+    "generateMonthly": "Sinh chi phí nhân sự tháng",
+    "generateSessionCost": "Sinh chi phí buổi dạy"
+  },
+  "compensationBasis": {
+    "monthly_fixed": "Cố định hàng tháng",
+    "per_session": "Theo buổi dạy"
+  },
+  "welfareFund": {
+    "title": "Quỹ phúc lợi cơ bản",
+    "monthlyAmount": "Mức cơ bản hàng tháng",
+    "configureBaseline": "Cấu hình quỹ phúc lợi"
+  },
   "expenseCategory": {
     "rent": "Thuê mặt bằng",
     "electricity": "Điện",

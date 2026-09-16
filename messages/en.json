@@ -771,6 +771,24 @@
     "posted": "Posted",
     "void": "Void"
   },
+  "personnelCost": {
+    "title": "Personnel cost",
+    "compensationRule": "Compensation rule",
+    "personnelCostEntry": "Personnel cost entry",
+    "directCost": "Direct class cost",
+    "sharedCost": "Shared personnel cost",
+    "generateMonthly": "Generate monthly personnel costs",
+    "generateSessionCost": "Generate session personnel cost"
+  },
+  "compensationBasis": {
+    "monthly_fixed": "Monthly fixed",
+    "per_session": "Per session"
+  },
+  "welfareFund": {
+    "title": "Welfare fund baseline",
+    "monthlyAmount": "Monthly baseline amount",
+    "configureBaseline": "Configure welfare baseline"
+  },
   "expenseCategory": {
     "rent": "Rent",
     "electricity": "Electricity",

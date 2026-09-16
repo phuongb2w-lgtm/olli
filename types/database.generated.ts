@@ -1796,6 +1796,139 @@ export type Database = {
         }
         Relationships: []
       }
+      personnel_cost_entry: {
+        Row: {
+          accounting_period: string
+          amount: number
+          app_user_id: string | null
+          class_id: string | null
+          compensation_basis_code: string | null
+          cost_domain_code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          incurred_date: string
+          organization_id: string
+          source_type: string
+          staff_compensation_rule_id: string | null
+          status: string
+          teacher_id: string | null
+          teaching_session_id: string | null
+          void_notes: string | null
+          voided_at: string | null
+          voided_by: string | null
+          welfare_fund_baseline_config_id: string | null
+        }
+        Insert: {
+          accounting_period: string
+          amount: number
+          app_user_id?: string | null
+          class_id?: string | null
+          compensation_basis_code?: string | null
+          cost_domain_code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          incurred_date: string
+          organization_id: string
+          source_type: string
+          staff_compensation_rule_id?: string | null
+          status?: string
+          teacher_id?: string | null
+          teaching_session_id?: string | null
+          void_notes?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+          welfare_fund_baseline_config_id?: string | null
+        }
+        Update: {
+          accounting_period?: string
+          amount?: number
+          app_user_id?: string | null
+          class_id?: string | null
+          compensation_basis_code?: string | null
+          cost_domain_code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          incurred_date?: string
+          organization_id?: string
+          source_type?: string
+          staff_compensation_rule_id?: string | null
+          status?: string
+          teacher_id?: string | null
+          teaching_session_id?: string | null
+          void_notes?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+          welfare_fund_baseline_config_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_app_user_id_fkey"
+            columns: ["organization_id", "app_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_class_id_fkey"
+            columns: ["organization_id", "class_id"]
+            isOneToOne: false
+            referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_staff_compensation_ru_fkey"
+            columns: ["organization_id", "staff_compensation_rule_id"]
+            isOneToOne: false
+            referencedRelation: "staff_compensation_rule"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_teacher_id_fkey"
+            columns: ["organization_id", "teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teacher"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_teaching_session_id_fkey"
+            columns: ["organization_id", "teaching_session_id"]
+            isOneToOne: false
+            referencedRelation: "teaching_session"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_voided_by_fkey"
+            columns: ["organization_id", "voided_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_welfare_fund_baseline_fkey"
+            columns: ["organization_id", "welfare_fund_baseline_config_id"]
+            isOneToOne: false
+            referencedRelation: "welfare_fund_baseline_config"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       progress_evaluation: {
         Row: {
           class_id: string
@@ -2098,6 +2231,86 @@ export type Database = {
           },
           {
             foreignKeyName: "room_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      staff_compensation_rule: {
+        Row: {
+          amount: number
+          app_user_id: string
+          compensation_basis_code: string
+          cost_domain_code: string
+          created_at: string
+          created_by: string | null
+          effective_from: string
+          effective_to: string | null
+          id: string
+          notes: string | null
+          organization_id: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          amount: number
+          app_user_id: string
+          compensation_basis_code: string
+          cost_domain_code: string
+          created_at?: string
+          created_by?: string | null
+          effective_from: string
+          effective_to?: string | null
+          id?: string
+          notes?: string | null
+          organization_id: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          amount?: number
+          app_user_id?: string
+          compensation_basis_code?: string
+          cost_domain_code?: string
+          created_at?: string
+          created_by?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_compensation_rule_organization_id_app_user_id_fkey"
+            columns: ["organization_id", "app_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "staff_compensation_rule_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "staff_compensation_rule_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_compensation_rule_organization_id_updated_by_fkey"
             columns: ["organization_id", "updated_by"]
             isOneToOne: false
             referencedRelation: "app_user"
@@ -2623,6 +2836,70 @@ export type Database = {
           },
         ]
       }
+      welfare_fund_baseline_config: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          effective_from: string
+          effective_to: string | null
+          id: string
+          monthly_amount: number
+          notes: string | null
+          organization_id: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          effective_from: string
+          effective_to?: string | null
+          id?: string
+          monthly_amount: number
+          notes?: string | null
+          organization_id: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          monthly_amount?: number
+          notes?: string | null
+          organization_id?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "welfare_fund_baseline_config_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "welfare_fund_baseline_config_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "welfare_fund_baseline_config_organization_id_updated_by_fkey"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
     }
     Views: {
       charge_balance: {
@@ -2654,6 +2931,116 @@ export type Database = {
           outstanding_balance?: never
         }
         Relationships: []
+      }
+      personnel_cost_entry_detail: {
+        Row: {
+          accounting_period: string | null
+          amount: number | null
+          app_user_id: string | null
+          attribution_type: string | null
+          class_id: string | null
+          compensation_basis_code: string | null
+          cost_domain_code: string | null
+          created_at: string | null
+          id: string | null
+          incurred_date: string | null
+          organization_id: string | null
+          source_type: string | null
+          staff_compensation_rule_id: string | null
+          status: string | null
+          teacher_id: string | null
+          teaching_session_id: string | null
+          welfare_fund_baseline_config_id: string | null
+        }
+        Insert: {
+          accounting_period?: string | null
+          amount?: number | null
+          app_user_id?: string | null
+          attribution_type?: never
+          class_id?: string | null
+          compensation_basis_code?: string | null
+          cost_domain_code?: string | null
+          created_at?: string | null
+          id?: string | null
+          incurred_date?: string | null
+          organization_id?: string | null
+          source_type?: string | null
+          staff_compensation_rule_id?: string | null
+          status?: string | null
+          teacher_id?: string | null
+          teaching_session_id?: string | null
+          welfare_fund_baseline_config_id?: string | null
+        }
+        Update: {
+          accounting_period?: string | null
+          amount?: number | null
+          app_user_id?: string | null
+          attribution_type?: never
+          class_id?: string | null
+          compensation_basis_code?: string | null
+          cost_domain_code?: string | null
+          created_at?: string | null
+          id?: string | null
+          incurred_date?: string | null
+          organization_id?: string | null
+          source_type?: string | null
+          staff_compensation_rule_id?: string | null
+          status?: string | null
+          teacher_id?: string | null
+          teaching_session_id?: string | null
+          welfare_fund_baseline_config_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_app_user_id_fkey"
+            columns: ["organization_id", "app_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_class_id_fkey"
+            columns: ["organization_id", "class_id"]
+            isOneToOne: false
+            referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_staff_compensation_ru_fkey"
+            columns: ["organization_id", "staff_compensation_rule_id"]
+            isOneToOne: false
+            referencedRelation: "staff_compensation_rule"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_teacher_id_fkey"
+            columns: ["organization_id", "teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teacher"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_teaching_session_id_fkey"
+            columns: ["organization_id", "teaching_session_id"]
+            isOneToOne: false
+            referencedRelation: "teaching_session"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personnel_cost_entry_organization_id_welfare_fund_baseline_fkey"
+            columns: ["organization_id", "welfare_fund_baseline_config_id"]
+            isOneToOne: false
+            referencedRelation: "welfare_fund_baseline_config"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -2744,6 +3131,14 @@ export type Database = {
         Args: { p_charge_id: string }
         Returns: number
       }
+      configure_welfare_fund_baseline: {
+        Args: {
+          p_effective_from: string
+          p_monthly_amount: number
+          p_notes?: string
+        }
+        Returns: string
+      }
       create_capital_asset: {
         Args: {
           p_category_code?: string
@@ -2777,8 +3172,23 @@ export type Database = {
         }
         Returns: string
       }
+      create_staff_compensation_rule: {
+        Args: {
+          p_amount: number
+          p_app_user_id: string
+          p_compensation_basis_code: string
+          p_cost_domain_code: string
+          p_effective_from: string
+          p_notes?: string
+        }
+        Returns: string
+      }
       current_app_user_id: { Args: never; Returns: string }
       current_organization_id: { Args: never; Returns: string }
+      end_staff_compensation_rule: {
+        Args: { p_effective_to: string; p_rule_id: string }
+        Returns: string
+      }
       enrollment_recognition_entitlement: {
         Args: { p_terms_id: string }
         Returns: number
@@ -2798,6 +3208,14 @@ export type Database = {
       generate_enrollment_charges: {
         Args: { p_terms_id: string }
         Returns: number
+      }
+      generate_personnel_costs: {
+        Args: { p_period_month: string }
+        Returns: Json
+      }
+      generate_teaching_session_personnel_cost: {
+        Args: { p_teaching_session_id: string }
+        Returns: Json
       }
       generate_teaching_sessions: {
         Args: {
@@ -2834,6 +3252,19 @@ export type Database = {
         Args: { p_status: string }
         Returns: boolean
       }
+      is_compensation_rule_applicable_to_month: {
+        Args: {
+          p_effective_from: string
+          p_effective_to: string
+          p_period_month: string
+        }
+        Returns: boolean
+      }
+      is_compensation_rule_effective_on: {
+        Args: { p_effective_from: string; p_effective_to: string; p_on: string }
+        Returns: boolean
+      }
+      normalize_accounting_period: { Args: { p_date: string }; Returns: string }
       normalize_recognition_basis_code: {
         Args: { p_code: string }
         Returns: string
@@ -2970,6 +3401,14 @@ export type Database = {
           p_tuition_plan_id?: string
         }
         Returns: undefined
+      }
+      validate_personnel_cost_domain: {
+        Args: { p_cost_domain_code: string; p_organization_id: string }
+        Returns: undefined
+      }
+      void_personnel_cost_entry: {
+        Args: { p_entry_id: string; p_notes?: string }
+        Returns: string
       }
       void_revenue_recognition_event: {
         Args: { p_event_id: string; p_notes?: string }

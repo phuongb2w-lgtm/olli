@@ -473,7 +473,7 @@ Order driven by **physical dependencies** and **accounting integrity** (configur
 | ~~**M2-T04**~~ | **DONE** — Enrollment financial terms, payment schedule, charge generation with provenance | M1 enrollment |
 | ~~**M2-T05**~~ | **DONE** — Payment recording, allocation workflow, reversals, enrollment cash summary | T04 |
 | ~~**M2-T06**~~ | **DONE** — Revenue recognition (per-lesson + stage), M1 evidence consumption | T05, M1 |
-| **M2-T07** | Personnel cost templates & welfare fund category (Cost B2 completion) | T02 |
+| ~~**M2-T07**~~ | **DONE** — Personnel compensation rules, cost entries, welfare baseline | T02, M1 |
 | **M2-T08** | Class cost allocation rules + contribution report (read models) | T02–T07 |
 | **M2-T09** | New-class financial simulator (read-only projection) | T04, T08 |
 | **M2-T10** | Finance UI + bilingual labels + permission refinement | T05+ |
@@ -1312,4 +1312,84 @@ T06 does **not** auto-recognize remaining tuition on withdrawal or auto-refund. 
 
 ---
 
-*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04. Updated for M2-T05. Updated for M2-T06.*
+## Appendix H — M2-T07 Personnel Costing (after `ba34bdc`)
+
+**Migration:** `20260914142000_m2_t07_personnel_costing.sql`
+
+### Staff identity
+
+Personnel costing reuses `app_user` as staff identity. `teacher.user_id` links academic teacher profile to staff account when applicable. Authorization roles do **not** determine cost classification — the compensation rule carries `cost_domain_code`.
+
+### Compensation rules
+
+`staff_compensation_rule` — effective-dated configuration:
+
+| Field | Purpose |
+|-------|---------|
+| `app_user_id` | Staff identity |
+| `cost_domain_code` | `personnel` (B2) or `marketing_sales` (Cost C) |
+| `compensation_basis_code` | `monthly_fixed` or `per_session` |
+| `amount` | Rate in minor units |
+| `effective_from` / `effective_to` | Preserved history; no silent overwrite |
+
+Overlap prevented per `(staff, basis, domain)` via exclusion constraint. `capital` and `operating_overhead` rejected.
+
+### Personnel cost entries
+
+`personnel_cost_entry` — immutable management-cost facts (distinct from `expense`):
+
+| Source | Trigger | Attribution |
+|--------|---------|-------------|
+| `monthly_fixed` | `generate_personnel_costs(period_month)` | Shared (no class/session) |
+| `per_session` | `generate_teaching_session_personnel_cost(session_id)` | Direct (`class_id`, `teaching_session_id`, `teacher_id`) |
+| `welfare_baseline` | `generate_personnel_costs(period_month)` | Shared org-level B2 |
+
+Snapshots at generation: `amount`, `cost_domain_code`, `compensation_basis_code`. Posted rows immutable; void via `void_personnel_cost_entry`.
+
+### Partial months
+
+T07 baseline: if a monthly rule applies to an accounting month, generate the full configured monthly amount. No calendar-day proration.
+
+### Welfare fund
+
+`welfare_fund_baseline_config` — organization-level monthly baseline. Generated entries use `source_type = 'welfare_baseline'`, `cost_domain_code = 'personnel'`, no `app_user_id`.
+
+### Reporting combination (no double count)
+
+| Source | Role in management reporting |
+|--------|------------------------------|
+| `expense` | Posted operating/cash expenses |
+| `depreciation_entry` | Cost A allocation |
+| `personnel_cost_entry` | B2/C personnel management costs |
+
+Personnel cost generation does **not** mirror into `expense`.
+
+### T08 handoff
+
+View `personnel_cost_entry_detail` exposes `attribution_type`:
+
+- `direct` — session-linked teacher cost (class P/L input)
+- `shared` — monthly fixed + welfare (allocation deferred to T08)
+
+Query by `accounting_period`, `class_id`, `cost_domain_code` without persisted totals.
+
+### RPCs
+
+| RPC | Permission |
+|-----|------------|
+| `create_staff_compensation_rule` | `personnel_cost.manage` |
+| `end_staff_compensation_rule` | `personnel_cost.manage` |
+| `configure_welfare_fund_baseline` | `personnel_cost.manage` |
+| `generate_personnel_costs` | `personnel_cost.manage` |
+| `generate_teaching_session_personnel_cost` | `personnel_cost.manage` |
+| `void_personnel_cost_entry` | `personnel_cost.manage` |
+
+Read: `personnel_cost.read` on tables/view.
+
+### Tests
+
+`supabase/tests/m2_personnel_costing_tests.sql` — 24 scenarios.
+
+---
+
+*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04. Updated for M2-T05. Updated for M2-T06. Updated for M2-T07.*
