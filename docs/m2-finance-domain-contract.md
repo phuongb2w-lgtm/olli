@@ -1601,6 +1601,61 @@ Server Actions live under `src/app/actions/` (`enrollment-finance`, `payments`, 
 
 `supabase/tests/m2_class_financial_simulator_tests.sql` — 35 scenarios.
 
+### Appendix L — M2-T11 milestone acceptance & closeout
+
+#### Implementation status (T02–T10)
+
+| Task | Scope | Status |
+|------|-------|--------|
+| M2-T02 | Cost taxonomy (`cost_domain_code`) | Complete |
+| M2-T03 | Capital assets & depreciation | Complete |
+| M2-T04 | Enrollment financial terms & charges | Complete |
+| M2-T05 | Payment recording & allocation | Complete |
+| M2-T06 | Revenue recognition | Complete |
+| M2-T07 | Personnel costing | Complete |
+| M2-T08 | Class cost allocation & actual economics | Complete |
+| M2-T09 | Class financial simulator | Complete |
+| M2-T10 | Finance management UI | Complete |
+
+#### Acceptance result
+
+Fresh-state verification from `supabase db reset` + auth seed + dev fixtures:
+
+- All M0 integrity/security suites pass.
+- All M2 unit suites (T02–T09) pass.
+- Cross-domain milestone acceptance (`supabase/tests/m2_milestone_acceptance_tests.sql`) — **5/5 PASS**:
+  1. Enrollment lifecycle (terms → schedule → charges → partial pay → delivery → recognition)
+  2. Fully prepaid, partially delivered (cash ≠ revenue)
+  3. Delivered but unpaid (revenue ≠ receivable settlement)
+  4. Class economics contribution reconciliation via `get_class_economics`
+  5. Simulator isolation (no accounting mutations)
+- Finance UI E2E (`tests/e2e/finance.spec.ts`) — 18/18 PASS.
+- Full `npm run verify` — **PASS**.
+
+#### Derived read models (not authoritative stored totals)
+
+`outstanding_balance` appears only on derived views (`charge_balance`, enrollment summary RPCs). No mutable convenience columns such as `total_paid`, `recognized_revenue_total`, `accumulated_depreciation`, or `class_profit` were introduced as authoritative persisted state.
+
+#### Deferred backlog (explicitly outside M2)
+
+- Refund / withdrawal / forfeiture engine
+- Commission formula engine
+- General ledger
+- Tax invoicing
+- FX
+- Bank reconciliation
+- Payroll
+- Advanced reporting exports
+- Richer simulator tuition distributions
+
+#### M2 non-goals
+
+M2 delivers enrollment-scoped finance, cost allocation, actual class economics, and a projected simulator boundary — not enterprise accounting, payroll, or statutory tax/GL integration.
+
+#### Milestone verdict
+
+**M2 CLOSED** — Finance milestone accepted at T11 closeout.
+
 ---
 
-*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04. Updated for M2-T05. Updated for M2-T06. Updated for M2-T07. Updated for M2-T08. Updated for M2-T09.*
+*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04. Updated for M2-T05. Updated for M2-T06. Updated for M2-T07. Updated for M2-T08. Updated for M2-T09. Updated for M2-T10 and M2-T11 closeout.*
