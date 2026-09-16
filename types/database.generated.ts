@@ -1960,6 +1960,57 @@ export type Database = {
           },
         ]
       }
+      lead_activity: {
+        Row: {
+          activity_type_code: string
+          content: string | null
+          created_at: string
+          created_by: string
+          id: string
+          lead_id: string
+          metadata: Json
+          occurred_at: string
+          organization_id: string
+        }
+        Insert: {
+          activity_type_code: string
+          content?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          lead_id: string
+          metadata?: Json
+          occurred_at?: string
+          organization_id: string
+        }
+        Update: {
+          activity_type_code?: string
+          content?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          lead_id?: string
+          metadata?: Json
+          occurred_at?: string
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_activity_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_activity_organization_id_lead_id_fkey"
+            columns: ["organization_id", "lead_id"]
+            isOneToOne: false
+            referencedRelation: "lead"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       lead_campaign: {
         Row: {
           code: string
@@ -2213,6 +2264,93 @@ export type Database = {
           },
         ]
       }
+      lead_follow_up: {
+        Row: {
+          assigned_user_id: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          created_by: string
+          due_at: string
+          id: string
+          lead_id: string
+          note: string | null
+          organization_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_user_id?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by: string
+          due_at: string
+          id?: string
+          lead_id: string
+          note?: string | null
+          organization_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_user_id?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string
+          due_at?: string
+          id?: string
+          lead_id?: string
+          note?: string | null
+          organization_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_follow_up_organization_id_assigned_user_id_fkey"
+            columns: ["organization_id", "assigned_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_follow_up_organization_id_cancelled_by_fkey"
+            columns: ["organization_id", "cancelled_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_follow_up_organization_id_completed_by_fkey"
+            columns: ["organization_id", "completed_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_follow_up_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_follow_up_organization_id_lead_id_fkey"
+            columns: ["organization_id", "lead_id"]
+            isOneToOne: false
+            referencedRelation: "lead"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       lead_lost_reason: {
         Row: {
           code: string
@@ -2325,6 +2463,64 @@ export type Database = {
             columns: ["organization_id", "updated_by"]
             isOneToOne: false
             referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_status_history: {
+        Row: {
+          changed_at: string
+          changed_by: string
+          from_status: string | null
+          id: string
+          lead_id: string
+          lost_reason_id: string | null
+          notes: string | null
+          organization_id: string
+          to_status: string
+        }
+        Insert: {
+          changed_at?: string
+          changed_by: string
+          from_status?: string | null
+          id?: string
+          lead_id: string
+          lost_reason_id?: string | null
+          notes?: string | null
+          organization_id: string
+          to_status: string
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string
+          from_status?: string | null
+          id?: string
+          lead_id?: string
+          lost_reason_id?: string | null
+          notes?: string | null
+          organization_id?: string
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_status_history_organization_id_changed_by_fkey"
+            columns: ["organization_id", "changed_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_status_history_organization_id_lead_id_fkey"
+            columns: ["organization_id", "lead_id"]
+            isOneToOne: false
+            referencedRelation: "lead"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_status_history_organization_id_lost_reason_id_fkey"
+            columns: ["organization_id", "lost_reason_id"]
+            isOneToOne: false
+            referencedRelation: "lead_lost_reason"
             referencedColumns: ["organization_id", "id"]
           },
         ]
@@ -4014,6 +4210,16 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m3_lc_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_lc_as_super: { Args: never; Returns: undefined }
+      _m3_lc_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_lc_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -4049,6 +4255,16 @@ export type Database = {
         Args: { p_terms_id: string }
         Returns: undefined
       }
+      add_lead_activity: {
+        Args: {
+          p_activity_type_code: string
+          p_content?: string
+          p_lead_id: string
+          p_metadata?: Json
+          p_occurred_at?: string
+        }
+        Returns: string
+      }
       allocate_payment: {
         Args: {
           p_allocations: Json
@@ -4073,6 +4289,10 @@ export type Database = {
       calculate_scenario_economics: {
         Args: { p_scenario_id: string }
         Returns: Json
+      }
+      cancel_lead_follow_up: {
+        Args: { p_follow_up_id: string; p_note?: string }
+        Returns: string
       }
       capital_asset_period_month: {
         Args: { p_period_number: number; p_placed_in_service: string }
@@ -4109,6 +4329,10 @@ export type Database = {
       compare_class_financial_scenarios: {
         Args: { p_class_id?: string; p_scenario_ids?: string[] }
         Returns: Json
+      }
+      complete_lead_follow_up: {
+        Args: { p_follow_up_id: string; p_note?: string }
+        Returns: string
       }
       compute_break_even_learner_count: {
         Args: { p_total_cost: number; p_tuition_per_learner: number }
@@ -4189,6 +4413,15 @@ export type Database = {
           p_notes?: string
           p_recognition_basis_code?: string
           p_tuition_plan_id?: string
+        }
+        Returns: string
+      }
+      create_lead_follow_up: {
+        Args: {
+          p_assigned_user_id?: string
+          p_due_at: string
+          p_lead_id: string
+          p_note?: string
         }
         Returns: string
       }
@@ -4309,6 +4542,10 @@ export type Database = {
         Returns: number
       }
       is_active_app_user: { Args: never; Returns: boolean }
+      is_allowed_lead_status_transition: {
+        Args: { p_from_status: string; p_to_status: string }
+        Returns: boolean
+      }
       is_attendance_eligible_for_recognition: {
         Args: { p_status: string }
         Returns: boolean
@@ -4476,6 +4713,15 @@ export type Database = {
           p_destination_start_date: string
           p_destination_status: string
           p_source_enrollment_id: string
+        }
+        Returns: string
+      }
+      transition_lead_status: {
+        Args: {
+          p_lead_id: string
+          p_lost_reason_id?: string
+          p_notes?: string
+          p_to_status: string
         }
         Returns: string
       }

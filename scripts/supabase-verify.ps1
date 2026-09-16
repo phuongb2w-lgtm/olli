@@ -14,7 +14,7 @@ npx supabase db reset
 
 function Invoke-SupabaseSqlFile {
   param([string]$Path)
-  $content = Get-Content -Raw -Path $Path
+  $content = Get-Content -Raw -Path $Path -Encoding utf8
   $content | docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1 | Out-Null
   if ($LASTEXITCODE -ne 0) { throw "psql failed: $Path" }
 }
@@ -72,6 +72,9 @@ Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m2_mileston
 Write-Host "==> M3-T02 CRM foundation tests (29)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m3_crm_foundation_tests.sql")
 
+Write-Host "==> M3-T03 lead lifecycle tests (25)..."
+Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m3_lead_lifecycle_tests.sql")
+
 Write-Host "==> Generating TypeScript types..."
 New-Item -ItemType Directory -Force -Path (Join-Path $ProjectRoot "types") | Out-Null
 npx supabase gen types typescript --local | Set-Content -Path (Join-Path $ProjectRoot "types\database.generated.ts") -Encoding utf8
@@ -79,4 +82,4 @@ npx supabase gen types typescript --local | Set-Content -Path (Join-Path $Projec
 if ($LASTEXITCODE -ne 0) { throw "Verification failed" }
 
 Write-Host ""
-Write-Host "SUCCESS: Supabase verification complete (25/25 integrity + 30/30 security + 5/5 charge_balance + 6/6 locale + 12/12 cost_domain + 20/20 capital_depreciation + 35/35 enrollment_financial + 41/41 payment_allocation + 30/30 revenue_recognition + 24/24 personnel_costing + 35/35 class_cost_allocation + 35/35 class_financial_simulator + 5/5 milestone_acceptance + 29/29 crm_foundation)."
+Write-Host "SUCCESS: Supabase verification complete (25/25 integrity + 30/30 security + 5/5 charge_balance + 6/6 locale + 12/12 cost_domain + 20/20 capital_depreciation + 35/35 enrollment_financial + 41/41 payment_allocation + 30/30 revenue_recognition + 24/24 personnel_costing + 35/35 class_cost_allocation + 35/35 class_financial_simulator + 5/5 milestone_acceptance + 29/29 crm_foundation + 25/25 lead_lifecycle)."

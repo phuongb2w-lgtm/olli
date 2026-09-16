@@ -23,6 +23,7 @@
     "organization": "Tổ chức",
     "account": "Tài khoản",
     "overview": "Tổng quan",
+    "admissions": "Tuyển sinh",
     "students": "Học viên",
     "classes": "Lớp học",
     "teachers": "Giáo viên",
@@ -310,7 +311,98 @@
     }
   },
   "crm": {
-    "title": "Tuyển sinh"
+    "title": "Tuyển sinh",
+    "leads": {
+      "title": "Lead",
+      "denied": "Bạn không có quyền đọc lead.",
+      "loadError": "Không thể tải danh sách lead.",
+      "search": "Tìm kiếm",
+      "searchPlaceholder": "Tìm theo tên học viên tiềm năng hoặc liên hệ…",
+      "statusFilter": "Trạng thái",
+      "filterAll": "Tất cả",
+      "applyFilters": "Áp dụng",
+      "candidateColumn": "Học viên tiềm năng",
+      "contactColumn": "Liên hệ",
+      "statusColumn": "Trạng thái",
+      "sourceColumn": "Nguồn",
+      "nextFollowUpColumn": "Theo dõi tiếp",
+      "lastActivityColumn": "Hoạt động gần nhất",
+      "createdColumn": "Ngày tạo",
+      "emptyValue": "—",
+      "emptyOrganization": "Chưa có lead trong tổ chức của bạn.",
+      "noResults": "Không có lead phù hợp với bộ lọc.",
+      "refreshHint": "Làm mới danh sách"
+    },
+    "detail": {
+      "title": "Chi tiết lead",
+      "denied": "Bạn không có quyền xem lead này.",
+      "loadError": "Không thể tải chi tiết lead.",
+      "notFound": "Không tìm thấy lead.",
+      "backToList": "Quay lại danh sách lead",
+      "source": "Nguồn",
+      "campaign": "Chiến dịch",
+      "assignedUser": "Phụ trách",
+      "createdAt": "Ngày tạo",
+      "lastLostReason": "Lý do mất gần nhất",
+      "lastLostAt": "Thời điểm mất",
+      "candidates": "Học viên tiềm năng",
+      "contacts": "Liên hệ",
+      "primary": "Chính",
+      "emptyCandidates": "Chưa có học viên tiềm năng.",
+      "emptyContacts": "Chưa có liên hệ.",
+      "timeline": "Dòng thời gian",
+      "emptyTimeline": "Chưa có hoạt động hoặc lịch sử trạng thái.",
+      "followUps": "Theo dõi",
+      "emptyFollowUps": "Chưa có lịch theo dõi."
+    },
+    "actions": {
+      "title": "Thao tác CRM",
+      "transitionTitle": "Đổi trạng thái",
+      "toStatus": "Trạng thái mới",
+      "selectStatus": "Chọn trạng thái",
+      "lostReason": "Lý do mất",
+      "lostReasonOptional": "Bắt buộc khi đánh dấu mất",
+      "notes": "Ghi chú",
+      "applyTransition": "Áp dụng chuyển trạng thái",
+      "addActivityTitle": "Ghi hoạt động",
+      "activityType": "Loại hoạt động",
+      "activityContent": "Ghi chú",
+      "addActivity": "Thêm hoạt động",
+      "createFollowUpTitle": "Lên lịch theo dõi",
+      "dueAt": "Hạn thực hiện",
+      "createFollowUp": "Tạo theo dõi",
+      "completeFollowUpTitle": "Theo dõi đang chờ",
+      "markComplete": "Đánh dấu hoàn thành",
+      "saving": "Đang lưu…"
+    },
+    "errors": {
+      "permission_denied": "Bạn không có quyền thực hiện thao tác này.",
+      "not_found": "Không tìm thấy bản ghi.",
+      "invalid_transition": "Không được phép chuyển trạng thái này.",
+      "lost_reason_required": "Cần chọn lý do mất khi đánh dấu lead là mất.",
+      "conversion_reserved": "Chuyển đổi chưa khả dụng trong luồng này.",
+      "invalid_activity_type": "Chọn loại hoạt động hợp lệ.",
+      "due_at_required": "Cần nhập thời hạn theo dõi.",
+      "follow_up_not_pending": "Theo dõi này không còn ở trạng thái chờ.",
+      "mutation_error": "Không thể hoàn thành thao tác."
+    },
+    "followUp": {
+      "pending": "Đang chờ",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy"
+    }
+  },
+  "activity": {
+    "lead": {
+      "call": "Cuộc gọi",
+      "message": "Tin nhắn",
+      "consultation": "Tư vấn",
+      "note": "Ghi chú",
+      "appointment": "Cuộc hẹn",
+      "status_change": "Thay đổi trạng thái",
+      "follow_up": "Hoàn thành theo dõi",
+      "other": "Khác"
+    }
   },
   "teaching": {
     "title": "Giảng dạy",

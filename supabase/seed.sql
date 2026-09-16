@@ -36,6 +36,11 @@ DECLARE
   v_guardian_quang uuid := 'a5200000-0000-4000-8000-000000000002';
   v_role_b_admin uuid;
   v_role_b_staff uuid;
+  v_lead_a1 uuid := 'a6100000-0000-4000-8000-000000000001';
+  v_lead_a2 uuid := 'a6100000-0000-4000-8000-000000000002';
+  v_lead_b1 uuid := 'b6100000-0000-4000-8000-000000000001';
+  v_src_walk_in_a uuid;
+  v_src_walk_in_b uuid;
 BEGIN
   IF EXISTS (SELECT 1 FROM organization WHERE id = v_org_a) THEN
     RETURN;
@@ -189,6 +194,30 @@ BEGIN
   JOIN teacher te ON te.organization_id = cl.organization_id AND te.given_name = 'Mai'
   JOIN room r ON r.organization_id = cl.organization_id AND r.code = 'A101'
   WHERE cl.organization_id = v_org_a AND cl.name = 'Class A1';
+
+  SELECT id INTO v_src_walk_in_a FROM lead_source
+  WHERE organization_id = v_org_a AND code = 'walk_in' LIMIT 1;
+  SELECT id INTO v_src_walk_in_b FROM lead_source
+  WHERE organization_id = v_org_b AND code = 'walk_in' LIMIT 1;
+
+  INSERT INTO lead (id, organization_id, status, lead_source_id, notes_summary, created_by, updated_by)
+  VALUES
+    (v_lead_a1, v_org_a, 'new', v_src_walk_in_a, 'Sibling inquiry — CRM fixture', v_app_a_admin, v_app_a_admin),
+    (v_lead_a2, v_org_a, 'qualified', v_src_walk_in_a, 'Ready for trial scheduling', v_app_a_admin, v_app_a_admin),
+    (v_lead_b1, v_org_b, 'new', v_src_walk_in_b, 'Org B isolation fixture', v_app_b_admin, v_app_b_admin);
+
+  INSERT INTO lead_candidate (organization_id, lead_id, given_name, family_name, is_primary_candidate, created_by, updated_by)
+  VALUES
+    (v_org_a, v_lead_a1, 'Tuấn', 'Phạm', true, v_app_a_admin, v_app_a_admin),
+    (v_org_a, v_lead_a1, 'Linh', 'Phạm', false, v_app_a_admin, v_app_a_admin),
+    (v_org_a, v_lead_a2, 'Hà', 'Lê', true, v_app_a_admin, v_app_a_admin),
+    (v_org_b, v_lead_b1, 'Org B', 'Lead', true, v_app_b_admin, v_app_b_admin);
+
+  INSERT INTO lead_contact (organization_id, lead_id, given_name, family_name, phone, is_primary_contact, is_billing_contact, created_by, updated_by)
+  VALUES
+    (v_org_a, v_lead_a1, 'Lan', 'Phạm', '0900111222', true, true, v_app_a_admin, v_app_a_admin),
+    (v_org_a, v_lead_a2, 'Minh', 'Lê', '0900333444', true, true, v_app_a_admin, v_app_a_admin),
+    (v_org_b, v_lead_b1, 'Contact', 'B', '0900555666', true, false, v_app_b_admin, v_app_b_admin);
 
   INSERT INTO teaching_session (
     organization_id, class_id, class_schedule_id, teacher_id, room_id,

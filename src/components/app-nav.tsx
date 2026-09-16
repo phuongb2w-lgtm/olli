@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 const navItems = [
   { key: "overview", href: "/" },
+  { key: "admissions", href: "/crm/leads" },
   { key: "students", href: "/students" },
   { key: "classes", href: "/classes" },
   { key: "teachers", href: null },

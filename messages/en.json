@@ -23,6 +23,7 @@
     "organization": "Organization",
     "account": "Account",
     "overview": "Overview",
+    "admissions": "Admissions",
     "students": "Students",
     "classes": "Classes",
     "teachers": "Teachers",
@@ -310,7 +311,98 @@
     }
   },
   "crm": {
-    "title": "Admissions"
+    "title": "Admissions",
+    "leads": {
+      "title": "Leads",
+      "denied": "You do not have permission to read leads.",
+      "loadError": "Unable to load leads.",
+      "search": "Search",
+      "searchPlaceholder": "Search by candidate or contact name…",
+      "statusFilter": "Status",
+      "filterAll": "All",
+      "applyFilters": "Apply",
+      "candidateColumn": "Candidate",
+      "contactColumn": "Contact",
+      "statusColumn": "Status",
+      "sourceColumn": "Source",
+      "nextFollowUpColumn": "Next follow-up",
+      "lastActivityColumn": "Last activity",
+      "createdColumn": "Created",
+      "emptyValue": "—",
+      "emptyOrganization": "No leads in your organization yet.",
+      "noResults": "No leads match your filters.",
+      "refreshHint": "Refresh list"
+    },
+    "detail": {
+      "title": "Lead detail",
+      "denied": "You do not have permission to view this lead.",
+      "loadError": "Unable to load lead detail.",
+      "notFound": "Lead not found.",
+      "backToList": "Back to leads",
+      "source": "Source",
+      "campaign": "Campaign",
+      "assignedUser": "Assigned to",
+      "createdAt": "Created",
+      "lastLostReason": "Last lost reason",
+      "lastLostAt": "Last lost at",
+      "candidates": "Candidates",
+      "contacts": "Contacts",
+      "primary": "Primary",
+      "emptyCandidates": "No candidates recorded.",
+      "emptyContacts": "No contacts recorded.",
+      "timeline": "Timeline",
+      "emptyTimeline": "No activity or status history yet.",
+      "followUps": "Follow-ups",
+      "emptyFollowUps": "No follow-ups scheduled."
+    },
+    "actions": {
+      "title": "CRM actions",
+      "transitionTitle": "Change status",
+      "toStatus": "New status",
+      "selectStatus": "Select status",
+      "lostReason": "Lost reason",
+      "lostReasonOptional": "Required when marking lost",
+      "notes": "Notes",
+      "applyTransition": "Apply transition",
+      "addActivityTitle": "Log activity",
+      "activityType": "Activity type",
+      "activityContent": "Notes",
+      "addActivity": "Add activity",
+      "createFollowUpTitle": "Schedule follow-up",
+      "dueAt": "Due at",
+      "createFollowUp": "Create follow-up",
+      "completeFollowUpTitle": "Pending follow-ups",
+      "markComplete": "Mark complete",
+      "saving": "Saving…"
+    },
+    "errors": {
+      "permission_denied": "You do not have permission for this action.",
+      "not_found": "Record not found.",
+      "invalid_transition": "This status change is not allowed.",
+      "lost_reason_required": "A lost reason is required when marking a lead as lost.",
+      "conversion_reserved": "Conversion is not available from this workflow yet.",
+      "invalid_activity_type": "Select a valid activity type.",
+      "due_at_required": "Follow-up due date is required.",
+      "follow_up_not_pending": "This follow-up is no longer pending.",
+      "mutation_error": "Unable to complete this action."
+    },
+    "followUp": {
+      "pending": "Pending",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "activity": {
+    "lead": {
+      "call": "Phone call",
+      "message": "Message",
+      "consultation": "Consultation",
+      "note": "Note",
+      "appointment": "Appointment",
+      "status_change": "Status change",
+      "follow_up": "Follow-up completed",
+      "other": "Other"
+    }
   },
   "teaching": {
     "title": "Teaching",
