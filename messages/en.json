@@ -810,6 +810,37 @@
     "unallocatedCost": "Unallocated shared cost",
     "allocatedCost": "Allocated shared cost"
   },
+  "classSimulation": {
+    "title": "Class financial simulator",
+    "projectedRevenue": "Projected revenue",
+    "projectedCost": "Projected cost",
+    "projectedContribution": "Projected contribution",
+    "projectedMargin": "Projected margin",
+    "breakEvenLearners": "Break-even learners",
+    "plannedLearners": "Planned learners",
+    "assumedTuition": "Assumed tuition",
+    "projectedVsActual": "Projected vs actual",
+    "createScenario": "Create scenario",
+    "finalizeScenario": "Finalize scenario",
+    "cloneScenario": "Clone scenario",
+    "compareScenarios": "Compare scenarios"
+  },
+  "scenarioStatus": {
+    "draft": "Draft",
+    "finalized": "Finalized"
+  },
+  "scenarioAssumption": {
+    "uniformTuition": "Uniform tuition assumption",
+    "plannedMonths": "Planned months",
+    "plannedSessions": "Planned sessions",
+    "directTeachingRate": "Direct teaching rate per session",
+    "sharedPersonnelMonthly": "Shared personnel (monthly)",
+    "operatingOverheadMonthly": "Operating overhead (monthly)",
+    "marketingSales": "Marketing & sales",
+    "depreciationMonthly": "Depreciation (monthly)",
+    "oneTime": "One-time amount",
+    "monthly": "Monthly amount"
+  },
   "expenseCategory": {
     "rent": "Rent",
     "electricity": "Electricity",

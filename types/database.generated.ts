@@ -717,6 +717,136 @@ export type Database = {
           },
         ]
       }
+      class_financial_scenario: {
+        Row: {
+          assumed_net_tuition_per_learner: number
+          capacity_snapshot: number | null
+          class_id: string | null
+          created_at: string
+          created_by: string | null
+          economics_snapshot: Json | null
+          finalized_at: string | null
+          finalized_by: string | null
+          id: string
+          marketing_assumption_basis: string
+          marketing_sales_assumption: number
+          monthly_depreciation_assumption: number
+          monthly_operating_overhead_assumption: number
+          monthly_shared_personnel_assumption: number
+          organization_id: string
+          per_session_rate_snapshot: number | null
+          per_session_teacher_rate: number | null
+          planned_learner_count: number
+          planned_months: number
+          planned_session_count: number
+          scenario_name: string
+          staff_compensation_rule_id: string | null
+          status: string
+          tuition_assumption_mode: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          assumed_net_tuition_per_learner?: number
+          capacity_snapshot?: number | null
+          class_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          economics_snapshot?: Json | null
+          finalized_at?: string | null
+          finalized_by?: string | null
+          id?: string
+          marketing_assumption_basis?: string
+          marketing_sales_assumption?: number
+          monthly_depreciation_assumption?: number
+          monthly_operating_overhead_assumption?: number
+          monthly_shared_personnel_assumption?: number
+          organization_id: string
+          per_session_rate_snapshot?: number | null
+          per_session_teacher_rate?: number | null
+          planned_learner_count: number
+          planned_months: number
+          planned_session_count: number
+          scenario_name: string
+          staff_compensation_rule_id?: string | null
+          status?: string
+          tuition_assumption_mode?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          assumed_net_tuition_per_learner?: number
+          capacity_snapshot?: number | null
+          class_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          economics_snapshot?: Json | null
+          finalized_at?: string | null
+          finalized_by?: string | null
+          id?: string
+          marketing_assumption_basis?: string
+          marketing_sales_assumption?: number
+          monthly_depreciation_assumption?: number
+          monthly_operating_overhead_assumption?: number
+          monthly_shared_personnel_assumption?: number
+          organization_id?: string
+          per_session_rate_snapshot?: number | null
+          per_session_teacher_rate?: number | null
+          planned_learner_count?: number
+          planned_months?: number
+          planned_session_count?: number
+          scenario_name?: string
+          staff_compensation_rule_id?: string | null
+          status?: string
+          tuition_assumption_mode?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_financial_scenario_organization_id_class_id_fkey"
+            columns: ["organization_id", "class_id"]
+            isOneToOne: false
+            referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_financial_scenario_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_financial_scenario_organization_id_finalized_by_fkey"
+            columns: ["organization_id", "finalized_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_financial_scenario_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_financial_scenario_organization_id_staff_compensatio_fkey"
+            columns: ["organization_id", "staff_compensation_rule_id"]
+            isOneToOne: false
+            referencedRelation: "staff_compensation_rule"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_financial_scenario_organization_id_updated_by_fkey"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       class_schedule: {
         Row: {
           class_id: string
@@ -3427,6 +3557,10 @@ export type Database = {
         }
         Returns: string
       }
+      calculate_scenario_economics: {
+        Args: { p_scenario_id: string }
+        Returns: Json
+      }
       capital_asset_period_month: {
         Args: { p_period_number: number; p_placed_in_service: string }
         Returns: string
@@ -3455,6 +3589,36 @@ export type Database = {
         Args: { p_class_id: string; p_period_month: string }
         Returns: number
       }
+      clone_class_financial_scenario: {
+        Args: { p_scenario_id: string }
+        Returns: string
+      }
+      compare_class_financial_scenarios: {
+        Args: { p_class_id?: string; p_scenario_ids?: string[] }
+        Returns: Json
+      }
+      compute_break_even_learner_count: {
+        Args: { p_total_cost: number; p_tuition_per_learner: number }
+        Returns: number
+      }
+      compute_projected_class_total_cost: {
+        Args: {
+          p_depreciation: number
+          p_direct_personnel: number
+          p_marketing_sales: number
+          p_operating_overhead: number
+          p_shared_personnel: number
+        }
+        Returns: number
+      }
+      compute_projected_contribution: {
+        Args: { p_revenue: number; p_total_cost: number }
+        Returns: number
+      }
+      compute_projected_margin_percentage: {
+        Args: { p_contribution: number; p_revenue: number }
+        Returns: number
+      }
       configure_welfare_fund_baseline: {
         Args: {
           p_effective_from: string
@@ -3472,6 +3636,25 @@ export type Database = {
           p_original_cost: number
           p_placed_in_service_date: string
           p_useful_life_months: number
+        }
+        Returns: string
+      }
+      create_class_financial_scenario: {
+        Args: {
+          p_assumed_net_tuition_per_learner: number
+          p_capacity_snapshot?: number
+          p_class_id?: string
+          p_marketing_assumption_basis?: string
+          p_marketing_sales_assumption?: number
+          p_monthly_depreciation_assumption?: number
+          p_monthly_operating_overhead_assumption?: number
+          p_monthly_shared_personnel_assumption?: number
+          p_per_session_teacher_rate?: number
+          p_planned_learner_count: number
+          p_planned_months: number
+          p_planned_session_count: number
+          p_scenario_name: string
+          p_staff_compensation_rule_id?: string
         }
         Returns: string
       }
@@ -3542,6 +3725,10 @@ export type Database = {
         Args: { p_organization_id: string }
         Returns: undefined
       }
+      finalize_class_financial_scenario: {
+        Args: { p_scenario_id: string }
+        Returns: Json
+      }
       generate_depreciation_schedule: {
         Args: { p_capital_asset_id: string }
         Returns: undefined
@@ -3570,6 +3757,10 @@ export type Database = {
         Args: { p_class_id: string; p_period_from: string; p_period_to: string }
         Returns: Json
       }
+      get_class_financial_scenario: {
+        Args: { p_scenario_id: string }
+        Returns: Json
+      }
       get_enrollment_financial_summary: {
         Args: { p_enrollment_id: string }
         Returns: Json
@@ -3583,6 +3774,14 @@ export type Database = {
         Returns: Json
       }
       get_payment_details: { Args: { p_payment_id: string }; Returns: Json }
+      get_projected_vs_actual_class_economics: {
+        Args: {
+          p_period_from: string
+          p_period_to: string
+          p_scenario_id: string
+        }
+        Returns: Json
+      }
       has_permission: { Args: { p_code: string }; Returns: boolean }
       initialize_enrollment_per_lesson_recognition: {
         Args: { p_lesson_count: number; p_terms_id: string }
@@ -3677,6 +3876,12 @@ export type Database = {
         Args: { p_enrollment_id: string }
         Returns: string
       }
+      resolve_scenario_per_session_rate: {
+        Args: {
+          p_scenario: Database["public"]["Tables"]["class_financial_scenario"]["Row"]
+        }
+        Returns: number
+      }
       retire_capital_asset: {
         Args: { p_capital_asset_id: string; p_retired_at?: string }
         Returns: undefined
@@ -3752,6 +3957,24 @@ export type Database = {
           p_destination_start_date: string
           p_destination_status: string
           p_source_enrollment_id: string
+        }
+        Returns: string
+      }
+      update_class_financial_scenario: {
+        Args: {
+          p_assumed_net_tuition_per_learner?: number
+          p_marketing_assumption_basis?: string
+          p_marketing_sales_assumption?: number
+          p_monthly_depreciation_assumption?: number
+          p_monthly_operating_overhead_assumption?: number
+          p_monthly_shared_personnel_assumption?: number
+          p_per_session_teacher_rate?: number
+          p_planned_learner_count?: number
+          p_planned_months?: number
+          p_planned_session_count?: number
+          p_scenario_id: string
+          p_scenario_name?: string
+          p_staff_compensation_rule_id?: string
         }
         Returns: string
       }

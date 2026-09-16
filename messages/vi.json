@@ -810,6 +810,37 @@
     "unallocatedCost": "Chi phí dùng chung chưa phân bổ",
     "allocatedCost": "Chi phí dùng chung đã phân bổ"
   },
+  "classSimulation": {
+    "title": "Mô phỏng tài chính lớp học",
+    "projectedRevenue": "Doanh thu dự kiến",
+    "projectedCost": "Chi phí dự kiến",
+    "projectedContribution": "Đóng góp dự kiến",
+    "projectedMargin": "Biên lợi nhuận dự kiến",
+    "breakEvenLearners": "Số học viên hòa vốn",
+    "plannedLearners": "Số học viên dự kiến",
+    "assumedTuition": "Học phí giả định",
+    "projectedVsActual": "Dự kiến so với thực tế",
+    "createScenario": "Tạo kịch bản",
+    "finalizeScenario": "Hoàn tất kịch bản",
+    "cloneScenario": "Sao chép kịch bản",
+    "compareScenarios": "So sánh kịch bản"
+  },
+  "scenarioStatus": {
+    "draft": "Nháp",
+    "finalized": "Đã hoàn tất"
+  },
+  "scenarioAssumption": {
+    "uniformTuition": "Giả định học phí đồng nhất",
+    "plannedMonths": "Số tháng dự kiến",
+    "plannedSessions": "Số buổi dự kiến",
+    "directTeachingRate": "Đơn giá giảng dạy trực tiếp mỗi buổi",
+    "sharedPersonnelMonthly": "Nhân sự dùng chung (tháng)",
+    "operatingOverheadMonthly": "Chi phí vận hành (tháng)",
+    "marketingSales": "Marketing & bán hàng",
+    "depreciationMonthly": "Khấu hao (tháng)",
+    "oneTime": "Một lần",
+    "monthly": "Theo tháng"
+  },
   "expenseCategory": {
     "rent": "Thuê mặt bằng",
     "electricity": "Điện",

@@ -63,6 +63,9 @@ Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m2_personne
 Write-Host "==> M2-T08 class cost allocation tests (35)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m2_class_cost_allocation_tests.sql")
 
+Write-Host "==> M2-T09 class financial simulator tests (35)..."
+Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m2_class_financial_simulator_tests.sql")
+
 Write-Host "==> Generating TypeScript types..."
 New-Item -ItemType Directory -Force -Path (Join-Path $ProjectRoot "types") | Out-Null
 npx supabase gen types typescript --local | Set-Content -Path (Join-Path $ProjectRoot "types\database.generated.ts") -Encoding utf8
@@ -70,4 +73,4 @@ npx supabase gen types typescript --local | Set-Content -Path (Join-Path $Projec
 if ($LASTEXITCODE -ne 0) { throw "Verification failed" }
 
 Write-Host ""
-Write-Host "SUCCESS: Supabase verification complete (25/25 integrity + 30/30 security + 5/5 charge_balance + 6/6 locale + 12/12 cost_domain + 20/20 capital_depreciation + 35/35 enrollment_financial + 41/41 payment_allocation + 30/30 revenue_recognition + 24/24 personnel_costing + 35/35 class_cost_allocation)."
+Write-Host "SUCCESS: Supabase verification complete (25/25 integrity + 30/30 security + 5/5 charge_balance + 6/6 locale + 12/12 cost_domain + 20/20 capital_depreciation + 35/35 enrollment_financial + 41/41 payment_allocation + 30/30 revenue_recognition + 24/24 personnel_costing + 35/35 class_cost_allocation + 35/35 class_financial_simulator)."

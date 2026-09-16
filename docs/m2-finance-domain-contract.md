@@ -475,7 +475,7 @@ Order driven by **physical dependencies** and **accounting integrity** (configur
 | ~~**M2-T06**~~ | **DONE** — Revenue recognition (per-lesson + stage), M1 evidence consumption | T05, M1 |
 | ~~**M2-T07**~~ | **DONE** — Personnel compensation rules, cost entries, welfare baseline | T02, M1 |
 | ~~**M2-T08**~~ | **DONE** — Shared cost allocation + class economics read model | T02–T07 |
-| **M2-T09** | New-class financial simulator (read-only projection) | T04, T08 |
+| ~~**M2-T09**~~ | **DONE** — New-class financial simulator (planning scenarios) | T04, T08 |
 | **M2-T10** | Finance UI + bilingual labels + permission refinement | T05+ |
 | **M2-T11** | M2 acceptance & finance regression suite | All |
 
@@ -1466,7 +1466,7 @@ Capital **acquisition cost** is never P&L — only posted monthly `depreciation_
 
 ### T09 boundary
 
-T08 reports **actual** economics from real source facts. Hypothetical/planned class simulation deferred to T09.
+T08 reports **actual** economics from real source facts. T09 scenarios are separate planning inputs and never feed T06/T07/T08 engines.
 
 ### Tests
 
@@ -1474,4 +1474,99 @@ T08 reports **actual** economics from real source facts. Hypothetical/planned cl
 
 ---
 
-*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04. Updated for M2-T05. Updated for M2-T06. Updated for M2-T07. Updated for M2-T08.*
+## Appendix J — M2-T09 Class Financial Simulator (after `07ca307`)
+
+**Migration:** `20260914142200_m2_t09_class_financial_simulator.sql`
+
+### Simulation vs accounting boundary
+
+Scenarios are **hypothetical planning models**. They must never create or mutate:
+
+`charge`, `payment`, `payment_allocation`, `financial_adjustment`, `revenue_recognition_event`, `expense`, `personnel_cost_entry`, `depreciation_entry`, `class_cost_allocation`.
+
+Actual class P&L continues to use T08 only.
+
+### Tuition is assumption, not class price
+
+Enrollment-specific tuition remains on `enrollment_financial_terms`. The simulator stores **assumed net tuition per learner** on `class_financial_scenario` only.
+
+Initial mode: `uniform_tuition`:
+
+```text
+projected_revenue = planned_learner_count × assumed_net_tuition_per_learner
+```
+
+This is projected full-service revenue — not cash collected and not T06 recognized revenue.
+
+### Cost assumptions & scaling
+
+| Bucket | Input | Projected amount |
+|--------|-------|------------------|
+| Direct personnel | per-session rate × planned sessions | `projected_direct_personnel` |
+| Shared personnel | monthly assumption × planned months | `projected_shared_personnel` |
+| Operating overhead | monthly assumption × planned months | `projected_operating_overhead` |
+| Marketing & sales | one-time **or** monthly × planned months | `projected_marketing_sales` |
+| Depreciation | monthly assumption × planned months | `projected_depreciation` |
+
+Direct rate may reference `staff_compensation_rule` (`per_session`) or an explicit scenario override. On finalize, the rate used is snapshotted in `per_session_rate_snapshot`.
+
+### Projected economics (T08-aligned)
+
+```text
+projected_total_cost = sum(all projected cost buckets)
+projected_contribution = projected_revenue − projected_total_cost
+projected_margin = projected_contribution / projected_revenue   (when revenue > 0)
+```
+
+Pure helpers: `compute_projected_class_total_cost`, `compute_projected_contribution`, `compute_projected_margin_percentage`.
+
+### Break-even learners
+
+Minimum whole learner count where projected contribution ≥ 0:
+
+```text
+break_even = CEIL(total_cost / tuition_per_learner)   when tuition > 0 and total_cost > 0
+break_even = 0                                        when total_cost <= 0
+break_even = NULL                                     when tuition <= 0
+```
+
+When linked to a class, compare against `class.capacity` as `break_even_within_capacity`.
+
+### Scenario lifecycle
+
+| Status | Behavior |
+|--------|----------|
+| `draft` | Editable; economics computed live |
+| `finalized` | Assumptions + `economics_snapshot` frozen; edits blocked — clone to revise |
+
+Multiple scenarios per class are supported (e.g. Conservative / Base / Growth). Optional `class_id` link for `planned` / `trial` classes; pre-class planning without a class row is allowed.
+
+### Projected vs actual
+
+`get_projected_vs_actual_class_economics(scenario_id, from, to)` compares scenario projected economics against T08 `get_class_economics` for the linked class. Returns variance on revenue, total cost, and contribution. Does not mutate the scenario.
+
+### Operations & permissions
+
+| RPC | Purpose |
+|-----|---------|
+| `create_class_financial_scenario` | Create draft scenario |
+| `update_class_financial_scenario` | Edit draft |
+| `finalize_class_financial_scenario` | Snapshot and lock |
+| `clone_class_financial_scenario` | Copy to new draft |
+| `get_class_financial_scenario` | Scenario + economics |
+| `compare_class_financial_scenarios` | Side-by-side read |
+| `get_projected_vs_actual_class_economics` | Projected vs T08 actual |
+
+Permissions: `class_simulation.read`, `class_simulation.manage`.
+
+### T10 Finance UI handoff
+
+Server Actions in `src/app/actions/class-simulation.ts` wrap the RPCs. M2-T10 should surface scenario CRUD, comparison tables, and projected-vs-actual variance without introducing a second economics formula.
+
+### Tests
+
+`supabase/tests/m2_class_financial_simulator_tests.sql` — 35 scenarios.
+
+---
+
+*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04. Updated for M2-T05. Updated for M2-T06. Updated for M2-T07. Updated for M2-T08. Updated for M2-T09.*
