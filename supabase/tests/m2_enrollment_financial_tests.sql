@@ -543,7 +543,10 @@ BEGIN
   PERFORM _m2_ef_record(
     26,
     'charge is not treated as revenue',
-    NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'revenue_recognition_event')
+    NOT EXISTS (
+      SELECT 1 FROM revenue_recognition_event
+      WHERE enrollment_id = b.enrollment_id
+    )
     AND EXISTS (
       SELECT 1 FROM charge
       WHERE enrollment_id = b.enrollment_id AND charge_source_code = 'tuition' AND amount = 1000000

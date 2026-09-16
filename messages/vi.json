@@ -754,6 +754,23 @@
     "overdue": "Quá hạn",
     "void": "Đã hủy"
   },
+  "revenueRecognition": {
+    "title": "Ghi nhận doanh thu",
+    "recognizedRevenue": "Doanh thu đã ghi nhận",
+    "serviceObligation": "Nghĩa vụ dịch vụ còn lại",
+    "recognizeRevenue": "Ghi nhận doanh thu",
+    "voidRecognition": "Hoàn tác ghi nhận"
+  },
+  "recognitionBasis": {
+    "per_lesson": "Theo buổi học",
+    "stage": "Giai đoạn / mốc",
+    "stage_checkpoint": "Giai đoạn / mốc",
+    "deferred": "Hoãn lại"
+  },
+  "recognitionStatus": {
+    "posted": "Đã ghi nhận",
+    "void": "Đã hủy"
+  },
   "expenseCategory": {
     "rent": "Thuê mặt bằng",
     "electricity": "Điện",

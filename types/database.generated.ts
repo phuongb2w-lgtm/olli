@@ -1094,6 +1094,125 @@ export type Database = {
           },
         ]
       }
+      enrollment_recognition_config: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          enrollment_financial_terms_id: string
+          enrollment_id: string
+          id: string
+          net_tuition_snapshot: number
+          organization_id: string
+          recognition_basis_code: string
+          recognition_unit_count: number | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          enrollment_financial_terms_id: string
+          enrollment_id: string
+          id?: string
+          net_tuition_snapshot: number
+          organization_id: string
+          recognition_basis_code: string
+          recognition_unit_count?: number | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          enrollment_financial_terms_id?: string
+          enrollment_id?: string
+          id?: string
+          net_tuition_snapshot?: number
+          organization_id?: string
+          recognition_basis_code?: string
+          recognition_unit_count?: number | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollment_recognition_config_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "enrollment_recognition_config_organization_id_enrollment_f_fkey"
+            columns: ["organization_id", "enrollment_financial_terms_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment_financial_terms"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "enrollment_recognition_config_organization_id_enrollment_i_fkey"
+            columns: ["organization_id", "enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "enrollment_recognition_config_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enrollment_recognition_stage: {
+        Row: {
+          amount: number
+          assessment_id: string | null
+          created_at: string
+          enrollment_recognition_config_id: string
+          id: string
+          label: string | null
+          organization_id: string
+          sequence_number: number
+          status: string
+        }
+        Insert: {
+          amount: number
+          assessment_id?: string | null
+          created_at?: string
+          enrollment_recognition_config_id: string
+          id?: string
+          label?: string | null
+          organization_id: string
+          sequence_number: number
+          status?: string
+        }
+        Update: {
+          amount?: number
+          assessment_id?: string | null
+          created_at?: string
+          enrollment_recognition_config_id?: string
+          id?: string
+          label?: string | null
+          organization_id?: string
+          sequence_number?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollment_recognition_stage_organization_id_assessment_id_fkey"
+            columns: ["organization_id", "assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessment"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "enrollment_recognition_stage_organization_id_enrollment_re_fkey"
+            columns: ["organization_id", "enrollment_recognition_config_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment_recognition_config"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       expense: {
         Row: {
           amount: number
@@ -1746,6 +1865,116 @@ export type Database = {
             columns: ["organization_id", "teacher_id"]
             isOneToOne: false
             referencedRelation: "teacher"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      revenue_recognition_event: {
+        Row: {
+          amount: number
+          assessment_result_id: string | null
+          created_at: string
+          created_by: string | null
+          enrollment_financial_terms_id: string
+          enrollment_id: string
+          enrollment_recognition_config_id: string
+          enrollment_recognition_stage_id: string | null
+          id: string
+          lesson_sequence_number: number | null
+          notes: string | null
+          organization_id: string
+          recognition_basis_code: string
+          recognized_at: string
+          status: string
+          teaching_session_id: string | null
+          voided_at: string | null
+        }
+        Insert: {
+          amount: number
+          assessment_result_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          enrollment_financial_terms_id: string
+          enrollment_id: string
+          enrollment_recognition_config_id: string
+          enrollment_recognition_stage_id?: string | null
+          id?: string
+          lesson_sequence_number?: number | null
+          notes?: string | null
+          organization_id: string
+          recognition_basis_code: string
+          recognized_at?: string
+          status?: string
+          teaching_session_id?: string | null
+          voided_at?: string | null
+        }
+        Update: {
+          amount?: number
+          assessment_result_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          enrollment_financial_terms_id?: string
+          enrollment_id?: string
+          enrollment_recognition_config_id?: string
+          enrollment_recognition_stage_id?: string | null
+          id?: string
+          lesson_sequence_number?: number | null
+          notes?: string | null
+          organization_id?: string
+          recognition_basis_code?: string
+          recognized_at?: string
+          status?: string
+          teaching_session_id?: string | null
+          voided_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revenue_recognition_event_organization_id_assessment_resul_fkey"
+            columns: ["organization_id", "assessment_result_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_result"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "revenue_recognition_event_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "revenue_recognition_event_organization_id_enrollment_finan_fkey"
+            columns: ["organization_id", "enrollment_financial_terms_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment_financial_terms"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "revenue_recognition_event_organization_id_enrollment_id_fkey"
+            columns: ["organization_id", "enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "revenue_recognition_event_organization_id_enrollment_reco_fkey1"
+            columns: ["organization_id", "enrollment_recognition_stage_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment_recognition_stage"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "revenue_recognition_event_organization_id_enrollment_recog_fkey"
+            columns: ["organization_id", "enrollment_recognition_config_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment_recognition_config"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "revenue_recognition_event_organization_id_teaching_session_fkey"
+            columns: ["organization_id", "teaching_session_id"]
+            isOneToOne: false
+            referencedRelation: "teaching_session"
             referencedColumns: ["organization_id", "id"]
           },
         ]
@@ -2455,6 +2684,14 @@ export type Database = {
         Args: { p_payment_id: string }
         Returns: string
       }
+      _recognize_per_lesson_for_enrollment: {
+        Args: { p_enrollment_id: string; p_teaching_session_id?: string }
+        Returns: number
+      }
+      _recognize_stage_for_enrollment: {
+        Args: { p_enrollment_id: string }
+        Returns: number
+      }
       _replace_enrollment_payment_schedule: {
         Args: { p_items: Json; p_mode: string; p_terms_id: string }
         Returns: undefined
@@ -2542,6 +2779,14 @@ export type Database = {
       }
       current_app_user_id: { Args: never; Returns: string }
       current_organization_id: { Args: never; Returns: string }
+      enrollment_recognition_entitlement: {
+        Args: { p_terms_id: string }
+        Returns: number
+      }
+      enrollment_recognized_revenue: {
+        Args: { p_enrollment_id: string }
+        Returns: number
+      }
       enrollment_schedule_total: {
         Args: { p_terms_id: string }
         Returns: number
@@ -2572,6 +2817,10 @@ export type Database = {
       }
       get_payment_details: { Args: { p_payment_id: string }; Returns: Json }
       has_permission: { Args: { p_code: string }; Returns: boolean }
+      initialize_enrollment_per_lesson_recognition: {
+        Args: { p_lesson_count: number; p_terms_id: string }
+        Returns: string
+      }
       installment_schedule_amount: {
         Args: {
           p_installment_count: number
@@ -2581,6 +2830,14 @@ export type Database = {
         Returns: number
       }
       is_active_app_user: { Args: never; Returns: boolean }
+      is_attendance_eligible_for_recognition: {
+        Args: { p_status: string }
+        Returns: boolean
+      }
+      normalize_recognition_basis_code: {
+        Args: { p_code: string }
+        Returns: string
+      }
       payment_allocated_amount: {
         Args: { p_payment_id: string }
         Returns: number
@@ -2588,6 +2845,22 @@ export type Database = {
       post_depreciation_through: {
         Args: { p_capital_asset_id: string; p_through_month: string }
         Returns: number
+      }
+      recognition_lesson_amount: {
+        Args: {
+          p_lesson_count: number
+          p_sequence_number: number
+          p_total: number
+        }
+        Returns: number
+      }
+      recognize_enrollment_revenue: {
+        Args: { p_enrollment_id: string }
+        Returns: Json
+      }
+      recognize_teaching_session_revenue: {
+        Args: { p_teaching_session_id: string }
+        Returns: Json
       }
       record_payment: {
         Args: {
@@ -2653,6 +2926,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      set_enrollment_recognition_stages: {
+        Args: { p_stages: Json; p_terms_id: string }
+        Returns: string
+      }
       set_own_preferred_locale: {
         Args: { p_locale: string }
         Returns: undefined
@@ -2693,6 +2970,10 @@ export type Database = {
           p_tuition_plan_id?: string
         }
         Returns: undefined
+      }
+      void_revenue_recognition_event: {
+        Args: { p_event_id: string; p_notes?: string }
+        Returns: Json
       }
     }
     Enums: {

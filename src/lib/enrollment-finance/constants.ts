@@ -9,6 +9,7 @@ export type PaymentPlanMode = (typeof PAYMENT_PLAN_MODES)[number];
 
 export const RECOGNITION_BASIS_CODES = [
   "per_lesson",
+  "stage",
   "stage_checkpoint",
   "deferred",
 ] as const;

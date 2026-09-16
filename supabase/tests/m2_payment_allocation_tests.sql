@@ -766,7 +766,10 @@ BEGIN
   PERFORM _m2_pay_record(
     37,
     'payment does not create revenue recognition',
-    NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'revenue_recognition_event')
+    NOT EXISTS (
+      SELECT 1 FROM revenue_recognition_event
+      WHERE organization_id = b.org_id
+    )
   );
 END $$;
 

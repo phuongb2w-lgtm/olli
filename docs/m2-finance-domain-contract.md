@@ -472,7 +472,7 @@ Order driven by **physical dependencies** and **accounting integrity** (configur
 | ~~**M2-T03**~~ | **DONE** — Cost A: `capital_asset`, `depreciation_entry`, quick/detailed convergence, immutability | T02 |
 | ~~**M2-T04**~~ | **DONE** — Enrollment financial terms, payment schedule, charge generation with provenance | M1 enrollment |
 | ~~**M2-T05**~~ | **DONE** — Payment recording, allocation workflow, reversals, enrollment cash summary | T04 |
-| **M2-T06** | Revenue recognition: policy config, recognition events, prepaid/deferred derivation | T05, M1 sessions/attendance/assessments |
+| ~~**M2-T06**~~ | **DONE** — Revenue recognition (per-lesson + stage), M1 evidence consumption | T05, M1 |
 | **M2-T07** | Personnel cost templates & welfare fund category (Cost B2 completion) | T02 |
 | **M2-T08** | Class cost allocation rules + contribution report (read models) | T02–T07 |
 | **M2-T09** | New-class financial simulator (read-only projection) | T04, T08 |
@@ -1203,4 +1203,113 @@ Preserves `security_invoker = true`. Adds derived columns: `original_amount`, `a
 
 ---
 
-*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04. Updated for M2-T05.*
+---
+
+## Appendix G — M2-T06 Revenue Recognition (after `98b57f7`)
+
+**Migration:** `20260914141900_m2_t06_revenue_recognition.sql`
+
+### Separation of concepts
+
+```text
+Net tuition ≠ Charge ≠ Payment ≠ Allocation ≠ Recognized revenue
+```
+
+| Concept | Source |
+|---------|--------|
+| Commercial entitlement | `enrollment_financial_terms.net_tuition_amount` |
+| Receivable / charged | `charge` + adjustments |
+| Cash received | `payment` |
+| Cash applied | `payment_allocation` |
+| Earned revenue | `revenue_recognition_event` (posted) |
+| Remaining service obligation | entitlement − recognized (derived) |
+
+Payment timing and charge settlement do **not** gate recognition.
+
+### Recognition bases
+
+Configured on `enrollment_financial_terms.recognition_basis_code`:
+
+| Code | Meaning |
+|------|---------|
+| `per_lesson` | Spread net tuition across N service units |
+| `stage` | Recognize configured checkpoint amounts (canonical) |
+| `stage_checkpoint` | Legacy alias → treated as `stage` |
+
+### M1 evidence consumed
+
+| Basis | Academic evidence |
+|-------|-------------------|
+| Per-lesson | `teaching_session.status = 'completed'` **and** `attendance.status IN ('present', 'late')` for the enrollment |
+| Stage | `assessment_result.status = 'finalized'` for enrollment + configured `assessment_id` |
+
+**Attendance rule:** `present` and `late` count as delivered service; `absent` and `excused` do not. Finance does not mutate M1 rows.
+
+### Configuration vs events
+
+| Layer | Table | Role |
+|-------|-------|------|
+| Config | `enrollment_recognition_config` | How entitlement is split (`recognition_unit_count` or stage schedule) |
+| Stage config | `enrollment_recognition_stage` | Sequence, amount, optional M1 `assessment_id` |
+| Events | `revenue_recognition_event` | Immutable earned-revenue facts (`posted` / `void`) |
+
+### Per-lesson precision
+
+Uses `recognition_lesson_amount(total, N, seq)` (= `installment_schedule_amount`):
+
+- Periods `1..N-1`: `floor(total / N)`
+- Period `N`: absorbs remainder
+- **Invariant:** Σ schedule amounts = net tuition exactly
+
+Lesson sequence assigned by `scheduled_start_at` order among eligible completed sessions.
+
+### Stage precision
+
+`set_enrollment_recognition_stages` requires `SUM(stage.amount) = net_tuition_amount` exactly.
+
+### Idempotency
+
+| Scope | Protection |
+|-------|------------|
+| Per-lesson | `UNIQUE (terms_id, teaching_session_id)` where posted |
+| Stage | `UNIQUE (enrollment_recognition_stage_id)` where posted |
+| Engine retry | `recognize_enrollment_revenue` skips existing events |
+
+### Recognition cap
+
+Trigger `validate_revenue_recognition_cap`:
+
+```text
+Σ(posted events for terms) <= active terms net_tuition_amount
+```
+
+Entitlement uses **live** `net_tuition_amount` (tuition corrections affect cap, not historical events).
+
+### Corrections
+
+- `void_revenue_recognition_event` sets `status = 'void'`; original row preserved
+- Academic corrections (e.g. attendance reversed) require explicit void — no silent rewrite
+- Tuition reduction after recognition: past events stand; future recognition capped at new entitlement minus already recognized
+
+### Withdrawal / dropout boundary
+
+T06 does **not** auto-recognize remaining tuition on withdrawal or auto-refund. Policy-driven forfeiture/refund deferred.
+
+### RPCs
+
+| RPC | Permission |
+|-----|------------|
+| `initialize_enrollment_per_lesson_recognition` | `revenue.recognize` |
+| `set_enrollment_recognition_stages` | `revenue.recognize` |
+| `recognize_enrollment_revenue` | `revenue.recognize` |
+| `recognize_teaching_session_revenue` | `revenue.recognize` |
+| `void_revenue_recognition_event` | `revenue.recognize` |
+| `get_enrollment_financial_summary` | `charge.read` (extended) |
+
+### Tests
+
+`supabase/tests/m2_revenue_recognition_tests.sql` — 30 scenarios.
+
+---
+
+*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04. Updated for M2-T05. Updated for M2-T06.*

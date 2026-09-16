@@ -754,6 +754,23 @@
     "overdue": "Overdue",
     "void": "Void"
   },
+  "revenueRecognition": {
+    "title": "Revenue recognition",
+    "recognizedRevenue": "Recognized revenue",
+    "serviceObligation": "Remaining service obligation",
+    "recognizeRevenue": "Recognize revenue",
+    "voidRecognition": "Void recognition"
+  },
+  "recognitionBasis": {
+    "per_lesson": "Per lesson",
+    "stage": "Stage / checkpoint",
+    "stage_checkpoint": "Stage / checkpoint",
+    "deferred": "Deferred"
+  },
+  "recognitionStatus": {
+    "posted": "Posted",
+    "void": "Void"
+  },
   "expenseCategory": {
     "rent": "Rent",
     "electricity": "Electricity",
