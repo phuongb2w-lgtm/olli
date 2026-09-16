@@ -789,6 +789,27 @@
     "monthlyAmount": "Monthly baseline amount",
     "configureBaseline": "Configure welfare baseline"
   },
+  "classEconomics": {
+    "title": "Class economics",
+    "recognizedRevenue": "Recognized revenue",
+    "totalCost": "Total cost",
+    "contribution": "Contribution",
+    "marginPercentage": "Margin",
+    "directPersonnelCost": "Direct personnel cost",
+    "allocatedCost": "Allocated cost"
+  },
+  "allocationBasis": {
+    "equal": "Equal split",
+    "active_enrollment_count": "Active enrollments",
+    "delivered_session_count": "Delivered sessions",
+    "recognized_revenue": "Recognized revenue"
+  },
+  "costAllocation": {
+    "title": "Cost allocation",
+    "runAllocation": "Run cost allocation",
+    "unallocatedCost": "Unallocated shared cost",
+    "allocatedCost": "Allocated shared cost"
+  },
   "expenseCategory": {
     "rent": "Rent",
     "electricity": "Electricity",

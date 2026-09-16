@@ -789,6 +789,27 @@
     "monthlyAmount": "Mức cơ bản hàng tháng",
     "configureBaseline": "Cấu hình quỹ phúc lợi"
   },
+  "classEconomics": {
+    "title": "Kinh tế lớp học",
+    "recognizedRevenue": "Doanh thu đã ghi nhận",
+    "totalCost": "Tổng chi phí",
+    "contribution": "Đóng góp",
+    "marginPercentage": "Biên lợi nhuận",
+    "directPersonnelCost": "Chi phí nhân sự trực tiếp",
+    "allocatedCost": "Chi phí phân bổ"
+  },
+  "allocationBasis": {
+    "equal": "Chia đều",
+    "active_enrollment_count": "Học viên đang học",
+    "delivered_session_count": "Buổi dạy đã hoàn thành",
+    "recognized_revenue": "Doanh thu đã ghi nhận"
+  },
+  "costAllocation": {
+    "title": "Phân bổ chi phí",
+    "runAllocation": "Chạy phân bổ chi phí",
+    "unallocatedCost": "Chi phí dùng chung chưa phân bổ",
+    "allocatedCost": "Chi phí dùng chung đã phân bổ"
+  },
   "expenseCategory": {
     "rent": "Thuê mặt bằng",
     "electricity": "Điện",

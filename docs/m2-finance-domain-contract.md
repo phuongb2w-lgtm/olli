@@ -474,7 +474,7 @@ Order driven by **physical dependencies** and **accounting integrity** (configur
 | ~~**M2-T05**~~ | **DONE** — Payment recording, allocation workflow, reversals, enrollment cash summary | T04 |
 | ~~**M2-T06**~~ | **DONE** — Revenue recognition (per-lesson + stage), M1 evidence consumption | T05, M1 |
 | ~~**M2-T07**~~ | **DONE** — Personnel compensation rules, cost entries, welfare baseline | T02, M1 |
-| **M2-T08** | Class cost allocation rules + contribution report (read models) | T02–T07 |
+| ~~**M2-T08**~~ | **DONE** — Shared cost allocation + class economics read model | T02–T07 |
 | **M2-T09** | New-class financial simulator (read-only projection) | T04, T08 |
 | **M2-T10** | Finance UI + bilingual labels + permission refinement | T05+ |
 | **M2-T11** | M2 acceptance & finance regression suite | All |
@@ -1392,4 +1392,86 @@ Read: `personnel_cost.read` on tables/view.
 
 ---
 
-*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04. Updated for M2-T05. Updated for M2-T06. Updated for M2-T07.*
+## Appendix I — M2-T08 Class Cost Allocation & Economics (after `27b3133`)
+
+**Migration:** `20260914142100_m2_t08_class_cost_allocation.sql`
+
+### P&L formula
+
+```text
+Contribution = Recognized Revenue − Total Cost
+
+Total Cost =
+  Direct Personnel Cost
+  + Allocated Shared Personnel
+  + Allocated Operating Overhead
+  + Allocated Marketing & Sales
+  + Allocated Depreciation
+```
+
+Class revenue is **recognized revenue** from T06 (`revenue_recognition_event` posted), never charges or cash.
+
+### Direct vs shared
+
+| Type | Source | Class attribution |
+|------|--------|-------------------|
+| Direct personnel | `personnel_cost_entry` with `teaching_session_id` | 100% to session class — never re-allocated |
+| Shared personnel | `personnel_cost_entry` without session (monthly/welfare) | Allocation pool |
+| Operating overhead | `expense` where `cost_domain_code = operating_overhead` | Allocation pool |
+| Marketing & sales | `expense` + shared `personnel_cost_entry` where domain = `marketing_sales` | Allocation pool |
+| Depreciation | `depreciation_entry` where `status = posted` | Allocation pool |
+
+**Personnel double-count rule:** T07 `personnel_cost_entry` is authoritative for personnel domain. `expense` rows with `cost_domain_code = personnel` are **excluded** from allocation pools.
+
+Capital **acquisition cost** is never P&L — only posted monthly `depreciation_entry` amounts.
+
+### Allocation bases
+
+| Basis | Weight |
+|-------|--------|
+| `equal` | 1 per eligible class |
+| `active_enrollment_count` | Enrollments with `status IN ('active','completed')` overlapping period |
+| `delivered_session_count` | `teaching_session.status = 'completed'` in period month |
+| `recognized_revenue` | Posted T06 recognition for class in period month |
+
+**Eligible classes:** `status IN ('planned','trial','active','closed')` overlapping period via term dates.
+
+**Remainder:** floor proportional shares; distribute +1 minor unit to positive-weight classes in stable `class.id` order until exact reconciliation.
+
+**Zero-weight (non-equal):** source remains unallocated; visible in reconciliation.
+
+### Default rules (seeded on first run)
+
+| Scope | Default basis |
+|-------|---------------|
+| `operating_overhead` | `active_enrollment_count` |
+| `shared_personnel` | `active_enrollment_count` |
+| `marketing_sales` | `recognized_revenue` |
+| `depreciation` | `equal` |
+
+### Idempotency & history
+
+- Unique posted allocation per `(org, period, source_type, source_record_id, class_id)`
+- `run_class_cost_allocation(period_month)` skips already-allocated sources
+- Posted allocations immutable; void batch via `void_class_cost_allocation_batch`
+- Rule changes effective-dated; historical periods unchanged
+
+### Read models
+
+| RPC / view | Purpose |
+|------------|---------|
+| `get_class_economics(class_id, from, to)` | Class P&L + margin |
+| `get_organization_cost_reconciliation(period_month)` | Shared vs allocated vs unallocated |
+| `class_cost_allocation_detail` | Allocation fact detail |
+
+### T09 boundary
+
+T08 reports **actual** economics from real source facts. Hypothetical/planned class simulation deferred to T09.
+
+### Tests
+
+`supabase/tests/m2_class_cost_allocation_tests.sql` — 35 scenarios.
+
+---
+
+*Document produced by M2-T01 audit at commit `2526990`. Updated for M2-T02 at `e0c99e5`. Updated for M2-T03 and M2-T04. Updated for M2-T05. Updated for M2-T06. Updated for M2-T07. Updated for M2-T08.*

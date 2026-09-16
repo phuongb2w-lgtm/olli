@@ -557,6 +557,166 @@ export type Database = {
           },
         ]
       }
+      class_cost_allocation: {
+        Row: {
+          accounting_period: string
+          allocated_amount: number
+          allocation_basis_code: string
+          allocation_batch_id: string
+          class_id: string
+          cost_allocation_rule_id: string
+          cost_domain_code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          organization_id: string
+          sequence_number: number
+          source_amount_snapshot: number
+          source_record_id: string
+          source_scope_code: string
+          source_type: string
+          status: string
+          weight_total: number
+          weight_value: number
+        }
+        Insert: {
+          accounting_period: string
+          allocated_amount: number
+          allocation_basis_code: string
+          allocation_batch_id: string
+          class_id: string
+          cost_allocation_rule_id: string
+          cost_domain_code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          organization_id: string
+          sequence_number: number
+          source_amount_snapshot: number
+          source_record_id: string
+          source_scope_code: string
+          source_type: string
+          status?: string
+          weight_total?: number
+          weight_value?: number
+        }
+        Update: {
+          accounting_period?: string
+          allocated_amount?: number
+          allocation_basis_code?: string
+          allocation_batch_id?: string
+          class_id?: string
+          cost_allocation_rule_id?: string
+          cost_domain_code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          organization_id?: string
+          sequence_number?: number
+          source_amount_snapshot?: number
+          source_record_id?: string
+          source_scope_code?: string
+          source_type?: string
+          status?: string
+          weight_total?: number
+          weight_value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_cost_allocation_organization_id_allocation_batch_id_fkey"
+            columns: ["organization_id", "allocation_batch_id"]
+            isOneToOne: false
+            referencedRelation: "class_cost_allocation_batch"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_cost_allocation_organization_id_class_id_fkey"
+            columns: ["organization_id", "class_id"]
+            isOneToOne: false
+            referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_cost_allocation_organization_id_cost_allocation_rule_fkey"
+            columns: ["organization_id", "cost_allocation_rule_id"]
+            isOneToOne: false
+            referencedRelation: "cost_allocation_rule"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_cost_allocation_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_cost_allocation_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      class_cost_allocation_batch: {
+        Row: {
+          accounting_period: string
+          created_at: string
+          created_by: string | null
+          id: string
+          organization_id: string
+          status: string
+          void_notes: string | null
+          voided_at: string | null
+          voided_by: string | null
+        }
+        Insert: {
+          accounting_period: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          organization_id: string
+          status?: string
+          void_notes?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Update: {
+          accounting_period?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          organization_id?: string
+          status?: string
+          void_notes?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_cost_allocation_batch_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_cost_allocation_batch_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_cost_allocation_batch_organization_id_voided_by_fkey"
+            columns: ["organization_id", "voided_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       class_schedule: {
         Row: {
           class_id: string
@@ -717,6 +877,73 @@ export type Database = {
           },
           {
             foreignKeyName: "class_teacher_assignment_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      cost_allocation_rule: {
+        Row: {
+          allocation_basis_code: string
+          created_at: string
+          created_by: string | null
+          effective_from: string
+          effective_to: string | null
+          id: string
+          notes: string | null
+          organization_id: string
+          source_scope_code: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          allocation_basis_code: string
+          created_at?: string
+          created_by?: string | null
+          effective_from: string
+          effective_to?: string | null
+          id?: string
+          notes?: string | null
+          organization_id: string
+          source_scope_code: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          allocation_basis_code?: string
+          created_at?: string
+          created_by?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          source_scope_code?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cost_allocation_rule_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "cost_allocation_rule_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cost_allocation_rule_organization_id_updated_by_fkey"
             columns: ["organization_id", "updated_by"]
             isOneToOne: false
             referencedRelation: "app_user"
@@ -2932,6 +3159,67 @@ export type Database = {
         }
         Relationships: []
       }
+      class_cost_allocation_detail: {
+        Row: {
+          accounting_period: string | null
+          allocated_amount: number | null
+          allocation_basis_code: string | null
+          allocation_batch_id: string | null
+          class_id: string | null
+          class_name: string | null
+          cost_allocation_rule_id: string | null
+          cost_domain_code: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string | null
+          organization_id: string | null
+          sequence_number: number | null
+          source_amount_snapshot: number | null
+          source_record_id: string | null
+          source_scope_code: string | null
+          source_type: string | null
+          status: string | null
+          weight_total: number | null
+          weight_value: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_cost_allocation_organization_id_allocation_batch_id_fkey"
+            columns: ["organization_id", "allocation_batch_id"]
+            isOneToOne: false
+            referencedRelation: "class_cost_allocation_batch"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_cost_allocation_organization_id_class_id_fkey"
+            columns: ["organization_id", "class_id"]
+            isOneToOne: false
+            referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_cost_allocation_organization_id_cost_allocation_rule_fkey"
+            columns: ["organization_id", "cost_allocation_rule_id"]
+            isOneToOne: false
+            referencedRelation: "cost_allocation_rule"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_cost_allocation_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "class_cost_allocation_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       personnel_cost_entry_detail: {
         Row: {
           accounting_period: string | null
@@ -3044,6 +3332,22 @@ export type Database = {
       }
     }
     Functions: {
+      _allocate_shared_source: {
+        Args: {
+          p_basis: string
+          p_batch_id: string
+          p_cost_domain_code: string
+          p_created_by: string
+          p_organization_id: string
+          p_period_month: string
+          p_rule_id: string
+          p_source_amount: number
+          p_source_record_id: string
+          p_source_scope_code: string
+          p_source_type: string
+        }
+        Returns: Json
+      }
       _build_payment_details: { Args: { p_payment_id: string }; Returns: Json }
       _cb_as_anon: { Args: never; Returns: undefined }
       _cb_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
@@ -3110,6 +3414,10 @@ export type Database = {
         }
         Returns: Json
       }
+      allocation_period_end: {
+        Args: { p_period_month: string }
+        Returns: string
+      }
       apply_enrollment_tuition_correction: {
         Args: {
           p_new_net_tuition: number
@@ -3131,6 +3439,22 @@ export type Database = {
         Args: { p_charge_id: string }
         Returns: number
       }
+      class_active_enrollment_count: {
+        Args: { p_class_id: string; p_period_month: string }
+        Returns: number
+      }
+      class_allocation_weight: {
+        Args: { p_basis: string; p_class_id: string; p_period_month: string }
+        Returns: number
+      }
+      class_delivered_session_count: {
+        Args: { p_class_id: string; p_period_month: string }
+        Returns: number
+      }
+      class_recognized_revenue_amount: {
+        Args: { p_class_id: string; p_period_month: string }
+        Returns: number
+      }
       configure_welfare_fund_baseline: {
         Args: {
           p_effective_from: string
@@ -3148,6 +3472,15 @@ export type Database = {
           p_original_cost: number
           p_placed_in_service_date: string
           p_useful_life_months: number
+        }
+        Returns: string
+      }
+      create_cost_allocation_rule: {
+        Args: {
+          p_allocation_basis_code: string
+          p_effective_from: string
+          p_notes?: string
+          p_source_scope_code: string
         }
         Returns: string
       }
@@ -3185,6 +3518,10 @@ export type Database = {
       }
       current_app_user_id: { Args: never; Returns: string }
       current_organization_id: { Args: never; Returns: string }
+      end_cost_allocation_rule: {
+        Args: { p_effective_to: string; p_rule_id: string }
+        Returns: string
+      }
       end_staff_compensation_rule: {
         Args: { p_effective_to: string; p_rule_id: string }
         Returns: string
@@ -3200,6 +3537,10 @@ export type Database = {
       enrollment_schedule_total: {
         Args: { p_terms_id: string }
         Returns: number
+      }
+      ensure_default_allocation_rules: {
+        Args: { p_organization_id: string }
+        Returns: undefined
       }
       generate_depreciation_schedule: {
         Args: { p_capital_asset_id: string }
@@ -3225,12 +3566,20 @@ export type Database = {
         }
         Returns: number
       }
+      get_class_economics: {
+        Args: { p_class_id: string; p_period_from: string; p_period_to: string }
+        Returns: Json
+      }
       get_enrollment_financial_summary: {
         Args: { p_enrollment_id: string }
         Returns: Json
       }
       get_enrollment_outstanding_charges: {
         Args: { p_enrollment_id: string }
+        Returns: Json
+      }
+      get_organization_cost_reconciliation: {
+        Args: { p_period_month: string }
         Returns: Json
       }
       get_payment_details: { Args: { p_payment_id: string }; Returns: Json }
@@ -3250,6 +3599,10 @@ export type Database = {
       is_active_app_user: { Args: never; Returns: boolean }
       is_attendance_eligible_for_recognition: {
         Args: { p_status: string }
+        Returns: boolean
+      }
+      is_class_eligible_for_allocation: {
+        Args: { p_class_id: string; p_period_month: string }
         Returns: boolean
       }
       is_compensation_rule_applicable_to_month: {
@@ -3308,6 +3661,14 @@ export type Database = {
         }
         Returns: Json
       }
+      resolve_allocation_rule: {
+        Args: {
+          p_organization_id: string
+          p_period_month: string
+          p_source_scope_code: string
+        }
+        Returns: string
+      }
       resolve_capital_cost_group_id: {
         Args: { p_organization_id: string }
         Returns: string
@@ -3326,6 +3687,10 @@ export type Database = {
       }
       reverse_payment_allocation: {
         Args: { p_allocation_id: string; p_notes?: string }
+        Returns: Json
+      }
+      run_class_cost_allocation: {
+        Args: { p_period_month: string }
         Returns: Json
       }
       seed_organization_cost_categories: {
@@ -3405,6 +3770,10 @@ export type Database = {
       validate_personnel_cost_domain: {
         Args: { p_cost_domain_code: string; p_organization_id: string }
         Returns: undefined
+      }
+      void_class_cost_allocation_batch: {
+        Args: { p_batch_id: string; p_notes?: string }
+        Returns: string
       }
       void_personnel_cost_entry: {
         Args: { p_entry_id: string; p_notes?: string }
