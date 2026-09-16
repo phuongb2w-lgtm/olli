@@ -297,7 +297,20 @@
       "draft": "Nháp",
       "open": "Đang mở",
       "closed": "Đã đóng"
+    },
+    "lead": {
+      "new": "Mới",
+      "contacted": "Đã liên hệ",
+      "qualified": "Đủ điều kiện",
+      "trial_scheduled": "Đã đặt học thử",
+      "trial_completed": "Đã học thử",
+      "converted": "Đã chuyển đổi",
+      "lost": "Đã mất",
+      "reactivated": "Kích hoạt lại"
     }
+  },
+  "crm": {
+    "title": "Tuyển sinh"
   },
   "teaching": {
     "title": "Giảng dạy",
@@ -1082,6 +1095,24 @@
       "status": "Trạng thái",
       "netTuitionRef": "Học phí ròng tham chiếu: {amount}"
     }
+  },
+  "leadSource": {
+    "walk_in": "Walk-in",
+    "facebook": "Facebook",
+    "website": "Website",
+    "referral": "Giới thiệu",
+    "phone": "Gọi điện",
+    "event": "Sự kiện",
+    "other": "Khác"
+  },
+  "leadLostReason": {
+    "price_too_high": "Giá cao",
+    "schedule_conflict": "Trùng lịch",
+    "chose_competitor": "Chọn trung tâm khác",
+    "no_response": "Không phản hồi",
+    "not_ready": "Chưa sẵn sàng",
+    "location": "Khoảng cách / địa điểm",
+    "other": "Khác"
   },
   "expenseCategory": {
     "rent": "Thuê mặt bằng",

@@ -1826,6 +1826,509 @@ export type Database = {
           },
         ]
       }
+      lead: {
+        Row: {
+          assigned_user_id: string | null
+          converted_at: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          lead_campaign_id: string | null
+          lead_source_id: string | null
+          lost_at: string | null
+          lost_by: string | null
+          lost_notes: string | null
+          lost_reason_id: string | null
+          notes_summary: string | null
+          organization_id: string
+          referral_guardian_id: string | null
+          referral_student_id: string | null
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          assigned_user_id?: string | null
+          converted_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lead_campaign_id?: string | null
+          lead_source_id?: string | null
+          lost_at?: string | null
+          lost_by?: string | null
+          lost_notes?: string | null
+          lost_reason_id?: string | null
+          notes_summary?: string | null
+          organization_id: string
+          referral_guardian_id?: string | null
+          referral_student_id?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          assigned_user_id?: string | null
+          converted_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lead_campaign_id?: string | null
+          lead_source_id?: string | null
+          lost_at?: string | null
+          lost_by?: string | null
+          lost_notes?: string | null
+          lost_reason_id?: string | null
+          notes_summary?: string | null
+          organization_id?: string
+          referral_guardian_id?: string | null
+          referral_student_id?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_organization_id_assigned_user_id_fkey"
+            columns: ["organization_id", "assigned_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_organization_id_lead_campaign_id_fkey"
+            columns: ["organization_id", "lead_campaign_id"]
+            isOneToOne: false
+            referencedRelation: "lead_campaign"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_organization_id_lead_source_id_fkey"
+            columns: ["organization_id", "lead_source_id"]
+            isOneToOne: false
+            referencedRelation: "lead_source"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_organization_id_lost_by_fkey"
+            columns: ["organization_id", "lost_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_organization_id_lost_reason_id_fkey"
+            columns: ["organization_id", "lost_reason_id"]
+            isOneToOne: false
+            referencedRelation: "lead_lost_reason"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_organization_id_referral_guardian_id_fkey"
+            columns: ["organization_id", "referral_guardian_id"]
+            isOneToOne: false
+            referencedRelation: "guardian"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_organization_id_referral_student_id_fkey"
+            columns: ["organization_id", "referral_student_id"]
+            isOneToOne: false
+            referencedRelation: "student"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_organization_id_updated_by_fkey"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_campaign: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          end_date: string | null
+          expense_id: string | null
+          id: string
+          lead_source_id: string | null
+          name: string
+          organization_id: string
+          start_date: string | null
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          expense_id?: string | null
+          id?: string
+          lead_source_id?: string | null
+          name: string
+          organization_id: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          expense_id?: string | null
+          id?: string
+          lead_source_id?: string | null
+          name?: string
+          organization_id?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_campaign_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_campaign_organization_id_expense_id_fkey"
+            columns: ["organization_id", "expense_id"]
+            isOneToOne: false
+            referencedRelation: "expense"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_campaign_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_campaign_organization_id_lead_source_id_fkey"
+            columns: ["organization_id", "lead_source_id"]
+            isOneToOne: false
+            referencedRelation: "lead_source"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_campaign_organization_id_updated_by_fkey"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_candidate: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          date_of_birth: string | null
+          family_name: string
+          given_name: string
+          id: string
+          is_primary_candidate: boolean
+          lead_id: string
+          organization_id: string
+          status: string
+          target_class_id: string | null
+          target_course_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          date_of_birth?: string | null
+          family_name: string
+          given_name: string
+          id?: string
+          is_primary_candidate?: boolean
+          lead_id: string
+          organization_id: string
+          status?: string
+          target_class_id?: string | null
+          target_course_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          date_of_birth?: string | null
+          family_name?: string
+          given_name?: string
+          id?: string
+          is_primary_candidate?: boolean
+          lead_id?: string
+          organization_id?: string
+          status?: string
+          target_class_id?: string | null
+          target_course_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_candidate_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_candidate_organization_id_lead_id_fkey"
+            columns: ["organization_id", "lead_id"]
+            isOneToOne: false
+            referencedRelation: "lead"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_candidate_organization_id_target_class_id_fkey"
+            columns: ["organization_id", "target_class_id"]
+            isOneToOne: false
+            referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_candidate_organization_id_target_course_id_fkey"
+            columns: ["organization_id", "target_course_id"]
+            isOneToOne: false
+            referencedRelation: "course"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_candidate_organization_id_updated_by_fkey"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_contact: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          email: string | null
+          email_normalized: string | null
+          family_name: string
+          given_name: string
+          id: string
+          is_billing_contact: boolean
+          is_primary_contact: boolean
+          lead_id: string
+          organization_id: string
+          phone: string | null
+          phone_normalized: string | null
+          relationship_type: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          email_normalized?: string | null
+          family_name: string
+          given_name: string
+          id?: string
+          is_billing_contact?: boolean
+          is_primary_contact?: boolean
+          lead_id: string
+          organization_id: string
+          phone?: string | null
+          phone_normalized?: string | null
+          relationship_type?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          email_normalized?: string | null
+          family_name?: string
+          given_name?: string
+          id?: string
+          is_billing_contact?: boolean
+          is_primary_contact?: boolean
+          lead_id?: string
+          organization_id?: string
+          phone?: string | null
+          phone_normalized?: string | null
+          relationship_type?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_contact_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_contact_organization_id_lead_id_fkey"
+            columns: ["organization_id", "lead_id"]
+            isOneToOne: false
+            referencedRelation: "lead"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_contact_organization_id_updated_by_fkey"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_lost_reason: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          display_name: string
+          id: string
+          organization_id: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          display_name: string
+          id?: string
+          organization_id: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          display_name?: string
+          id?: string
+          organization_id?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_lost_reason_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_lost_reason_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_lost_reason_organization_id_updated_by_fkey"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_source: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          display_name: string
+          id: string
+          organization_id: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          display_name: string
+          id?: string
+          organization_id: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          display_name?: string
+          id?: string
+          organization_id?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_source_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_source_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_source_organization_id_updated_by_fkey"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       observation_indicator: {
         Row: {
           code: string
@@ -3501,6 +4004,16 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m3_crm_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_crm_as_super: { Args: never; Returns: undefined }
+      _m3_crm_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_crm_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -3817,6 +4330,8 @@ export type Database = {
         Returns: boolean
       }
       normalize_accounting_period: { Args: { p_date: string }; Returns: string }
+      normalize_email_key: { Args: { p_email: string }; Returns: string }
+      normalize_phone_digits: { Args: { p_phone: string }; Returns: string }
       normalize_recognition_basis_code: {
         Args: { p_code: string }
         Returns: string
@@ -3899,6 +4414,10 @@ export type Database = {
         Returns: Json
       }
       seed_organization_cost_categories: {
+        Args: { p_organization_id: string }
+        Returns: undefined
+      }
+      seed_organization_lead_reference_data: {
         Args: { p_organization_id: string }
         Returns: undefined
       }

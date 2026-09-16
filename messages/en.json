@@ -297,7 +297,20 @@
       "draft": "Draft",
       "open": "Open",
       "closed": "Closed"
+    },
+    "lead": {
+      "new": "New",
+      "contacted": "Contacted",
+      "qualified": "Qualified",
+      "trial_scheduled": "Trial scheduled",
+      "trial_completed": "Trial completed",
+      "converted": "Converted",
+      "lost": "Lost",
+      "reactivated": "Reactivated"
     }
+  },
+  "crm": {
+    "title": "Admissions"
   },
   "teaching": {
     "title": "Teaching",
@@ -1082,6 +1095,24 @@
       "status": "Status",
       "netTuitionRef": "Net tuition reference: {amount}"
     }
+  },
+  "leadSource": {
+    "walk_in": "Walk-in",
+    "facebook": "Facebook",
+    "website": "Website",
+    "referral": "Referral",
+    "phone": "Phone inquiry",
+    "event": "Event",
+    "other": "Other"
+  },
+  "leadLostReason": {
+    "price_too_high": "Price too high",
+    "schedule_conflict": "Schedule conflict",
+    "chose_competitor": "Chose competitor",
+    "no_response": "No response",
+    "not_ready": "Not ready yet",
+    "location": "Location / distance",
+    "other": "Other"
   },
   "expenseCategory": {
     "rent": "Rent",
