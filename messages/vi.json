@@ -331,7 +331,37 @@
       "emptyValue": "—",
       "emptyOrganization": "Chưa có lead trong tổ chức của bạn.",
       "noResults": "Không có lead phù hợp với bộ lọc.",
-      "refreshHint": "Làm mới danh sách"
+      "refreshHint": "Làm mới danh sách",
+      "ownerFilter": "Phụ trách",
+      "ownerAll": "Tất cả lead",
+      "ownerMe": "Giao cho tôi",
+      "ownerUnassigned": "Chưa phân công",
+      "ownerSelectedUser": "Giao cho nhân viên",
+      "ownerUser": "Người phụ trách",
+      "selectOwnerUser": "Chọn nhân viên",
+      "ownerColumn": "Phụ trách",
+      "workloadTitle": "Khối lượng lead đang xử lý",
+      "unassignedWorkload": "Chưa phân công: {count}",
+      "assigneeWorkload": "{name}: {count}"
+    },
+    "assignment": {
+      "title": "Phân công",
+      "currentOwner": "Người phụ trách hiện tại",
+      "unassignedLabel": "Chưa phân công",
+      "assignTo": "Phân công cho",
+      "reassignTo": "Chuyển phụ trách cho",
+      "selectAssignee": "Chọn người phụ trách",
+      "note": "Lý do / ghi chú (tùy chọn)",
+      "assign": "Phân công",
+      "reassign": "Chuyển phụ trách",
+      "unassign": "Hủy phân công",
+      "saving": "Đang lưu…",
+      "historyTitle": "Lịch sử phân công",
+      "emptyHistory": "Chưa có thay đổi phân công nào.",
+      "historyEntry": "{from} → {to}",
+      "changedBy": "Bởi {name}",
+      "followUpOwner": "Phụ trách theo dõi: {name}",
+      "noEligibleAssignees": "Không có người phụ trách hợp lệ trong tổ chức."
     },
     "detail": {
       "title": "Chi tiết lead",
@@ -384,6 +414,7 @@
       "invalid_activity_type": "Chọn loại hoạt động hợp lệ.",
       "due_at_required": "Cần nhập thời hạn theo dõi.",
       "follow_up_not_pending": "Theo dõi này không còn ở trạng thái chờ.",
+      "invalid_assignee": "Chọn người phụ trách hợp lệ trong tổ chức.",
       "mutation_error": "Không thể hoàn thành thao tác."
     },
     "followUp": {

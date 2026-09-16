@@ -2,9 +2,13 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { LeadListFilters } from "@/components/leads/lead-list-filters";
 import { LeadListTable } from "@/components/leads/lead-list-table";
+import { getCurrentAppUser } from "@/lib/auth/get-identity-state";
 import { can } from "@/lib/permissions/can";
+import { queryEligibleAssignees } from "@/lib/leads/query-eligible-assignees";
 import { isLeadSearchActive } from "@/lib/leads/parse-list-params";
 import { queryLeadList } from "@/lib/leads/query-lead-list";
+import { queryLeadWorkloadSummary } from "@/lib/leads/query-lead-workload";
+import { LeadWorkloadSummary } from "@/components/leads/lead-workload-summary";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -30,7 +34,13 @@ export default async function LeadsPage({ searchParams }: Props) {
 
   const rawParams = await searchParams;
   const supabase = await createClient();
-  const { result, error } = await queryLeadList(supabase, rawParams);
+  const currentUser = await getCurrentAppUser();
+  const [{ result, error }, { summary: workload }, assigneeResult] = await Promise.all([
+    queryLeadList(supabase, rawParams, currentUser?.appUserId ?? null),
+    queryLeadWorkloadSummary(supabase),
+    queryEligibleAssignees(supabase),
+  ]);
+  const assignees = assigneeResult.assignees;
 
   if (error || !result) {
     return (
@@ -56,7 +66,9 @@ export default async function LeadsPage({ searchParams }: Props) {
         </Link>
       </div>
 
-      <LeadListFilters params={params} />
+      {workload ? <LeadWorkloadSummary summary={workload} /> : null}
+
+      <LeadListFilters params={params} assignees={assignees} />
 
       {isEmpty ? (
         <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-600">

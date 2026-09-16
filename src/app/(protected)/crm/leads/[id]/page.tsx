@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { LeadDetailView } from "@/components/leads/lead-detail-view";
 import { can } from "@/lib/permissions/can";
+import { queryEligibleAssignees } from "@/lib/leads/query-eligible-assignees";
 import { queryLeadDetail } from "@/lib/leads/query-lead-detail";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,6 +17,7 @@ export default async function LeadDetailPage({ params }: Props) {
   const { id } = await params;
   const hasRead = await can("lead.read");
   const hasUpdate = await can("lead.update");
+  const hasAssign = await can("lead.assign");
 
   if (!hasRead) {
     return (
@@ -29,7 +31,10 @@ export default async function LeadDetailPage({ params }: Props) {
   }
 
   const supabase = await createClient();
-  const { detail, error, notFound } = await queryLeadDetail(supabase, id);
+  const [{ detail, error, notFound }, { assignees }] = await Promise.all([
+    queryLeadDetail(supabase, id),
+    hasAssign ? queryEligibleAssignees(supabase) : Promise.resolve({ assignees: [], error: false }),
+  ]);
 
   if (error) {
     return (
@@ -58,7 +63,12 @@ export default async function LeadDetailPage({ params }: Props) {
       <Link href="/crm/leads" className="text-sm text-slate-600 hover:text-slate-900">
         {t("backToList")}
       </Link>
-      <LeadDetailView detail={detail} canUpdate={hasUpdate} />
+      <LeadDetailView
+        detail={detail}
+        canUpdate={hasUpdate}
+        canAssign={hasAssign}
+        assignees={assignees}
+      />
     </div>
   );
 }

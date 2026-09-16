@@ -1,12 +1,16 @@
 import {
   DEFAULT_LEAD_PAGE_SIZE,
   LEAD_LIST_STATUSES,
+  LEAD_OWNERSHIP_FILTERS,
   type LeadListStatus,
+  type LeadOwnershipFilter,
 } from "@/lib/leads/constants";
 
 export type LeadListParams = {
   q: string;
   status: LeadListStatus;
+  owner: LeadOwnershipFilter;
+  ownerUserId: string | null;
   page: number;
   pageSize: number;
 };
@@ -30,13 +34,19 @@ export function parseLeadListParams(
   const status = (LEAD_LIST_STATUSES as readonly string[]).includes(statusRaw)
     ? (statusRaw as LeadListStatus)
     : "all";
+  const ownerRaw = firstString(raw.owner);
+  const owner = (LEAD_OWNERSHIP_FILTERS as readonly string[]).includes(ownerRaw)
+    ? (ownerRaw as LeadOwnershipFilter)
+    : "all";
+  const ownerUserIdRaw = firstString(raw.ownerUserId).trim();
+  const ownerUserId = owner === "user" && ownerUserIdRaw ? ownerUserIdRaw : null;
   const page = parsePositiveInt(firstString(raw.page), 1);
   const pageSize = Math.min(
     100,
     parsePositiveInt(firstString(raw.pageSize), DEFAULT_LEAD_PAGE_SIZE),
   );
 
-  return { q, status, page, pageSize };
+  return { q, status, owner, ownerUserId, page, pageSize };
 }
 
 export function clampPage(page: number, totalCount: number, pageSize: number): number {

@@ -177,6 +177,65 @@ async function main() {
       reactivated?.lost_reason_id === lostReasonId,
   );
 
+  const { data: assignLead } = await admin
+    .from("lead")
+    .insert({ organization_id: ORG_A, status: "new", notes_summary: "Assign smoke" })
+    .select("id")
+    .single();
+
+  const assignTarget = "a1000000-0000-4000-8000-000000000001";
+  const { error: assignErr, data: assignResult } = await admin.rpc("assign_lead", {
+    p_lead_id: assignLead.id,
+    p_assigned_user_id: assignTarget,
+    p_note: "Smoke assign",
+  });
+  record(16, "assign lead via RPC", !assignErr && assignResult?.no_op === false);
+
+  const { count: assignHistCount } = await admin
+    .from("lead_assignment")
+    .select("*", { count: "exact", head: true })
+    .eq("lead_id", assignLead.id);
+  record(17, "assignment history recorded", (assignHistCount ?? 0) === 1);
+
+  const { error: unassignErr } = await admin.rpc("assign_lead", {
+    p_lead_id: assignLead.id,
+    p_assigned_user_id: null,
+    p_note: "Smoke unassign",
+  });
+  record(18, "unassign lead via RPC", !unassignErr);
+
+  const { error: assignBypassErr } = await admin
+    .from("lead")
+    .update({ assigned_user_id: assignTarget })
+    .eq("id", assignLead.id);
+  record(19, "direct assigned_user_id update blocked", Boolean(assignBypassErr));
+
+  const { count: histAfterNoOp } = await admin
+    .from("lead_assignment")
+    .select("*", { count: "exact", head: true })
+    .eq("lead_id", assignLead.id);
+  await admin.rpc("assign_lead", {
+    p_lead_id: assignLead.id,
+    p_assigned_user_id: null,
+    p_note: null,
+  });
+  const { count: histAfterDuplicate } = await admin
+    .from("lead_assignment")
+    .select("*", { count: "exact", head: true })
+    .eq("lead_id", assignLead.id);
+  record(
+    20,
+    "no-op assignment does not append history",
+    histAfterNoOp === histAfterDuplicate,
+  );
+
+  const { data: assignedLead } = await admin
+    .from("lead")
+    .select("assigned_user_id, status")
+    .eq("id", assignLead.id)
+    .single();
+  record(21, "assignment does not change status", assignedLead?.status === "new");
+
   const failed = results.filter((r) => !r.passed);
   console.log(`\nCRM leads smoke: ${results.length - failed.length}/${results.length} passed`);
   if (failed.length > 0) process.exit(1);

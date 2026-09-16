@@ -38,9 +38,27 @@ type LeadRow = {
   lead_source_id: string | null;
 };
 
+function applyOwnershipFilter<T extends { eq: (col: string, val: string) => T; is: (col: string, val: null) => T }>(
+  query: T,
+  params: LeadListParams,
+  currentUserId: string | null,
+): T {
+  if (params.owner === "me" && currentUserId) {
+    return query.eq("assigned_user_id", currentUserId);
+  }
+  if (params.owner === "unassigned") {
+    return query.is("assigned_user_id", null);
+  }
+  if (params.owner === "user" && params.ownerUserId) {
+    return query.eq("assigned_user_id", params.ownerUserId);
+  }
+  return query;
+}
+
 export async function queryLeadList(
   supabase: DbClient,
   rawParams: Record<string, string | string[] | undefined>,
+  currentUserId: string | null = null,
 ): Promise<{ result: LeadListResult | null; error: boolean }> {
   const params = parseLeadListParams(rawParams);
 
@@ -57,6 +75,7 @@ export async function queryLeadList(
     if (params.status !== "all") {
       countQuery = countQuery.eq("status", params.status);
     }
+    countQuery = applyOwnershipFilter(countQuery, params, currentUserId);
     if (matchingIds !== null) {
       countQuery = countQuery.in("id", [...matchingIds]);
     }
@@ -79,6 +98,7 @@ export async function queryLeadList(
     if (params.status !== "all") {
       pageQuery = pageQuery.eq("status", params.status);
     }
+    pageQuery = applyOwnershipFilter(pageQuery, params, currentUserId);
     if (matchingIds !== null) {
       pageQuery = pageQuery.in("id", [...matchingIds]);
     }

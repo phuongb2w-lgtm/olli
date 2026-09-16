@@ -2,15 +2,18 @@
 
 import { useTranslations } from "next-intl";
 import { LEAD_LIST_STATUSES } from "@/lib/leads/constants";
+import type { EligibleAssignee } from "@/lib/leads/query-eligible-assignees";
 import type { LeadListParams } from "@/lib/leads/parse-list-params";
 
 type Props = {
   params: LeadListParams;
+  assignees: EligibleAssignee[];
 };
 
-export function LeadListFilters({ params }: Props) {
+export function LeadListFilters({ params, assignees }: Props) {
   const t = useTranslations("crm.leads");
   const tStatus = useTranslations("status.lead");
+  const showUserPicker = params.owner === "user";
 
   return (
     <form method="get" className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
@@ -27,6 +30,42 @@ export function LeadListFilters({ params }: Props) {
           className="w-full rounded border border-slate-300 px-3 py-2 text-sm"
         />
       </div>
+      <div>
+        <label htmlFor="lead-owner" className="mb-1 block text-sm font-medium text-slate-700">
+          {t("ownerFilter")}
+        </label>
+        <select
+          id="lead-owner"
+          name="owner"
+          defaultValue={params.owner}
+          className="rounded border border-slate-300 px-3 py-2 text-sm"
+        >
+          <option value="all">{t("ownerAll")}</option>
+          <option value="me">{t("ownerMe")}</option>
+          <option value="unassigned">{t("ownerUnassigned")}</option>
+          <option value="user">{t("ownerSelectedUser")}</option>
+        </select>
+      </div>
+      {showUserPicker ? (
+        <div>
+          <label htmlFor="lead-owner-user" className="mb-1 block text-sm font-medium text-slate-700">
+            {t("ownerUser")}
+          </label>
+          <select
+            id="lead-owner-user"
+            name="ownerUserId"
+            defaultValue={params.ownerUserId ?? ""}
+            className="rounded border border-slate-300 px-3 py-2 text-sm"
+          >
+            <option value="">{t("selectOwnerUser")}</option>
+            {assignees.map((user) => (
+              <option key={user.userId} value={user.userId}>
+                {user.displayName}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
       <div>
         <label htmlFor="lead-status" className="mb-1 block text-sm font-medium text-slate-700">
           {t("statusFilter")}

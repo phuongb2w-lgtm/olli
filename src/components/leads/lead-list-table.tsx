@@ -14,6 +14,7 @@ function formatDate(value: string | null): string {
 
 export async function LeadListTable({ items }: Props) {
   const t = await getTranslations("crm.leads");
+  const tAssignment = await getTranslations("crm.assignment");
 
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
@@ -28,6 +29,9 @@ export async function LeadListTable({ items }: Props) {
             </th>
             <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
               {t("statusColumn")}
+            </th>
+            <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
+              {t("ownerColumn")}
             </th>
             <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
               {t("sourceColumn")}
@@ -54,6 +58,9 @@ export async function LeadListTable({ items }: Props) {
               <td className="px-4 py-3 text-slate-700">{item.primaryContactName ?? t("emptyValue")}</td>
               <td className="px-4 py-3">
                 <LeadStatusBadge status={item.status} />
+              </td>
+              <td className="px-4 py-3 text-slate-700">
+                {item.assignedUserName ?? tAssignment("unassignedLabel")}
               </td>
               <td className="px-4 py-3 text-slate-700">{item.sourceLabel ?? t("emptyValue")}</td>
               <td className="px-4 py-3 text-slate-700">{formatDate(item.nextFollowUpAt)}</td>

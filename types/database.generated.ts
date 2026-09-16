@@ -2011,6 +2011,68 @@ export type Database = {
           },
         ]
       }
+      lead_assignment: {
+        Row: {
+          changed_at: string
+          changed_by: string
+          id: string
+          lead_id: string
+          new_assigned_user_id: string | null
+          note: string | null
+          organization_id: string
+          previous_assigned_user_id: string | null
+        }
+        Insert: {
+          changed_at?: string
+          changed_by: string
+          id?: string
+          lead_id: string
+          new_assigned_user_id?: string | null
+          note?: string | null
+          organization_id: string
+          previous_assigned_user_id?: string | null
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string
+          id?: string
+          lead_id?: string
+          new_assigned_user_id?: string | null
+          note?: string | null
+          organization_id?: string
+          previous_assigned_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_assignment_organization_id_changed_by_fkey"
+            columns: ["organization_id", "changed_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_assignment_organization_id_lead_id_fkey"
+            columns: ["organization_id", "lead_id"]
+            isOneToOne: false
+            referencedRelation: "lead"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_assignment_organization_id_new_assigned_user_id_fkey"
+            columns: ["organization_id", "new_assigned_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_assignment_organization_id_previous_assigned_user_id_fkey"
+            columns: ["organization_id", "previous_assigned_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       lead_campaign: {
         Row: {
           code: string
@@ -4200,6 +4262,16 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m3_as_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_as_as_super: { Args: never; Returns: undefined }
+      _m3_as_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_as_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _m3_crm_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _m3_crm_as_super: { Args: never; Returns: undefined }
       _m3_crm_expect_fail: {
@@ -4285,6 +4357,14 @@ export type Database = {
           p_terms_id: string
         }
         Returns: string
+      }
+      assign_lead: {
+        Args: {
+          p_assigned_user_id?: string
+          p_lead_id: string
+          p_note?: string
+        }
+        Returns: Json
       }
       calculate_scenario_economics: {
         Args: { p_scenario_id: string }
@@ -4565,6 +4645,17 @@ export type Database = {
       is_compensation_rule_effective_on: {
         Args: { p_effective_from: string; p_effective_to: string; p_on: string }
         Returns: boolean
+      }
+      is_eligible_lead_assignee: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
+      list_eligible_lead_assignees: {
+        Args: never
+        Returns: {
+          display_name: string
+          user_id: string
+        }[]
       }
       normalize_accounting_period: { Args: { p_date: string }; Returns: string }
       normalize_email_key: { Args: { p_email: string }; Returns: string }

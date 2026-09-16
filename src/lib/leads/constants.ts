@@ -52,6 +52,20 @@ export type LeadFollowUpStatus = (typeof LEAD_FOLLOW_UP_STATUSES)[number];
 
 export const DEFAULT_LEAD_PAGE_SIZE = 25;
 
+/** Terminal pipeline states excluded from active workload counts. */
+export const LEAD_INACTIVE_STATUSES = ["lost", "converted"] as const;
+
+export type LeadInactiveStatus = (typeof LEAD_INACTIVE_STATUSES)[number];
+
+export const LEAD_OWNERSHIP_FILTERS = [
+  "all",
+  "me",
+  "unassigned",
+  "user",
+] as const;
+
+export type LeadOwnershipFilter = (typeof LEAD_OWNERSHIP_FILTERS)[number];
+
 export const LEAD_TRANSITION_TARGETS: Partial<Record<LeadStatus, LeadStatus[]>> = {
   new: ["contacted", "qualified", "trial_scheduled", "lost"],
   contacted: ["qualified", "trial_scheduled", "lost"],

@@ -331,7 +331,37 @@
       "emptyValue": "—",
       "emptyOrganization": "No leads in your organization yet.",
       "noResults": "No leads match your filters.",
-      "refreshHint": "Refresh list"
+      "refreshHint": "Refresh list",
+      "ownerFilter": "Ownership",
+      "ownerAll": "All leads",
+      "ownerMe": "Assigned to me",
+      "ownerUnassigned": "Unassigned",
+      "ownerSelectedUser": "Assigned to user",
+      "ownerUser": "Assignee",
+      "selectOwnerUser": "Select user",
+      "ownerColumn": "Owner",
+      "workloadTitle": "Active lead workload",
+      "unassignedWorkload": "Unassigned: {count}",
+      "assigneeWorkload": "{name}: {count}"
+    },
+    "assignment": {
+      "title": "Ownership",
+      "currentOwner": "Current owner",
+      "unassignedLabel": "Unassigned",
+      "assignTo": "Assign to",
+      "reassignTo": "Reassign to",
+      "selectAssignee": "Select assignee",
+      "note": "Reason / note (optional)",
+      "assign": "Assign",
+      "reassign": "Reassign",
+      "unassign": "Unassign",
+      "saving": "Saving…",
+      "historyTitle": "Assignment history",
+      "emptyHistory": "No assignment changes recorded yet.",
+      "historyEntry": "{from} → {to}",
+      "changedBy": "By {name}",
+      "followUpOwner": "Follow-up owner: {name}",
+      "noEligibleAssignees": "No eligible assignees in your organization."
     },
     "detail": {
       "title": "Lead detail",
@@ -384,6 +414,7 @@
       "invalid_activity_type": "Select a valid activity type.",
       "due_at_required": "Follow-up due date is required.",
       "follow_up_not_pending": "This follow-up is no longer pending.",
+      "invalid_assignee": "Select an eligible assignee in your organization.",
       "mutation_error": "Unable to complete this action."
     },
     "followUp": {

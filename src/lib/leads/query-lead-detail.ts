@@ -58,9 +58,19 @@ export type LeadFollowUpDetail = {
   completedAt: string | null;
 };
 
+export type LeadAssignmentHistoryDetail = {
+  id: string;
+  changedAt: string;
+  changedByName: string | null;
+  previousAssigneeName: string | null;
+  newAssigneeName: string | null;
+  note: string | null;
+};
+
 export type LeadTimelineEntry =
   | { kind: "activity"; occurredAt: string; activity: LeadActivityDetail }
-  | { kind: "status"; occurredAt: string; status: LeadStatusHistoryDetail };
+  | { kind: "status"; occurredAt: string; status: LeadStatusHistoryDetail }
+  | { kind: "assignment"; occurredAt: string; assignment: LeadAssignmentHistoryDetail };
 
 export type LeadDetail = {
   id: string;
@@ -70,6 +80,8 @@ export type LeadDetail = {
   sourceLabel: string | null;
   campaignName: string | null;
   assignedUserName: string | null;
+  assignedUserId: string | null;
+  assignmentHistory: LeadAssignmentHistoryDetail[];
   lostReasonLabel: string | null;
   lostNotes: string | null;
   lostAt: string | null;
@@ -112,6 +124,7 @@ export async function queryLeadDetail(
     activities,
     statusHistory,
     followUps,
+    assignmentHistory,
   ] = await Promise.all([
     lead.lead_source_id
       ? supabase.from("lead_source").select("display_name").eq("id", lead.lead_source_id).maybeSingle()
@@ -159,6 +172,13 @@ export async function queryLeadDetail(
       .select("id, due_at, note, status, assigned_user_id, completed_at")
       .eq("lead_id", leadId)
       .order("due_at", { ascending: true }),
+    supabase
+      .from("lead_assignment")
+      .select(
+        "id, changed_at, changed_by, previous_assigned_user_id, new_assigned_user_id, note",
+      )
+      .eq("lead_id", leadId)
+      .order("changed_at", { ascending: false }),
   ]);
 
   const actorIds = new Set<string>();
@@ -167,6 +187,11 @@ export async function queryLeadDetail(
   }
   for (const row of statusHistory.data ?? []) {
     actorIds.add(row.changed_by);
+  }
+  for (const row of assignmentHistory.data ?? []) {
+    actorIds.add(row.changed_by);
+    if (row.previous_assigned_user_id) actorIds.add(row.previous_assigned_user_id);
+    if (row.new_assigned_user_id) actorIds.add(row.new_assigned_user_id);
   }
   const assigneeIds = (followUps.data ?? [])
     .map((f) => f.assigned_user_id)
@@ -227,6 +252,21 @@ export async function queryLeadDetail(
     notes: h.notes,
   }));
 
+  const assignmentHistoryDetails: LeadAssignmentHistoryDetail[] = (
+    assignmentHistory.data ?? []
+  ).map((a) => ({
+    id: a.id,
+    changedAt: a.changed_at,
+    changedByName: actorMap.get(a.changed_by) ?? null,
+    previousAssigneeName: a.previous_assigned_user_id
+      ? actorMap.get(a.previous_assigned_user_id) ?? null
+      : null,
+    newAssigneeName: a.new_assigned_user_id
+      ? actorMap.get(a.new_assigned_user_id) ?? null
+      : null,
+    note: a.note,
+  }));
+
   const followUpDetails: LeadFollowUpDetail[] = (followUps.data ?? []).map((f) => ({
     id: f.id,
     dueAt: f.due_at,
@@ -247,7 +287,17 @@ export async function queryLeadDetail(
       occurredAt: status.changedAt,
       status,
     })),
-  ].sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
+    ...assignmentHistoryDetails.map((assignment) => ({
+      kind: "assignment" as const,
+      occurredAt: assignment.changedAt,
+      assignment,
+    })),
+  ].sort((a, b) => {
+    const timeCompare = b.occurredAt.localeCompare(a.occurredAt);
+    if (timeCompare !== 0) return timeCompare;
+    const kindOrder = { assignment: 0, status: 1, activity: 2 };
+    return kindOrder[a.kind] - kindOrder[b.kind];
+  });
 
   return {
     detail: {
@@ -258,6 +308,8 @@ export async function queryLeadDetail(
       sourceLabel: source.data?.display_name ?? null,
       campaignName: campaign.data?.name ?? null,
       assignedUserName: assignedUser.data?.display_name ?? null,
+      assignedUserId: lead.assigned_user_id,
+      assignmentHistory: assignmentHistoryDetails,
       lostReasonLabel: lostReason.data?.display_name ?? null,
       lostNotes: lead.lost_notes,
       lostAt: lead.lost_at,

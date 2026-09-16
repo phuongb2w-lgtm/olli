@@ -1,11 +1,15 @@
 import { getTranslations } from "next-intl/server";
+import { LeadAssignmentPanel } from "@/components/leads/lead-assignment-panel";
 import { LeadDetailActions } from "@/components/leads/lead-detail-actions";
 import { LeadStatusBadge } from "@/components/leads/lead-status-badge";
+import type { EligibleAssignee } from "@/lib/leads/query-eligible-assignees";
 import type { LeadDetail } from "@/lib/leads/query-lead-detail";
 
 type Props = {
   detail: LeadDetail;
   canUpdate: boolean;
+  canAssign: boolean;
+  assignees: EligibleAssignee[];
 };
 
 function formatDateTime(value: string | null): string {
@@ -13,10 +17,11 @@ function formatDateTime(value: string | null): string {
   return new Date(value).toLocaleString();
 }
 
-export async function LeadDetailView({ detail, canUpdate }: Props) {
+export async function LeadDetailView({ detail, canUpdate, canAssign, assignees }: Props) {
   const t = await getTranslations("crm.detail");
   const tActivity = await getTranslations("activity.lead");
   const tStatus = await getTranslations("status.lead");
+  const tAssignment = await getTranslations("crm.assignment");
   const tFollowUp = await getTranslations("crm.followUp");
 
   const pendingFollowUps = detail.followUps
@@ -41,7 +46,9 @@ export async function LeadDetailView({ detail, canUpdate }: Props) {
           </div>
           <div>
             <dt className="font-medium text-slate-600">{t("assignedUser")}</dt>
-            <dd className="text-slate-900">{detail.assignedUserName ?? "—"}</dd>
+            <dd className="text-slate-900">
+              {detail.assignedUserName ?? tAssignment("unassignedLabel")}
+            </dd>
           </div>
           <div>
             <dt className="font-medium text-slate-600">{t("createdAt")}</dt>
@@ -99,6 +106,15 @@ export async function LeadDetailView({ detail, canUpdate }: Props) {
         </section>
       </div>
 
+      <LeadAssignmentPanel
+        leadId={detail.id}
+        assignedUserId={detail.assignedUserId}
+        assignedUserName={detail.assignedUserName}
+        assignees={assignees}
+        assignmentHistory={detail.assignmentHistory}
+        canAssign={canAssign}
+      />
+
       <LeadDetailActions
         leadId={detail.id}
         status={detail.status}
@@ -114,19 +130,36 @@ export async function LeadDetailView({ detail, canUpdate }: Props) {
         ) : (
           <ol className="mt-4 space-y-4">
             {detail.timeline.map((entry) => (
-              <li key={`${entry.kind}-${entry.kind === "activity" ? entry.activity.id : entry.status.id}`} className="border-l-2 border-slate-200 pl-4">
+              <li
+                key={`${entry.kind}-${
+                  entry.kind === "activity"
+                    ? entry.activity.id
+                    : entry.kind === "status"
+                      ? entry.status.id
+                      : entry.assignment.id
+                }`}
+                className="border-l-2 border-slate-200 pl-4"
+              >
                 <p className="text-xs text-slate-500">{formatDateTime(entry.occurredAt)}</p>
                 {entry.kind === "activity" ? (
                   <p className="text-sm text-slate-900">
                     <span className="font-medium">{tActivity(entry.activity.activityType)}</span>
                     {entry.activity.content ? `: ${entry.activity.content}` : ""}
                   </p>
-                ) : (
+                ) : entry.kind === "status" ? (
                   <p className="text-sm text-slate-900">
                     {entry.status.fromStatus
                       ? `${tStatus(entry.status.fromStatus)} → ${tStatus(entry.status.toStatus)}`
                       : tStatus(entry.status.toStatus)}
                     {entry.status.notes ? ` — ${entry.status.notes}` : ""}
+                  </p>
+                ) : (
+                  <p className="text-sm text-slate-900">
+                    {tAssignment("historyEntry", {
+                      from: entry.assignment.previousAssigneeName ?? tAssignment("unassignedLabel"),
+                      to: entry.assignment.newAssigneeName ?? tAssignment("unassignedLabel"),
+                    })}
+                    {entry.assignment.note ? ` — ${entry.assignment.note}` : ""}
                   </p>
                 )}
               </li>
@@ -142,6 +175,7 @@ export async function LeadDetailView({ detail, canUpdate }: Props) {
             <li key={f.id} className="text-slate-800">
               {formatDateTime(f.dueAt)} — {tFollowUp(f.status)}
               {f.note ? `: ${f.note}` : ""}
+              {f.assignedUserName ? ` (${tAssignment("followUpOwner", { name: f.assignedUserName })})` : ""}
             </li>
           ))}
           {detail.followUps.length === 0 ? (

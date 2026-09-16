@@ -17,6 +17,7 @@ export type LeadMutationState = {
     | "invalid_activity_type"
     | "due_at_required"
     | "follow_up_not_pending"
+    | "invalid_assignee"
     | "mutation_error";
 };
 
@@ -29,7 +30,9 @@ function mapRpcError(message: string): LeadMutationState["error"] {
   if (message.includes("invalid_activity_type")) return "invalid_activity_type";
   if (message.includes("due_at_required")) return "due_at_required";
   if (message.includes("follow_up_not_pending")) return "follow_up_not_pending";
+  if (message.includes("invalid_assignee")) return "invalid_assignee";
   if (message.includes("lead_lifecycle_protected")) return "invalid_transition";
+  if (message.includes("Lead assignment must")) return "permission_denied";
   return "mutation_error";
 }
 
@@ -162,6 +165,47 @@ export async function completeLeadFollowUpAction(
   const supabase = await createClient();
   const { error } = await supabase.rpc("complete_lead_follow_up", {
     p_follow_up_id: followUpId,
+    p_note: note,
+  });
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/leads");
+  revalidatePath(`/crm/leads/${leadId}`);
+  return {};
+}
+
+export async function assignLeadAction(
+  _prev: LeadMutationState,
+  formData: FormData,
+): Promise<LeadMutationState> {
+  if (!(await can("lead.assign"))) {
+    return { error: "permission_denied" };
+  }
+  if (!(await getCurrentAppUser())) {
+    return { error: "permission_denied" };
+  }
+
+  const leadId = String(formData.get("leadId") ?? "");
+  const assigneeRaw = String(formData.get("assignedUserId") ?? "");
+  const unassign = formData.get("unassign") === "true";
+  const note = String(formData.get("note") ?? "") || undefined;
+
+  if (!leadId) {
+    return { error: "mutation_error" };
+  }
+
+  const assignedUserId = unassign ? null : assigneeRaw || null;
+  if (!unassign && !assignedUserId) {
+    return { error: "invalid_assignee" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("assign_lead", {
+    p_lead_id: leadId,
+    p_assigned_user_id: assignedUserId ?? undefined,
     p_note: note,
   });
 
