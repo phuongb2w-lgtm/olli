@@ -1,12 +1,16 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type { StudentEnrollmentItem } from "@/lib/enrollments/query-student-enrollments";
 
 type Props = {
   items: StudentEnrollmentItem[];
+  studentId: string;
+  canViewFinance?: boolean;
 };
 
-export async function StudentEnrollmentList({ items }: Props) {
+export async function StudentEnrollmentList({ items, studentId, canViewFinance = false }: Props) {
   const t = await getTranslations("enrollments");
+  const tFinance = await getTranslations("finance.enrollment");
   const tStatus = await getTranslations("status.enrollment");
   const placeholder = t("emptyValue");
 
@@ -39,6 +43,11 @@ export async function StudentEnrollmentList({ items }: Props) {
               <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
                 {t("endDate")}
               </th>
+              {canViewFinance ? (
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
+                  {tFinance("title")}
+                </th>
+              ) : null}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 bg-white">
@@ -56,6 +65,16 @@ export async function StudentEnrollmentList({ items }: Props) {
                 </td>
                 <td className="px-4 py-3 text-slate-700">{item.startDate}</td>
                 <td className="px-4 py-3 text-slate-700">{item.endDate ?? placeholder}</td>
+                {canViewFinance ? (
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/students/${studentId}/enrollments/${item.enrollmentId}/finance`}
+                      className="text-sm underline"
+                    >
+                      {tFinance("viewFinance")}
+                    </Link>
+                  </td>
+                ) : null}
               </tr>
             ))}
           </tbody>

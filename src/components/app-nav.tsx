@@ -9,7 +9,7 @@ const navItems = [
   { key: "students", href: "/students" },
   { key: "classes", href: "/classes" },
   { key: "teachers", href: null },
-  { key: "finance", href: null },
+  { key: "finance", href: "/finance" },
   { key: "reports", href: null },
   { key: "settings", href: null },
 ] as const;

@@ -33,6 +33,7 @@ export default async function StudentEnrollmentsPage({ params, searchParams }: P
   }
 
   const hasCreate = await can("enrollment.create");
+  const canViewFinance = await can("charge.read");
   const [canViewProgressAssessment, canViewProgressAttendance] = await Promise.all([
     can("assessment.read"),
     can("attendance.read"),
@@ -99,7 +100,7 @@ export default async function StudentEnrollmentsPage({ params, searchParams }: P
         </p>
       ) : null}
 
-      <StudentEnrollmentList items={items} />
+      <StudentEnrollmentList items={items} studentId={studentId} canViewFinance={canViewFinance} />
     </div>
   );
 }

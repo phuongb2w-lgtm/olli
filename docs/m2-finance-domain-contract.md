@@ -1559,9 +1559,43 @@ Multiple scenarios per class are supported (e.g. Conservative / Base / Growth). 
 
 Permissions: `class_simulation.read`, `class_simulation.manage`.
 
-### T10 Finance UI handoff
+### Appendix K — M2-T10 Finance UI handoff
 
-Server Actions in `src/app/actions/class-simulation.ts` wrap the RPCs. M2-T10 should surface scenario CRUD, comparison tables, and projected-vs-actual variance without introducing a second economics formula.
+#### Navigation
+
+Finance is a top-level sidebar section (`/finance`) with sub-navigation:
+
+| Route | Surface |
+|-------|---------|
+| `/finance` | Management overview (period metrics) |
+| `/finance/payments` | Payments list + record/allocate |
+| `/finance/costs` | Cost B1/B2/C by `cost_domain_code` + reconciliation |
+| `/finance/costs/assets` | Capital assets (Cost A) |
+| `/finance/costs/personnel` | Personnel rules, welfare baseline, entries |
+| `/finance/class-economics` | Class P&L from `get_class_economics` |
+| `/finance/simulator` | Scenario workflow + projected vs actual |
+| `/students/[id]/enrollments/[enrollmentId]/finance` | Enrollment finance (terms, schedule, summary) |
+
+#### Permission mapping (UX; RLS/RPC authoritative)
+
+| Surface | Read | Manage |
+|---------|------|--------|
+| Overview | `charge.read` / `payment.read` / `class_economics.read` | — |
+| Enrollment finance | `charge.read` | `charge.create` |
+| Payments | `payment.read` | `payment.record`, `payment.reverse` |
+| Costs / expenses | `expense.read` | `expense.create` |
+| Capital assets | `asset.read` | `asset.create`, `asset.update` |
+| Personnel | `personnel_cost.read` | `personnel_cost.manage` |
+| Class economics / reconciliation | `class_economics.read` | `cost_allocation.manage` |
+| Simulator | `class_simulation.read` | `class_simulation.manage` |
+
+#### Actual vs projected labeling
+
+- Enrollment summary and class economics show **accounting facts** from RPCs (`get_enrollment_financial_summary`, `get_class_economics`).
+- Simulator surfaces label all computed values **Projected** (violet styling); finalized scenarios are read-only.
+- `get_projected_vs_actual_class_economics` shows Projected / Actual / Variance columns side-by-side.
+
+Server Actions live under `src/app/actions/` (`enrollment-finance`, `payments`, `class-economics`, `capital-assets`, `personnel-cost`, `class-simulation`, `expenses`, `cost-allocation`). UI must not recompute balances, revenue, allocation, or P&L formulas client-side.
 
 ### Tests
 

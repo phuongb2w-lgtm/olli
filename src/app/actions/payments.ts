@@ -174,3 +174,19 @@ export async function reversePaymentAllocation(
   if (error || !data) return { error: "save_error" };
   return { payment: data as Record<string, unknown> };
 }
+
+export async function recordPaymentFormAction(
+  _prev: PaymentActionState,
+  formData: FormData,
+): Promise<PaymentActionState> {
+  return recordPayment({
+    guardianId: String(formData.get("guardianId") ?? ""),
+    amount: Number(formData.get("amount")),
+    paidAt: String(formData.get("paidAt") ?? "") || null,
+    methodCode: String(formData.get("methodCode") ?? "cash") as RecordPaymentInput["methodCode"],
+    referenceNumber: String(formData.get("referenceNumber") ?? "") || null,
+    notes: String(formData.get("notes") ?? "") || null,
+    studentId: String(formData.get("studentId") ?? "") || null,
+    payerNameSnapshot: String(formData.get("payerNameSnapshot") ?? "") || null,
+  });
+}
