@@ -323,6 +323,10 @@
       "completed": "Hoàn thành học thử",
       "cancelled": "Hủy học thử",
       "no_show": "Vắng mặt học thử"
+    },
+    "identity": {
+      "resolutionChanged": "Xác định danh tính: {from} → {to}",
+      "unresolved": "Chưa xác định"
     }
   },
   "crm": {
@@ -390,6 +394,40 @@
       "filterScheduled": "Có học thử đang lên lịch",
       "nextTrialColumn": "Học thử tiếp theo",
       "scheduledBadge": "Đã lên lịch học thử"
+    },
+    "identity": {
+      "title": "Xác định danh tính",
+      "intro": "Chọn mỗi học viên tiềm năng và liên hệ sẽ tái sử dụng học viên hoặc người giám hộ hiện có khi chuyển đổi, hay tạo bản ghi mới. Kết quả khớp chỉ là bằng chứng — hệ thống không tự động gộp dữ liệu.",
+      "candidatesSection": "Học viên tiềm năng → Học viên",
+      "contactsSection": "Liên hệ → Người giám hộ",
+      "possibleMatches": "Bản ghi hiện có có thể trùng",
+      "strongMatch": "Khớp mạnh",
+      "possibleMatch": "Khớp có thể",
+      "useExisting": "Dùng bản ghi hiện có",
+      "createNew": "Tạo mới khi chuyển đổi",
+      "createNewAtConversion": "Tạo mới khi chuyển đổi",
+      "unresolved": "Chưa xác định",
+      "duplicateWarning": "Có thể đã tồn tại bản ghi tương tự. Hãy xem các kết quả khớp trước khi chọn tạo mới.",
+      "acknowledgeStrongMatch": "Tôi đã xem các kết quả khớp và vẫn muốn tạo bản ghi mới",
+      "resetResolution": "Đặt lại xác định",
+      "readyForConversion": "Danh tính sẵn sàng chuyển đổi",
+      "notReady": "Cần rà soát danh tính",
+      "readyBadge": "Danh tính sẵn sàng",
+      "unresolvedBadge": "{count} danh tính chưa xác định",
+      "staleReviewRequired": "Cần rà soát lại",
+      "selectedStudent": "Học viên đã chọn",
+      "selectedGuardian": "Người giám hộ đã chọn",
+      "noMatches": "Không tìm thấy kết quả khớp trong tổ chức của bạn.",
+      "emptyCandidates": "Không có học viên tiềm năng đang hoạt động.",
+      "emptyContacts": "Không có liên hệ đang hoạt động.",
+      "historyTitle": "Lịch sử xác định danh tính",
+      "matchReason": {
+        "same_name_and_dob": "Cùng tên và ngày sinh",
+        "same_name": "Cùng tên",
+        "same_phone": "Cùng số điện thoại",
+        "same_email": "Cùng email",
+        "linked_via_guardian_contact": "Liên kết với liên hệ khớp trên lead này"
+      }
     },
     "assignment": {
       "title": "Phân công",
@@ -472,6 +510,9 @@
       "schedule_required": "Nhập thời gian bắt đầu và kết thúc.",
       "invalid_schedule": "Thời gian kết thúc phải sau thời gian bắt đầu.",
       "trial_not_scheduled": "Học thử này không còn ở trạng thái đã lên lịch.",
+      "strong_match_ack_required": "Cần xác nhận đã xem bản ghi có thể trùng trước khi tạo mới.",
+      "invalid_resolution": "Lựa chọn xác định danh tính không hợp lệ.",
+      "ineligible_target": "Học viên hoặc người giám hộ đã chọn không đủ điều kiện để tái sử dụng.",
       "mutation_error": "Không thể hoàn thành thao tác."
     },
     "followUp": {

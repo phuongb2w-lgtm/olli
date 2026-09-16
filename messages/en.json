@@ -323,6 +323,10 @@
       "completed": "Trial completed",
       "cancelled": "Trial cancelled",
       "no_show": "Trial no-show"
+    },
+    "identity": {
+      "resolutionChanged": "Identity resolution: {from} → {to}",
+      "unresolved": "Unresolved"
     }
   },
   "crm": {
@@ -390,6 +394,40 @@
       "filterScheduled": "Has scheduled trial",
       "nextTrialColumn": "Next trial",
       "scheduledBadge": "Trial scheduled"
+    },
+    "identity": {
+      "title": "Identity resolution",
+      "intro": "Choose whether each candidate and contact should reuse an existing student or guardian at conversion, or create new records. Matching is evidence only — nothing is merged automatically.",
+      "candidatesSection": "Candidate → Student",
+      "contactsSection": "Contact → Guardian",
+      "possibleMatches": "Possible existing records",
+      "strongMatch": "Strong match",
+      "possibleMatch": "Possible match",
+      "useExisting": "Use existing",
+      "createNew": "Create new at conversion",
+      "createNewAtConversion": "Create new at conversion",
+      "unresolved": "Unresolved",
+      "duplicateWarning": "Possible existing record found. Review matches before choosing to create a new record.",
+      "acknowledgeStrongMatch": "I reviewed the possible matches and still want to create a new record",
+      "resetResolution": "Reset resolution",
+      "readyForConversion": "Identity ready for conversion",
+      "notReady": "Identity review required",
+      "readyBadge": "Identity ready",
+      "unresolvedBadge": "{count} unresolved identities",
+      "staleReviewRequired": "Review required",
+      "selectedStudent": "Selected student",
+      "selectedGuardian": "Selected guardian",
+      "noMatches": "No likely matches found in your organization.",
+      "emptyCandidates": "No active candidates.",
+      "emptyContacts": "No active contacts.",
+      "historyTitle": "Identity resolution history",
+      "matchReason": {
+        "same_name_and_dob": "Same name and date of birth",
+        "same_name": "Same name",
+        "same_phone": "Same phone number",
+        "same_email": "Same email address",
+        "linked_via_guardian_contact": "Linked to a matching contact on this lead"
+      }
     },
     "assignment": {
       "title": "Ownership",
@@ -472,6 +510,9 @@
       "schedule_required": "Enter a scheduled start and end time.",
       "invalid_schedule": "Scheduled end must be after start.",
       "trial_not_scheduled": "This trial is no longer scheduled.",
+      "strong_match_ack_required": "Acknowledge the possible existing record before creating a new one.",
+      "invalid_resolution": "This identity resolution choice is not valid.",
+      "ineligible_target": "The selected student or guardian is not eligible for reuse.",
       "mutation_error": "Unable to complete this action."
     },
     "followUp": {

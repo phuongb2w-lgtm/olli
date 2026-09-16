@@ -16,6 +16,7 @@ export async function LeadListTable({ items }: Props) {
   const t = await getTranslations("crm.leads");
   const tAssignment = await getTranslations("crm.assignment");
   const tTrial = await getTranslations("crm.trial");
+  const tIdentity = await getTranslations("crm.identity");
 
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
@@ -66,6 +67,15 @@ export async function LeadListTable({ items }: Props) {
                   {item.hasScheduledTrial ? (
                     <span className="rounded bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-800">
                       {tTrial("scheduledBadge")}
+                    </span>
+                  ) : null}
+                  {item.identityReady ? (
+                    <span className="rounded bg-green-50 px-2 py-0.5 text-xs font-medium text-green-800">
+                      {tIdentity("readyBadge")}
+                    </span>
+                  ) : item.unresolvedIdentityCount > 0 ? (
+                    <span className="rounded bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-900">
+                      {tIdentity("unresolvedBadge", { count: item.unresolvedIdentityCount })}
                     </span>
                   ) : null}
                 </div>

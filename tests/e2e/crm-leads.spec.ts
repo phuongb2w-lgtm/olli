@@ -138,6 +138,31 @@ test.describe("M3 CRM leads", () => {
     await expect(page.getByText(outcomeNote).first()).toBeVisible({ timeout: 15_000 });
   });
 
+  test("11. admin can resolve lead identity", async ({ page }) => {
+    await signIn(page, adminEmail);
+    await page.goto(`/crm/leads/${leadFixtureId}`);
+    await expect(
+      page.getByRole("heading", { level: 2, name: /^Identity resolution$|^Xác định danh tính$/i }),
+    ).toBeVisible();
+
+    const identitySection = page
+      .locator("section")
+      .filter({
+        has: page.getByRole("heading", { level: 2, name: /^Identity resolution$|^Xác định danh tính$/i }),
+      });
+
+    await expect(
+      identitySection.getByRole("button", { name: /Create new at conversion|Tạo mới khi chuyển đổi/i }).first(),
+    ).toBeVisible();
+    await identitySection
+      .getByRole("button", { name: /Create new at conversion|Tạo mới khi chuyển đổi/i })
+      .first()
+      .click();
+    await expect(identitySection.getByText(/Unresolved|Create new|Chưa xác định|Tạo mới/i).first()).toBeVisible({
+      timeout: 15_000,
+    });
+  });
+
   test("10. Vietnamese CRM labels render", async ({ page }) => {
     await signIn(page, adminEmail);
     await page.goto("/crm/leads");

@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { LeadAssignmentPanel } from "@/components/leads/lead-assignment-panel";
 import { LeadDetailActions } from "@/components/leads/lead-detail-actions";
 import { LeadStatusBadge } from "@/components/leads/lead-status-badge";
+import { LeadIdentityPanel } from "@/components/leads/lead-identity-panel";
 import { LeadTrialPanel } from "@/components/leads/lead-trial-panel";
 import type { EligibleAssignee } from "@/lib/leads/query-eligible-assignees";
 import type {
@@ -9,9 +10,11 @@ import type {
   TrialTeachingSession,
 } from "@/lib/leads/query-eligible-trial-classes";
 import type { LeadDetail } from "@/lib/leads/query-lead-detail";
+import type { LeadIdentityBundle } from "@/lib/leads/query-lead-identity";
 
 type Props = {
   detail: LeadDetail;
+  identity: LeadIdentityBundle | null;
   canUpdate: boolean;
   canAssign: boolean;
   assignees: EligibleAssignee[];
@@ -26,6 +29,7 @@ function formatDateTime(value: string | null): string {
 
 export async function LeadDetailView({
   detail,
+  identity,
   canUpdate,
   canAssign,
   assignees,
@@ -38,10 +42,25 @@ export async function LeadDetailView({
   const tAssignment = await getTranslations("crm.assignment");
   const tFollowUp = await getTranslations("crm.followUp");
   const tTrialEvent = await getTranslations("event.trial");
+  const tIdentityEvent = await getTranslations("event.identity");
 
   const pendingFollowUps = detail.followUps
     .filter((f) => f.status === "pending")
     .map((f) => ({ id: f.id, dueAt: f.dueAt, note: f.note }));
+
+  const timeline = [
+    ...detail.timeline,
+    ...(identity?.events.map((event) => ({
+      kind: "identity" as const,
+      occurredAt: event.changedAt,
+      identity: event,
+    })) ?? []),
+  ].sort((a, b) => {
+    const timeCompare = b.occurredAt.localeCompare(a.occurredAt);
+    if (timeCompare !== 0) return timeCompare;
+    const kindOrder = { identity: 0, trial: 1, assignment: 2, status: 3, activity: 4 };
+    return kindOrder[a.kind] - kindOrder[b.kind];
+  });
 
   return (
     <div className="space-y-6">
@@ -130,6 +149,16 @@ export async function LeadDetailView({
         canAssign={canAssign}
       />
 
+      {identity ? (
+        <LeadIdentityPanel
+          leadId={detail.id}
+          candidates={detail.candidates}
+          contacts={detail.contacts}
+          identity={identity}
+          canUpdate={canUpdate}
+        />
+      ) : null}
+
       <LeadTrialPanel
         leadId={detail.id}
         candidates={detail.candidates}
@@ -150,11 +179,11 @@ export async function LeadDetailView({
 
       <section className="rounded-lg border border-slate-200 bg-white p-4">
         <h2 className="text-base font-semibold text-slate-900">{t("timeline")}</h2>
-        {detail.timeline.length === 0 ? (
+        {timeline.length === 0 ? (
           <p className="mt-3 text-sm text-slate-500">{t("emptyTimeline")}</p>
         ) : (
           <ol className="mt-4 space-y-4">
-            {detail.timeline.map((entry) => (
+            {timeline.map((entry) => (
               <li
                 key={`${entry.kind}-${
                   entry.kind === "activity"
@@ -163,7 +192,9 @@ export async function LeadDetailView({
                       ? entry.status.id
                       : entry.kind === "assignment"
                         ? entry.assignment.id
-                        : entry.trialEvent.id
+                        : entry.kind === "identity"
+                          ? entry.identity.id
+                          : entry.trialEvent.id
                 }`}
                 className="border-l-2 border-slate-200 pl-4"
               >
@@ -184,6 +215,14 @@ export async function LeadDetailView({
                   <p className="text-sm text-slate-900">
                     {tTrialEvent(entry.trialEvent.eventType)}
                     {entry.trialEvent.note ? ` — ${entry.trialEvent.note}` : ""}
+                  </p>
+                ) : entry.kind === "identity" ? (
+                  <p className="text-sm text-slate-900">
+                    {tIdentityEvent("resolutionChanged", {
+                      from: entry.identity.previousResolutionMode ?? tIdentityEvent("unresolved"),
+                      to: entry.identity.newResolutionMode ?? tIdentityEvent("unresolved"),
+                    })}
+                    {entry.identity.note ? ` — ${entry.identity.note}` : ""}
                   </p>
                 ) : (
                   <p className="text-sm text-slate-900">

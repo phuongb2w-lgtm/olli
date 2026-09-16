@@ -24,6 +24,8 @@ export type LeadListItem = {
   lastActivityType: string | null;
   nextTrialAt: string | null;
   hasScheduledTrial: boolean;
+  identityReady: boolean;
+  unresolvedIdentityCount: number;
 };
 
 export type LeadListResult = {
@@ -264,6 +266,22 @@ async function enrichLeadListItems(
     }
   }
 
+  const identityStatuses = await Promise.all(
+    leadIds.map(async (leadId) => {
+      const { data } = await supabase.rpc("get_lead_identity_resolution_status", {
+        p_lead_id: leadId,
+      });
+      return {
+        leadId,
+        ready: Boolean((data as { ready?: boolean } | null)?.ready),
+        unresolved:
+          ((data as { unresolved_candidates?: number } | null)?.unresolved_candidates ?? 0) +
+          ((data as { unresolved_contacts?: number } | null)?.unresolved_contacts ?? 0),
+      };
+    }),
+  );
+  const identityMap = new Map(identityStatuses.map((s) => [s.leadId, s]));
+
   return leads.map((lead) => {
     const activity = lastActivity.get(lead.id);
     const trialAt = nextTrial.get(lead.id) ?? null;
@@ -280,6 +298,8 @@ async function enrichLeadListItems(
       lastActivityType: activity?.type ?? null,
       nextTrialAt: trialAt,
       hasScheduledTrial: trialAt !== null,
+      identityReady: identityMap.get(lead.id)?.ready ?? false,
+      unresolvedIdentityCount: identityMap.get(lead.id)?.unresolved ?? 0,
     };
   });
 }

@@ -8,6 +8,7 @@ import {
   queryTrialTeachingSessions,
 } from "@/lib/leads/query-eligible-trial-classes";
 import { queryLeadDetail } from "@/lib/leads/query-lead-detail";
+import { queryLeadIdentity } from "@/lib/leads/query-lead-identity";
 import type { TrialTeachingSession } from "@/lib/leads/query-eligible-trial-classes";
 import { createClient } from "@/lib/supabase/server";
 
@@ -78,6 +79,13 @@ export default async function LeadDetailPage({ params }: Props) {
     );
   }
 
+  const { bundle: identity } = await queryLeadIdentity(
+    supabase,
+    detail.id,
+    detail.candidates.map((c) => c.id),
+    detail.contacts.map((c) => c.id),
+  );
+
   return (
     <div className="space-y-4">
       <Link href="/crm/leads" className="text-sm text-slate-600 hover:text-slate-900">
@@ -85,6 +93,7 @@ export default async function LeadDetailPage({ params }: Props) {
       </Link>
       <LeadDetailView
         detail={detail}
+        identity={identity}
         canUpdate={hasUpdate}
         canAssign={hasAssign}
         assignees={assignees}

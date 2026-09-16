@@ -312,6 +312,95 @@ async function main() {
       trialAfterBypass?.status === "completed",
   );
 
+  const { data: identityLeadRow } = await admin
+    .from("lead")
+    .insert({ organization_id: ORG_A, status: "qualified", notes_summary: "Identity smoke lead" })
+    .select("id")
+    .single();
+  const identityLeadId = identityLeadRow?.id;
+  const { data: identityCandidate } = await admin
+    .from("lead_candidate")
+    .insert({
+      organization_id: ORG_A,
+      lead_id: identityLeadId,
+      given_name: "Văn Phương",
+      family_name: "Trần",
+      is_primary_candidate: true,
+    })
+    .select("id")
+    .single();
+  const { data: identityContact } = await admin
+    .from("lead_contact")
+    .insert({
+      organization_id: ORG_A,
+      lead_id: identityLeadId,
+      given_name: "Lan",
+      family_name: "Phạm",
+      phone: "0912345678",
+      is_primary_contact: true,
+    })
+    .select("id")
+    .single();
+  const { data: studentMatches } = await admin.rpc("find_student_matches_for_lead_candidate", {
+    p_lead_candidate_id: identityCandidate?.id,
+  });
+  record(
+    27,
+    "candidate student match suggestions",
+    (studentMatches?.length ?? 0) >= 1 &&
+      studentMatches.some(
+        (m) => m.match_confidence === "strong" || m.match_confidence === "possible",
+      ),
+  );
+  const { data: guardianMatches } = await admin.rpc("find_guardian_matches_for_lead_contact", {
+    p_lead_contact_id: identityContact?.id,
+  });
+  record(
+    28,
+    "contact guardian match suggestions",
+    (guardianMatches?.length ?? 0) >= 1 &&
+      guardianMatches.some((m) => m.match_confidence === "strong"),
+  );
+
+  const seedStudentId = "a5100000-0000-4000-8000-000000000001";
+  const seedGuardianId = "a5200000-0000-4000-8000-000000000001";
+  const { error: resolveCandidateErr } = await admin.rpc("resolve_lead_candidate_identity", {
+    p_lead_candidate_id: identityCandidate?.id,
+    p_resolution_mode: "use_existing",
+    p_student_id: seedStudentId,
+  });
+  const { error: resolveContactErr } = await admin.rpc("resolve_lead_contact_identity", {
+    p_lead_contact_id: identityContact?.id,
+    p_resolution_mode: "use_existing",
+    p_guardian_id: seedGuardianId,
+  });
+  record(
+    29,
+    "resolve candidate and contact identities",
+    !resolveCandidateErr && !resolveContactErr,
+  );
+
+  const { data: readiness } = await admin.rpc("get_lead_identity_resolution_status", {
+    p_lead_id: identityLeadId,
+  });
+  record(30, "identity readiness reports ready", readiness?.ready === true);
+
+  const beforeIdentityStudents = await admin.from("student").select("id", { count: "exact", head: true });
+  const beforeIdentityGuardians = await admin.from("guardian").select("id", { count: "exact", head: true });
+  await admin.rpc("resolve_lead_candidate_identity", {
+    p_lead_candidate_id: identityCandidate?.id,
+    p_resolution_mode: "create_new",
+    p_acknowledge_strong_match: true,
+  });
+  const afterIdentityStudents = await admin.from("student").select("id", { count: "exact", head: true });
+  const afterIdentityGuardians = await admin.from("guardian").select("id", { count: "exact", head: true });
+  record(
+    31,
+    "identity resolution creates no student or guardian rows",
+    beforeIdentityStudents.count === afterIdentityStudents.count &&
+      beforeIdentityGuardians.count === afterIdentityGuardians.count,
+  );
+
   const failed = results.filter((r) => !r.passed);
   console.log(`\nCRM leads smoke: ${results.length - failed.length}/${results.length} passed`);
   if (failed.length > 0) process.exit(1);

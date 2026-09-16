@@ -2244,6 +2244,70 @@ export type Database = {
           },
         ]
       }
+      lead_candidate_identity_resolution: {
+        Row: {
+          id: string
+          identity_snapshot: Json
+          is_stale: boolean
+          lead_candidate_id: string
+          organization_id: string
+          resolution_mode: string
+          resolved_at: string
+          resolved_by: string
+          strong_match_acknowledged: boolean
+          student_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          identity_snapshot?: Json
+          is_stale?: boolean
+          lead_candidate_id: string
+          organization_id: string
+          resolution_mode: string
+          resolved_at?: string
+          resolved_by: string
+          strong_match_acknowledged?: boolean
+          student_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          identity_snapshot?: Json
+          is_stale?: boolean
+          lead_candidate_id?: string
+          organization_id?: string
+          resolution_mode?: string
+          resolved_at?: string
+          resolved_by?: string
+          strong_match_acknowledged?: boolean
+          student_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_candidate_identity_resol_organization_id_lead_candida_fkey"
+            columns: ["organization_id", "lead_candidate_id"]
+            isOneToOne: true
+            referencedRelation: "lead_candidate"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_candidate_identity_resolu_organization_id_resolved_by_fkey"
+            columns: ["organization_id", "resolved_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_candidate_identity_resolut_organization_id_student_id_fkey"
+            columns: ["organization_id", "student_id"]
+            isOneToOne: false
+            referencedRelation: "student"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       lead_contact: {
         Row: {
           created_at: string
@@ -2320,6 +2384,70 @@ export type Database = {
           {
             foreignKeyName: "lead_contact_organization_id_updated_by_fkey"
             columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_contact_identity_resolution: {
+        Row: {
+          guardian_id: string | null
+          id: string
+          identity_snapshot: Json
+          is_stale: boolean
+          lead_contact_id: string
+          organization_id: string
+          resolution_mode: string
+          resolved_at: string
+          resolved_by: string
+          strong_match_acknowledged: boolean
+          updated_at: string
+        }
+        Insert: {
+          guardian_id?: string | null
+          id?: string
+          identity_snapshot?: Json
+          is_stale?: boolean
+          lead_contact_id: string
+          organization_id: string
+          resolution_mode: string
+          resolved_at?: string
+          resolved_by: string
+          strong_match_acknowledged?: boolean
+          updated_at?: string
+        }
+        Update: {
+          guardian_id?: string | null
+          id?: string
+          identity_snapshot?: Json
+          is_stale?: boolean
+          lead_contact_id?: string
+          organization_id?: string
+          resolution_mode?: string
+          resolved_at?: string
+          resolved_by?: string
+          strong_match_acknowledged?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_contact_identity_resolut_organization_id_lead_contact_fkey"
+            columns: ["organization_id", "lead_contact_id"]
+            isOneToOne: true
+            referencedRelation: "lead_contact"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_contact_identity_resoluti_organization_id_guardian_id_fkey"
+            columns: ["organization_id", "guardian_id"]
+            isOneToOne: false
+            referencedRelation: "guardian"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_contact_identity_resoluti_organization_id_resolved_by_fkey"
+            columns: ["organization_id", "resolved_by"]
             isOneToOne: false
             referencedRelation: "app_user"
             referencedColumns: ["organization_id", "id"]
@@ -2409,6 +2537,56 @@ export type Database = {
             columns: ["organization_id", "lead_id"]
             isOneToOne: false
             referencedRelation: "lead"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_identity_resolution_event: {
+        Row: {
+          changed_at: string
+          changed_by: string
+          id: string
+          new_resolution_mode: string | null
+          new_target_id: string | null
+          note: string | null
+          organization_id: string
+          previous_resolution_mode: string | null
+          previous_target_id: string | null
+          subject_id: string
+          subject_type: string
+        }
+        Insert: {
+          changed_at?: string
+          changed_by: string
+          id?: string
+          new_resolution_mode?: string | null
+          new_target_id?: string | null
+          note?: string | null
+          organization_id: string
+          previous_resolution_mode?: string | null
+          previous_target_id?: string | null
+          subject_id: string
+          subject_type: string
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string
+          id?: string
+          new_resolution_mode?: string | null
+          new_target_id?: string | null
+          note?: string | null
+          organization_id?: string
+          previous_resolution_mode?: string | null
+          previous_target_id?: string | null
+          subject_id?: string
+          subject_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_identity_resolution_event_organization_id_changed_by_fkey"
+            columns: ["organization_id", "changed_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
             referencedColumns: ["organization_id", "id"]
           },
         ]
@@ -4595,6 +4773,18 @@ export type Database = {
         Args: { p_period_month: string }
         Returns: string
       }
+      append_lead_identity_resolution_event: {
+        Args: {
+          p_new_resolution_mode: string
+          p_new_target_id: string
+          p_note: string
+          p_previous_resolution_mode: string
+          p_previous_target_id: string
+          p_subject_id: string
+          p_subject_type: string
+        }
+        Returns: string
+      }
       append_lead_trial_event: {
         Args: {
           p_event_type: string
@@ -4626,6 +4816,23 @@ export type Database = {
           p_assigned_user_id?: string
           p_lead_id: string
           p_note?: string
+        }
+        Returns: Json
+      }
+      build_lead_candidate_identity_snapshot: {
+        Args: {
+          p_date_of_birth: string
+          p_family_name: string
+          p_given_name: string
+        }
+        Returns: Json
+      }
+      build_lead_contact_identity_snapshot: {
+        Args: {
+          p_email: string
+          p_family_name: string
+          p_given_name: string
+          p_phone: string
         }
         Returns: Json
       }
@@ -4826,6 +5033,34 @@ export type Database = {
         Args: { p_scenario_id: string }
         Returns: Json
       }
+      find_guardian_matches_for_lead_contact: {
+        Args: { p_lead_contact_id: string }
+        Returns: {
+          email: string
+          family_name: string
+          given_name: string
+          guardian_id: string
+          match_confidence: string
+          match_reasons: string[]
+          phone: string
+          sort_rank: number
+          status: string
+        }[]
+      }
+      find_student_matches_for_lead_candidate: {
+        Args: { p_lead_candidate_id: string }
+        Returns: {
+          date_of_birth: string
+          family_name: string
+          given_name: string
+          match_confidence: string
+          match_reasons: string[]
+          sort_rank: number
+          status: string
+          student_code: string
+          student_id: string
+        }[]
+      }
       generate_depreciation_schedule: {
         Args: { p_capital_asset_id: string }
         Returns: undefined
@@ -4864,6 +5099,10 @@ export type Database = {
       }
       get_enrollment_outstanding_charges: {
         Args: { p_enrollment_id: string }
+        Returns: Json
+      }
+      get_lead_identity_resolution_status: {
+        Args: { p_lead_id: string }
         Returns: Json
       }
       get_organization_cost_reconciliation: {
@@ -4915,6 +5154,14 @@ export type Database = {
       }
       is_compensation_rule_effective_on: {
         Args: { p_effective_from: string; p_effective_to: string; p_on: string }
+        Returns: boolean
+      }
+      is_eligible_identity_guardian: {
+        Args: { p_guardian_id: string }
+        Returns: boolean
+      }
+      is_eligible_identity_student: {
+        Args: { p_student_id: string }
         Returns: boolean
       }
       is_eligible_lead_assignee: {
@@ -5025,6 +5272,26 @@ export type Database = {
       resolve_enrollment_billing_guardian_id: {
         Args: { p_enrollment_id: string }
         Returns: string
+      }
+      resolve_lead_candidate_identity: {
+        Args: {
+          p_acknowledge_strong_match?: boolean
+          p_lead_candidate_id: string
+          p_note?: string
+          p_resolution_mode?: string
+          p_student_id?: string
+        }
+        Returns: Json
+      }
+      resolve_lead_contact_identity: {
+        Args: {
+          p_acknowledge_strong_match?: boolean
+          p_guardian_id?: string
+          p_lead_contact_id: string
+          p_note?: string
+          p_resolution_mode?: string
+        }
+        Returns: Json
       }
       resolve_lead_trial_schedule: {
         Args: {
