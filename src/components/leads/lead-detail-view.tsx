@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { LeadEditPanel } from "@/components/leads/lead-edit-panel";
 import { LeadAssignmentPanel } from "@/components/leads/lead-assignment-panel";
 import { LeadDetailActions } from "@/components/leads/lead-detail-actions";
 import { LeadStatusBadge } from "@/components/leads/lead-status-badge";
@@ -13,6 +14,10 @@ import type {
 import type { LeadDetail } from "@/lib/leads/query-lead-detail";
 import type { LeadIdentityBundle } from "@/lib/leads/query-lead-identity";
 import type { LeadConversionDetail } from "@/lib/leads/query-lead-conversion";
+import type {
+  LeadCatalogCampaign,
+  LeadCatalogSource,
+} from "@/lib/leads/query-lead-catalogs";
 
 type Props = {
   detail: LeadDetail;
@@ -24,6 +29,8 @@ type Props = {
   assignees: EligibleAssignee[];
   eligibleClasses: EligibleTrialClass[];
   sessionsByClass: Record<string, TrialTeachingSession[]>;
+  sources: LeadCatalogSource[];
+  campaigns: LeadCatalogCampaign[];
 };
 
 function formatDateTime(value: string | null): string {
@@ -41,6 +48,8 @@ export async function LeadDetailView({
   assignees,
   eligibleClasses,
   sessionsByClass,
+  sources,
+  campaigns,
 }: Props) {
   const t = await getTranslations("crm.detail");
   const tConversion = await getTranslations("crm.conversion");
@@ -152,6 +161,19 @@ export async function LeadDetailView({
           </ul>
         </section>
       </div>
+
+      <LeadEditPanel
+        leadId={detail.id}
+        status={detail.status}
+        notesSummary={detail.notesSummary}
+        leadSourceId={detail.leadSourceId}
+        leadCampaignId={detail.leadCampaignId}
+        candidates={detail.candidates}
+        contacts={detail.contacts}
+        sources={sources}
+        campaigns={campaigns}
+        canUpdate={canUpdate}
+      />
 
       <LeadAssignmentPanel
         leadId={detail.id}

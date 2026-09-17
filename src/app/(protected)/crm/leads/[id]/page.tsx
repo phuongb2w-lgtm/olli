@@ -10,6 +10,7 @@ import {
 import { queryLeadDetail } from "@/lib/leads/query-lead-detail";
 import { queryLeadIdentity } from "@/lib/leads/query-lead-identity";
 import { queryLeadConversion } from "@/lib/leads/query-lead-conversion";
+import { queryLeadCatalogs } from "@/lib/leads/query-lead-catalogs";
 import type { TrialTeachingSession } from "@/lib/leads/query-eligible-trial-classes";
 import { createClient } from "@/lib/supabase/server";
 
@@ -39,11 +40,12 @@ export default async function LeadDetailPage({ params }: Props) {
   }
 
   const supabase = await createClient();
-  const [{ detail, error, notFound }, { assignees }, { classes: eligibleClasses }] =
+  const [{ detail, error, notFound }, { assignees }, { classes: eligibleClasses }, catalogs] =
     await Promise.all([
       queryLeadDetail(supabase, id),
       hasAssign ? queryEligibleAssignees(supabase) : Promise.resolve({ assignees: [], error: false }),
       hasRead ? queryEligibleTrialClasses(supabase) : Promise.resolve({ classes: [], error: false }),
+      queryLeadCatalogs(supabase),
     ]);
 
   const sessionsByClass: Record<string, TrialTeachingSession[]> = {};
@@ -106,6 +108,8 @@ export default async function LeadDetailPage({ params }: Props) {
         assignees={assignees}
         eligibleClasses={eligibleClasses}
         sessionsByClass={sessionsByClass}
+        sources={catalogs.sources}
+        campaigns={catalogs.campaigns}
       />
     </div>
   );

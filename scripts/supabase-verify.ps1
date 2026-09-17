@@ -90,6 +90,9 @@ Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m3_lead_con
 Write-Host "==> M3-T08 CRM attribution reporting tests (28)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m3_crm_attribution_reporting_tests.sql")
 
+Write-Host "==> M3-T09 CRM operational workspace tests (25)..."
+Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m3_crm_operational_workspace_tests.sql")
+
 Write-Host "==> Generating TypeScript types..."
 New-Item -ItemType Directory -Force -Path (Join-Path $ProjectRoot "types") | Out-Null
 npx supabase gen types typescript --local | Set-Content -Path (Join-Path $ProjectRoot "types\database.generated.ts") -Encoding utf8
@@ -97,4 +100,4 @@ npx supabase gen types typescript --local | Set-Content -Path (Join-Path $Projec
 if ($LASTEXITCODE -ne 0) { throw "Verification failed" }
 
 Write-Host ""
-Write-Host "SUCCESS: Supabase verification complete (25/25 integrity + 30/30 security + 5/5 charge_balance + 6/6 locale + 12/12 cost_domain + 20/20 capital_depreciation + 35/35 enrollment_financial + 41/41 payment_allocation + 30/30 revenue_recognition + 24/24 personnel_costing + 35/35 class_cost_allocation + 35/35 class_financial_simulator + 5/5 milestone_acceptance + 29/29 crm_foundation + 25/25 lead_lifecycle + 27/27 lead_assignment + 35/35 lead_trial + 40/40 lead_identity_resolution + 48/48 lead_conversion + 28/28 crm_attribution_reporting)."
+Write-Host "SUCCESS: Supabase verification complete (25/25 integrity + 30/30 security + 5/5 charge_balance + 6/6 locale + 12/12 cost_domain + 20/20 capital_depreciation + 35/35 enrollment_financial + 41/41 payment_allocation + 30/30 revenue_recognition + 24/24 personnel_costing + 35/35 class_cost_allocation + 35/35 class_financial_simulator + 5/5 milestone_acceptance + 29/29 crm_foundation + 25/25 lead_lifecycle + 27/27 lead_assignment + 35/35 lead_trial + 40/40 lead_identity_resolution + 48/48 lead_conversion + 28/28 crm_attribution_reporting + 25/25 crm_operational_workspace)."

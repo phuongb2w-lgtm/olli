@@ -105,7 +105,9 @@ export type LeadDetail = {
   notesSummary: string | null;
   createdAt: string;
   sourceLabel: string | null;
+  leadSourceId: string | null;
   campaignName: string | null;
+  leadCampaignId: string | null;
   assignedUserName: string | null;
   assignedUserId: string | null;
   assignmentHistory: LeadAssignmentHistoryDetail[];
@@ -390,7 +392,9 @@ export async function queryLeadDetail(
       notesSummary: lead.notes_summary,
       createdAt: lead.created_at,
       sourceLabel: source.data?.display_name ?? null,
+      leadSourceId: lead.lead_source_id,
       campaignName: campaign.data?.name ?? null,
+      leadCampaignId: lead.lead_campaign_id,
       assignedUserName: assignedUser.data?.display_name ?? null,
       assignedUserId: lead.assigned_user_id,
       assignmentHistory: assignmentHistoryDetails,

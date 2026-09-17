@@ -70,8 +70,19 @@ export async function queryLeadList(
     const matchingIds = await resolveMatchingLeadIds(supabase, params.q);
     const scheduledTrialLeadIds =
       params.trial === "scheduled" ? await resolveScheduledTrialLeadIds(supabase) : null;
+    const followUpDueLeadIds =
+      params.preset === "follow_up_due" ? await resolveFollowUpDueLeadIds(supabase) : null;
+    const identityLeadIds =
+      params.identity !== "all" ? await resolveIdentityLeadIds(supabase, params.identity) : null;
 
-    if (matchingIds !== null && matchingIds.size === 0) {
+    const extraFilterIds = intersectLeadIdSets([
+      matchingIds,
+      scheduledTrialLeadIds,
+      followUpDueLeadIds,
+      identityLeadIds,
+    ]);
+
+    if (extraFilterIds !== null && extraFilterIds.size === 0) {
       return {
         result: { items: [], totalCount: 0, params: { ...params, page: 1 } },
         error: false,
@@ -93,17 +104,8 @@ export async function queryLeadList(
       countQuery = countQuery.eq("lead_campaign_id", params.campaignId);
     }
     countQuery = applyOwnershipFilter(countQuery, params, currentUserId);
-    if (matchingIds !== null) {
-      countQuery = countQuery.in("id", [...matchingIds]);
-    }
-    if (scheduledTrialLeadIds !== null) {
-      if (scheduledTrialLeadIds.size === 0) {
-        return {
-          result: { items: [], totalCount: 0, params: { ...params, page: 1 } },
-          error: false,
-        };
-      }
-      countQuery = countQuery.in("id", [...scheduledTrialLeadIds]);
+    if (extraFilterIds !== null) {
+      countQuery = countQuery.in("id", [...extraFilterIds]);
     }
     const { count, error: countError } = await countQuery;
 
@@ -135,11 +137,8 @@ export async function queryLeadList(
       pageQuery = pageQuery.eq("lead_campaign_id", params.campaignId);
     }
     pageQuery = applyOwnershipFilter(pageQuery, params, currentUserId);
-    if (matchingIds !== null) {
-      pageQuery = pageQuery.in("id", [...matchingIds]);
-    }
-    if (scheduledTrialLeadIds !== null) {
-      pageQuery = pageQuery.in("id", [...scheduledTrialLeadIds]);
+    if (extraFilterIds !== null) {
+      pageQuery = pageQuery.in("id", [...extraFilterIds]);
     }
     const { data: leads, error: pageError } = await pageQuery;
     if (pageError || !leads) {
@@ -161,6 +160,86 @@ export async function queryLeadList(
   }
 }
 
+function intersectLeadIdSets(filters: Array<Set<string> | null>): Set<string> | null {
+  const active = filters.filter((f): f is Set<string> => f !== null);
+  if (active.length === 0) return null;
+  let result = new Set(active[0]);
+  for (let i = 1; i < active.length; i += 1) {
+    result = new Set([...result].filter((id) => active[i].has(id)));
+  }
+  return result;
+}
+
+async function resolveFollowUpDueLeadIds(supabase: DbClient): Promise<Set<string>> {
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+  const { data } = await supabase
+    .from("lead_follow_up")
+    .select("lead_id")
+    .eq("status", "pending")
+    .lte("due_at", endOfDay.toISOString());
+  return new Set((data ?? []).map((row) => row.lead_id));
+}
+
+async function resolveIdentityLeadIds(
+  supabase: DbClient,
+  filter: "ready" | "unresolved",
+): Promise<Set<string>> {
+  const unresolved = new Set<string>();
+
+  const [
+    { data: candidates },
+    { data: candidateResolutions },
+    { data: contacts },
+    { data: contactResolutions },
+  ] = await Promise.all([
+    supabase.from("lead_candidate").select("id, lead_id").eq("status", "active"),
+    supabase
+      .from("lead_candidate_identity_resolution")
+      .select("lead_candidate_id, is_stale, resolution_mode, student_id"),
+    supabase.from("lead_contact").select("id, lead_id").eq("status", "active"),
+    supabase
+      .from("lead_contact_identity_resolution")
+      .select("lead_contact_id, is_stale, resolution_mode, guardian_id"),
+  ]);
+
+  const candResMap = new Map(
+    (candidateResolutions ?? []).map((r) => [r.lead_candidate_id, r]),
+  );
+  const contactResMap = new Map(
+    (contactResolutions ?? []).map((r) => [r.lead_contact_id, r]),
+  );
+
+  const leadsWithCandidates = new Set<string>();
+  const leadsWithContacts = new Set<string>();
+  for (const c of candidates ?? []) {
+    leadsWithCandidates.add(c.lead_id);
+    const res = candResMap.get(c.id);
+    if (!res || res.is_stale) {
+      unresolved.add(c.lead_id);
+    }
+  }
+  for (const c of contacts ?? []) {
+    leadsWithContacts.add(c.lead_id);
+    const res = contactResMap.get(c.id);
+    if (!res || res.is_stale) {
+      unresolved.add(c.lead_id);
+    }
+  }
+
+  if (filter === "unresolved") {
+    return unresolved;
+  }
+
+  const ready = new Set<string>();
+  for (const leadId of leadsWithCandidates) {
+    if (leadsWithContacts.has(leadId) && !unresolved.has(leadId)) {
+      ready.add(leadId);
+    }
+  }
+  return ready;
+}
+
 async function resolveScheduledTrialLeadIds(supabase: DbClient): Promise<Set<string>> {
   const { data } = await supabase
     .from("lead_trial")
@@ -178,6 +257,20 @@ async function resolveMatchingLeadIds(
   const pattern = `%${q.replace(/[%_\\]/g, "\\$&")}%`;
   const leadIds = new Set<string>();
 
+  const digitsOnly = q.replace(/\D/g, "");
+  const contactOrParts = [
+    `given_name.ilike.${pattern}`,
+    `family_name.ilike.${pattern}`,
+    `phone.ilike.${pattern}`,
+    `email.ilike.${pattern}`,
+    `phone_normalized.ilike.${pattern}`,
+    `email_normalized.ilike.${pattern}`,
+  ];
+  if (digitsOnly.length >= 4) {
+    contactOrParts.push(`phone_normalized.ilike.%${digitsOnly}%`);
+  }
+
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const [candidates, contacts] = await Promise.all([
     supabase
       .from("lead_candidate")
@@ -187,7 +280,7 @@ async function resolveMatchingLeadIds(
     supabase
       .from("lead_contact")
       .select("lead_id")
-      .or(`given_name.ilike.${pattern},family_name.ilike.${pattern},phone.ilike.${pattern},email.ilike.${pattern}`)
+      .or(contactOrParts.join(","))
       .eq("status", "active"),
   ]);
 
@@ -196,6 +289,9 @@ async function resolveMatchingLeadIds(
   }
   for (const row of contacts.data ?? []) {
     leadIds.add(row.lead_id);
+  }
+  if (uuidPattern.test(q.trim())) {
+    leadIds.add(q.trim());
   }
 
   return leadIds;

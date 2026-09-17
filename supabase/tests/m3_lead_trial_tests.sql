@@ -302,8 +302,10 @@ DECLARE
 BEGIN
   PERFORM _m3_tr_as_super();
   INSERT INTO lead (organization_id, status, converted_at) VALUES (org, 'converted', now()) RETURNING id INTO v_lead;
+  ALTER TABLE lead_candidate DISABLE TRIGGER lead_candidate_protect_converted_edits;
   INSERT INTO lead_candidate (organization_id, lead_id, given_name, family_name, is_primary_candidate)
   VALUES (org, v_lead, 'Converted', 'Lead', true) RETURNING id INTO v_candidate;
+  ALTER TABLE lead_candidate ENABLE TRIGGER lead_candidate_protect_converted_edits;
   SELECT id INTO v_class FROM class WHERE organization_id = org AND name = 'Class A1' LIMIT 1;
   PERFORM _m3_tr_as_auth('a1111111-1111-4111-8111-111111111111');
   BEGIN

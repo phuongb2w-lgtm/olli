@@ -53,7 +53,7 @@ test.describe("M3 CRM leads", () => {
     await signIn(page, adminEmail);
     await page.goto(`/crm/leads/${leadFixtureId}`);
     await expect(page.getByRole("heading", { name: /Lead detail|Chi tiết lead/i })).toBeVisible();
-    await expect(page.getByText("Walk-in")).toBeVisible();
+    await expect(page.getByText("Walk-in").first()).toBeVisible();
     await expect(page.getByRole("heading", { name: /Candidates|Học viên tiềm năng/i })).toBeVisible();
   });
 
@@ -161,6 +161,45 @@ test.describe("M3 CRM leads", () => {
     await expect(identitySection.getByText(/Unresolved|Create new|Chưa xác định|Tạo mới/i).first()).toBeVisible({
       timeout: 15_000,
     });
+  });
+
+  test("12. admin can create lead via intake workflow", async ({ page }) => {
+    const unique = Date.now();
+    const givenName = `E2E${unique}`;
+    await signIn(page, adminEmail);
+    await page.goto("/crm/leads/new");
+    await expect(page.getByRole("heading", { name: /New lead|Lead mới/i })).toBeVisible();
+    await page.locator("#intake-notes").fill(`Intake note ${unique}`);
+    await page.locator("#candidate-given-0").fill(givenName);
+    await page.locator("#candidate-family-0").fill("Nguyen");
+    await page.locator("#contact-given-0").fill("Parent");
+    await page.locator("#contact-family-0").fill("Nguyen");
+    await page.locator("#contact-phone-0").fill("0900888777");
+    await page.getByRole("button", { name: /Create lead|Tạo lead/i }).click();
+    await expect(page.getByRole("heading", { name: /Lead detail|Chi tiết lead/i })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByText(givenName).first()).toBeVisible();
+    await page.goto(`/crm/leads?q=${givenName}&pageSize=100`);
+    await expect(page.getByRole("table")).toBeVisible();
+  });
+
+  test("13. staff without lead.create does not see new lead control", async ({ page }) => {
+    await signIn(page, staffEmail);
+    await page.goto("/crm/leads");
+    await expect(page.getByRole("link", { name: /New lead|Lead mới/i })).not.toBeVisible();
+    await page.goto("/crm/leads/new");
+    await expect(
+      page.getByText(/do not have permission to create leads|không có quyền tạo lead/i),
+    ).toBeVisible();
+  });
+
+  test("14. worklist preset link applies filter", async ({ page }) => {
+    await signIn(page, adminEmail);
+    await page.goto("/crm/leads");
+    await page.getByRole("link", { name: /My leads|Lead của tôi/i }).click();
+    await expect(page).toHaveURL(/preset=my/);
+    await expect(page.getByRole("table")).toBeVisible();
   });
 
   test("10. Vietnamese CRM labels render", async ({ page }) => {

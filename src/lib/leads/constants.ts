@@ -89,6 +89,26 @@ export const LEAD_TRIAL_FILTERS = ["all", "scheduled"] as const;
 
 export type LeadTrialFilter = (typeof LEAD_TRIAL_FILTERS)[number];
 
+export const LEAD_WORKLIST_PRESETS = [
+  "all",
+  "my",
+  "unassigned",
+  "follow_up_due",
+  "trial_scheduled",
+  "identity_unresolved",
+  "ready_to_convert",
+] as const;
+
+export type LeadWorklistPreset = (typeof LEAD_WORKLIST_PRESETS)[number];
+
+export const LEAD_IDENTITY_FILTERS = ["all", "ready", "unresolved"] as const;
+
+export type LeadIdentityFilter = (typeof LEAD_IDENTITY_FILTERS)[number];
+
+export const LEAD_CONTACT_RELATIONSHIPS = ["mother", "father", "guardian", "other"] as const;
+
+export type LeadContactRelationship = (typeof LEAD_CONTACT_RELATIONSHIPS)[number];
+
 export const LEAD_TRANSITION_TARGETS: Partial<Record<LeadStatus, LeadStatus[]>> = {
   new: ["contacted", "qualified", "trial_scheduled", "lost"],
   contacted: ["qualified", "trial_scheduled", "lost"],

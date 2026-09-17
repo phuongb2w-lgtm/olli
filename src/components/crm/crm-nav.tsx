@@ -4,12 +4,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-const items = [
+const baseItems = [
   { key: "leads", href: "/crm/leads" },
   { key: "reports", href: "/crm/reports" },
 ] as const;
 
-export function CrmNav() {
+type Props = {
+  showSettings?: boolean;
+};
+
+export function CrmNav({ showSettings = false }: Props) {
+  const items = showSettings
+    ? [...baseItems, { key: "settings" as const, href: "/crm/settings" }]
+    : baseItems;
   const t = useTranslations("crm.nav");
   const pathname = usePathname();
 

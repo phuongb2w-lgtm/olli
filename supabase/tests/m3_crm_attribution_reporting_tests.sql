@@ -272,9 +272,13 @@ BEGIN
   PERFORM public.convert_lead(v_lead);
   SELECT lead_source_id, lead_campaign_id INTO snap_src, snap_camp
   FROM lead_conversion WHERE lead_id = v_lead;
-  PERFORM set_config('olli.lead_lifecycle_mutation', 'true', true);
-  UPDATE lead SET lead_source_id = v_src2, lead_campaign_id = v_camp2 WHERE id = v_lead;
-  PERFORM set_config('olli.lead_lifecycle_mutation', 'false', true);
+  BEGIN
+    PERFORM set_config('olli.lead_lifecycle_mutation', 'true', true);
+    UPDATE lead SET lead_source_id = v_src2, lead_campaign_id = v_camp2 WHERE id = v_lead;
+    PERFORM set_config('olli.lead_lifecycle_mutation', 'false', true);
+  EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('olli.lead_lifecycle_mutation', 'false', true);
+  END;
   r := _m3_rpt_report(CURRENT_DATE - 1, CURRENT_DATE + 1);
   PERFORM _m3_rpt_record(13, 'source attribution uses correct grain', snap_src = v_src1);
   PERFORM _m3_rpt_record(14, 'campaign attribution uses correct grain', snap_camp = v_camp1);
@@ -286,12 +290,12 @@ BEGIN
   PERFORM _m3_rpt_record(
     16,
     'later lead source edit does not rewrite conversion attribution',
-    snap_src = v_src1
+    (SELECT lead_source_id FROM lead_conversion WHERE lead_id = v_lead) = v_src1
   );
   PERFORM _m3_rpt_record(
     17,
     'later lead campaign edit does not rewrite conversion attribution',
-    snap_camp = v_camp1
+    (SELECT lead_campaign_id FROM lead_conversion WHERE lead_id = v_lead) = v_camp1
   );
   PERFORM _m3_rpt_record(
     18,

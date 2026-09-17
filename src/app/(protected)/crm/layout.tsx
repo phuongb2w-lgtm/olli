@@ -9,6 +9,7 @@ export default async function CrmLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const t = await getTranslations("crm");
   const hasRead = await can("lead.read");
+  const hasManageSources = await can("lead.manage_sources");
 
   return (
     <div className="space-y-6">
@@ -16,7 +17,7 @@ export default async function CrmLayout({
         <h1 className="text-xl font-semibold text-slate-900">{t("title")}</h1>
         <p className="mt-1 text-sm text-slate-500">{t("subtitle")}</p>
       </div>
-      {hasRead ? <CrmNav /> : null}
+      {hasRead ? <CrmNav showSettings={hasManageSources} /> : null}
       {children}
     </div>
   );

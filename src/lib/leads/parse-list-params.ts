@@ -1,11 +1,15 @@
 import {
   DEFAULT_LEAD_PAGE_SIZE,
+  LEAD_IDENTITY_FILTERS,
   LEAD_LIST_STATUSES,
   LEAD_OWNERSHIP_FILTERS,
   LEAD_TRIAL_FILTERS,
+  LEAD_WORKLIST_PRESETS,
+  type LeadIdentityFilter,
   type LeadListStatus,
   type LeadOwnershipFilter,
   type LeadTrialFilter,
+  type LeadWorklistPreset,
 } from "@/lib/leads/constants";
 
 export type LeadListParams = {
@@ -16,6 +20,8 @@ export type LeadListParams = {
   trial: LeadTrialFilter;
   sourceId: string | null;
   campaignId: string | null;
+  preset: LeadWorklistPreset;
+  identity: LeadIdentityFilter;
   page: number;
   pageSize: number;
 };
@@ -56,12 +62,49 @@ export function parseLeadListParams(
   );
   const sourceIdRaw = firstString(raw.sourceId).trim();
   const sourceId =
-    sourceIdRaw === "unattributed" ? "unattributed" : sourceIdRaw || null;
+    sourceIdRaw === "all" || !sourceIdRaw
+      ? null
+      : sourceIdRaw === "unattributed"
+        ? "unattributed"
+        : sourceIdRaw;
   const campaignIdRaw = firstString(raw.campaignId).trim();
   const campaignId =
-    campaignIdRaw === "unattributed" ? "unattributed" : campaignIdRaw || null;
+    campaignIdRaw === "all" || !campaignIdRaw
+      ? null
+      : campaignIdRaw === "unattributed"
+        ? "unattributed"
+        : campaignIdRaw;
+  const presetRaw = firstString(raw.preset);
+  const preset = (LEAD_WORKLIST_PRESETS as readonly string[]).includes(presetRaw)
+    ? (presetRaw as LeadWorklistPreset)
+    : "all";
+  const identityRaw = firstString(raw.identity);
+  const identity = (LEAD_IDENTITY_FILTERS as readonly string[]).includes(identityRaw)
+    ? (identityRaw as LeadIdentityFilter)
+    : "all";
 
-  return { q, status, owner, ownerUserId, trial, sourceId, campaignId, page, pageSize };
+  let resolvedOwner = owner;
+  let resolvedTrial = trial;
+  let resolvedIdentity = identity;
+  if (preset === "my") resolvedOwner = "me";
+  if (preset === "unassigned") resolvedOwner = "unassigned";
+  if (preset === "trial_scheduled") resolvedTrial = "scheduled";
+  if (preset === "identity_unresolved") resolvedIdentity = "unresolved";
+  if (preset === "ready_to_convert") resolvedIdentity = "ready";
+
+  return {
+    q,
+    status,
+    owner: resolvedOwner,
+    ownerUserId,
+    trial: resolvedTrial,
+    sourceId,
+    campaignId,
+    preset,
+    identity: resolvedIdentity,
+    page,
+    pageSize,
+  };
 }
 
 export function clampPage(page: number, totalCount: number, pageSize: number): number {

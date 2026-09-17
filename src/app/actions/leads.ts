@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { getCurrentAppUser } from "@/lib/auth/get-identity-state";
 import type { LeadUserActivityType } from "@/lib/leads/constants";
-import { LEAD_USER_ACTIVITY_TYPES } from "@/lib/leads/constants";
+import { LEAD_CONTACT_RELATIONSHIPS, LEAD_USER_ACTIVITY_TYPES } from "@/lib/leads/constants";
 import { can } from "@/lib/permissions/can";
 import { createClient } from "@/lib/supabase/server";
 
@@ -38,7 +39,24 @@ export type LeadMutationState = {
     | "invalid_enrollment_mapping"
     | "capacity_reached"
     | "overlap_conflict"
+    | "intake_people_required"
+    | "invalid_contact"
+    | "invalid_source"
+    | "invalid_campaign"
+    | "invalid_referral"
+    | "primary_candidate_conflict"
+    | "primary_contact_conflict"
+    | "invalid_status"
     | "mutation_error";
+};
+
+export type LeadIntakeState = LeadMutationState & {
+  leadId?: string;
+  assignError?: LeadMutationState["error"];
+};
+
+export type LeadCatalogState = LeadMutationState & {
+  success?: boolean;
 };
 
 function mapRpcError(message: string): LeadMutationState["error"] {
@@ -78,6 +96,14 @@ function mapRpcError(message: string): LeadMutationState["error"] {
   if (message.includes("identity resolution must")) return "permission_denied";
   if (message.includes("Lead assignment must")) return "permission_denied";
   if (message.includes("Lead trial")) return "permission_denied";
+  if (message.includes("intake_people_required")) return "intake_people_required";
+  if (message.includes("invalid_contact")) return "invalid_contact";
+  if (message.includes("invalid_source")) return "invalid_source";
+  if (message.includes("invalid_campaign")) return "invalid_campaign";
+  if (message.includes("invalid_referral")) return "invalid_referral";
+  if (message.includes("primary_candidate_conflict")) return "primary_candidate_conflict";
+  if (message.includes("primary_contact_conflict")) return "primary_contact_conflict";
+  if (message.includes("invalid_status")) return "invalid_status";
   return "mutation_error";
 }
 
@@ -656,4 +682,359 @@ export async function convertLeadAction(
   revalidatePath("/crm/leads");
   revalidatePath(`/crm/leads/${leadId}`);
   return {};
+}
+
+type IntakeCandidate = {
+  given_name: string;
+  family_name: string;
+  date_of_birth?: string;
+  is_primary_candidate?: boolean;
+};
+
+type IntakeContact = {
+  given_name: string;
+  family_name: string;
+  phone?: string;
+  email?: string;
+  relationship_type?: string;
+  is_primary_contact?: boolean;
+  is_billing_contact?: boolean;
+};
+
+function parseIntakePayload(formData: FormData): {
+  lead: Record<string, string | null>;
+  candidates: IntakeCandidate[];
+  contacts: IntakeContact[];
+} | null {
+  const raw = String(formData.get("payload") ?? "");
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as {
+      lead?: Record<string, string | null>;
+      candidates?: IntakeCandidate[];
+      contacts?: IntakeContact[];
+    };
+    return {
+      lead: parsed.lead ?? {},
+      candidates: parsed.candidates ?? [],
+      contacts: parsed.contacts ?? [],
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function createLeadWithPeopleAction(
+  _prev: LeadIntakeState,
+  formData: FormData,
+): Promise<LeadIntakeState> {
+  if (!(await can("lead.create"))) {
+    return { error: "permission_denied" };
+  }
+  if (!(await getCurrentAppUser())) {
+    return { error: "permission_denied" };
+  }
+
+  const payload = parseIntakePayload(formData);
+  if (!payload) {
+    return { error: "mutation_error" };
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("create_lead_with_people", {
+    p_lead: payload.lead,
+    p_candidates: payload.candidates,
+    p_contacts: payload.contacts,
+  });
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  const leadId = String((data as { lead_id?: string } | null)?.lead_id ?? "");
+  if (!leadId) {
+    return { error: "mutation_error" };
+  }
+
+  const assignAfter = formData.get("assignAfter") === "true";
+  const assigneeId = String(formData.get("assignedUserId") ?? "");
+  let assignError: LeadMutationState["error"] | undefined;
+
+  if (assignAfter && assigneeId) {
+    if (!(await can("lead.assign"))) {
+      assignError = "permission_denied";
+    } else {
+      const { error: assignErr } = await supabase.rpc("assign_lead", {
+        p_lead_id: leadId,
+        p_assigned_user_id: assigneeId,
+      });
+      if (assignErr) {
+        assignError = mapRpcError(assignErr.message);
+      }
+    }
+  }
+
+  revalidatePath("/crm/leads");
+  revalidatePath(`/crm/leads/${leadId}`);
+
+  if (assignError) {
+    return { leadId, assignError };
+  }
+
+  redirect(`/crm/leads/${leadId}`);
+}
+
+export async function updateLeadOperationalAction(
+  _prev: LeadMutationState,
+  formData: FormData,
+): Promise<LeadMutationState> {
+  if (!(await can("lead.update"))) {
+    return { error: "permission_denied" };
+  }
+  if (!(await getCurrentAppUser())) {
+    return { error: "permission_denied" };
+  }
+
+  const leadId = String(formData.get("leadId") ?? "");
+  const notesSummary = String(formData.get("notesSummary") ?? "");
+  const sourceId = String(formData.get("leadSourceId") ?? "");
+  const campaignId = String(formData.get("leadCampaignId") ?? "");
+  const clearSource = formData.get("clearSource") === "true";
+  const clearCampaign = formData.get("clearCampaign") === "true";
+
+  if (!leadId) {
+    return { error: "mutation_error" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("update_lead_operational", {
+    p_lead_id: leadId,
+    p_notes_summary: notesSummary || undefined,
+    p_lead_source_id: sourceId || undefined,
+    p_lead_campaign_id: campaignId || undefined,
+    p_clear_source: clearSource,
+    p_clear_campaign: clearCampaign,
+  });
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/leads");
+  revalidatePath(`/crm/leads/${leadId}`);
+  return {};
+}
+
+export async function updateLeadCandidateAction(
+  _prev: LeadMutationState,
+  formData: FormData,
+): Promise<LeadMutationState> {
+  if (!(await can("lead.update"))) {
+    return { error: "permission_denied" };
+  }
+  const actor = await getCurrentAppUser();
+  if (!actor) {
+    return { error: "permission_denied" };
+  }
+
+  const leadId = String(formData.get("leadId") ?? "");
+  const candidateId = String(formData.get("candidateId") ?? "");
+  const givenName = String(formData.get("givenName") ?? "").trim();
+  const familyName = String(formData.get("familyName") ?? "").trim();
+  const dateOfBirth = String(formData.get("dateOfBirth") ?? "") || null;
+  const isPrimary = formData.get("isPrimaryCandidate") === "true";
+
+  if (!leadId || !candidateId || !givenName || !familyName) {
+    return { error: "invalid_candidate" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("lead_candidate")
+    .update({
+      given_name: givenName,
+      family_name: familyName,
+      date_of_birth: dateOfBirth,
+      is_primary_candidate: isPrimary,
+      updated_by: actor.appUserId,
+    })
+    .eq("id", candidateId)
+    .eq("lead_id", leadId);
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/leads");
+  revalidatePath(`/crm/leads/${leadId}`);
+  return {};
+}
+
+export async function updateLeadContactAction(
+  _prev: LeadMutationState,
+  formData: FormData,
+): Promise<LeadMutationState> {
+  if (!(await can("lead.update"))) {
+    return { error: "permission_denied" };
+  }
+  const actor = await getCurrentAppUser();
+  if (!actor) {
+    return { error: "permission_denied" };
+  }
+
+  const leadId = String(formData.get("leadId") ?? "");
+  const contactId = String(formData.get("contactId") ?? "");
+  const givenName = String(formData.get("givenName") ?? "").trim();
+  const familyName = String(formData.get("familyName") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim() || null;
+  const email = String(formData.get("email") ?? "").trim() || null;
+  const relationshipRaw = String(formData.get("relationshipType") ?? "guardian");
+  const relationshipType = (LEAD_CONTACT_RELATIONSHIPS as readonly string[]).includes(
+    relationshipRaw,
+  )
+    ? relationshipRaw
+    : "guardian";
+  const isPrimary = formData.get("isPrimaryContact") === "true";
+  const isBilling = formData.get("isBillingContact") === "true";
+
+  if (!leadId || !contactId || !givenName || !familyName) {
+    return { error: "invalid_contact" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("lead_contact")
+    .update({
+      given_name: givenName,
+      family_name: familyName,
+      phone,
+      email,
+      relationship_type: relationshipType,
+      is_primary_contact: isPrimary,
+      is_billing_contact: isBilling,
+      updated_by: actor.appUserId,
+    })
+    .eq("id", contactId)
+    .eq("lead_id", leadId);
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/leads");
+  revalidatePath(`/crm/leads/${leadId}`);
+  return {};
+}
+
+export async function upsertLeadSourceCatalogAction(
+  _prev: LeadCatalogState,
+  formData: FormData,
+): Promise<LeadCatalogState> {
+  if (!(await can("lead.manage_sources"))) {
+    return { error: "permission_denied" };
+  }
+  if (!(await getCurrentAppUser())) {
+    return { error: "permission_denied" };
+  }
+
+  const id = String(formData.get("id") ?? "") || undefined;
+  const code = String(formData.get("code") ?? "");
+  const displayName = String(formData.get("displayName") ?? "");
+  const status = String(formData.get("status") ?? "active");
+
+  if (!code.trim() || !displayName.trim()) {
+    return { error: "mutation_error" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("upsert_lead_source_catalog", {
+    p_id: (id ?? null) as unknown as string,
+    p_code: code,
+    p_display_name: displayName,
+    p_status: status,
+  });
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/settings");
+  revalidatePath("/crm/leads");
+  return { success: true };
+}
+
+export async function upsertLeadCampaignCatalogAction(
+  _prev: LeadCatalogState,
+  formData: FormData,
+): Promise<LeadCatalogState> {
+  if (!(await can("lead.manage_sources"))) {
+    return { error: "permission_denied" };
+  }
+  if (!(await getCurrentAppUser())) {
+    return { error: "permission_denied" };
+  }
+
+  const id = String(formData.get("id") ?? "") || undefined;
+  const code = String(formData.get("code") ?? "");
+  const name = String(formData.get("name") ?? "");
+  const leadSourceId = String(formData.get("leadSourceId") ?? "") || undefined;
+  const status = String(formData.get("status") ?? "active");
+
+  if (!code.trim() || !name.trim()) {
+    return { error: "mutation_error" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("upsert_lead_campaign_catalog", {
+    p_id: (id ?? null) as unknown as string,
+    p_code: code,
+    p_name: name,
+    p_lead_source_id: (leadSourceId ?? null) as string | undefined,
+    p_status: status,
+  });
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/settings");
+  revalidatePath("/crm/leads");
+  return { success: true };
+}
+
+export async function upsertLeadLostReasonCatalogAction(
+  _prev: LeadCatalogState,
+  formData: FormData,
+): Promise<LeadCatalogState> {
+  if (!(await can("lead.manage_sources"))) {
+    return { error: "permission_denied" };
+  }
+  if (!(await getCurrentAppUser())) {
+    return { error: "permission_denied" };
+  }
+
+  const id = String(formData.get("id") ?? "") || undefined;
+  const code = String(formData.get("code") ?? "");
+  const displayName = String(formData.get("displayName") ?? "");
+  const status = String(formData.get("status") ?? "active");
+
+  if (!code.trim() || !displayName.trim()) {
+    return { error: "mutation_error" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("upsert_lead_lost_reason_catalog", {
+    p_id: (id ?? null) as unknown as string,
+    p_code: code,
+    p_display_name: displayName,
+    p_status: status,
+  });
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/settings");
+  revalidatePath("/crm/leads");
+  return { success: true };
 }

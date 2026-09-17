@@ -5097,6 +5097,16 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m3_ow_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_ow_as_super: { Args: never; Returns: undefined }
+      _m3_ow_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_ow_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _m3_tr_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _m3_tr_as_super: { Args: never; Returns: undefined }
       _m3_tr_expect_fail: {
@@ -5136,6 +5146,10 @@ export type Database = {
       _sec_as_super: { Args: never; Returns: undefined }
       _sec_record: {
         Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _validate_lead_catalog_refs: {
+        Args: { p_campaign_id: string; p_org_id: string; p_source_id: string }
         Returns: undefined
       }
       activate_enrollment_financial_terms: {
@@ -5381,6 +5395,10 @@ export type Database = {
           p_note?: string
         }
         Returns: string
+      }
+      create_lead_with_people: {
+        Args: { p_candidates: Json; p_contacts: Json; p_lead: Json }
+        Returns: Json
       }
       create_quick_capital_asset: {
         Args: {
@@ -5855,6 +5873,45 @@ export type Database = {
           p_tuition_plan_id?: string
         }
         Returns: undefined
+      }
+      update_lead_operational: {
+        Args: {
+          p_clear_campaign?: boolean
+          p_clear_source?: boolean
+          p_lead_campaign_id?: string
+          p_lead_id: string
+          p_lead_source_id?: string
+          p_notes_summary?: string
+        }
+        Returns: undefined
+      }
+      upsert_lead_campaign_catalog: {
+        Args: {
+          p_code: string
+          p_id: string
+          p_lead_source_id?: string
+          p_name: string
+          p_status?: string
+        }
+        Returns: string
+      }
+      upsert_lead_lost_reason_catalog: {
+        Args: {
+          p_code: string
+          p_display_name: string
+          p_id: string
+          p_status?: string
+        }
+        Returns: string
+      }
+      upsert_lead_source_catalog: {
+        Args: {
+          p_code: string
+          p_display_name: string
+          p_id: string
+          p_status?: string
+        }
+        Returns: string
       }
       validate_lead_trial_academic_refs: {
         Args: {

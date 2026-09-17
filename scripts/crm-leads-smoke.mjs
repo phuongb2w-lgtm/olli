@@ -559,6 +559,107 @@ async function main() {
     Boolean(readerReportErr) || readerReport === null,
   );
 
+  const { data: intakeResult, error: intakeErr } = await admin.rpc("create_lead_with_people", {
+    p_lead: { notes_summary: "Smoke intake" },
+    p_candidates: [{ given_name: "Smoke", family_name: "Candidate" }],
+    p_contacts: [{ given_name: "Smoke", family_name: "Contact", phone: "0900123456" }],
+  });
+  record(
+    41,
+    "admin can create lead with people via RPC",
+    !intakeErr && Boolean(intakeResult?.lead_id),
+  );
+
+  const intakeLeadId = intakeResult?.lead_id;
+  const { count: intakeAssignNull } = await admin
+    .from("lead")
+    .select("*", { count: "exact", head: true })
+    .eq("id", intakeLeadId)
+    .is("assigned_user_id", null);
+  record(42, "intake leaves assignment null", intakeAssignNull === 1);
+
+  const { data: multiResult, error: multiErr } = await admin.rpc("create_lead_with_people", {
+    p_lead: {},
+    p_candidates: [
+      { given_name: "A", family_name: "Sibling" },
+      { given_name: "B", family_name: "Sibling", is_primary_candidate: true },
+    ],
+    p_contacts: [
+      { given_name: "Parent", family_name: "One", phone: "0900111111" },
+      { given_name: "Parent", family_name: "Two", phone: "0900222222" },
+    ],
+  });
+  record(
+    43,
+    "intake supports multiple candidates and contacts",
+    !multiErr && Boolean(multiResult?.lead_id),
+  );
+
+  const { error: updateOpErr } = await admin.rpc("update_lead_operational", {
+    p_lead_id: intakeLeadId,
+    p_notes_summary: "Smoke updated notes",
+  });
+  record(44, "admin can update lead operational fields", !updateOpErr);
+
+  const { data: staffIntake, error: staffIntakeErr } = await staff.rpc("create_lead_with_people", {
+    p_lead: {},
+    p_candidates: [{ given_name: "Denied", family_name: "Create" }],
+    p_contacts: [{ given_name: "Denied", family_name: "Contact" }],
+  });
+  record(
+    45,
+    "staff without lead.create cannot intake",
+    Boolean(staffIntakeErr) || !staffIntake?.lead_id,
+  );
+
+  const { data: newSourceId, error: catalogErr } = await admin.rpc("upsert_lead_source_catalog", {
+    p_id: null,
+    p_code: `smoke_src_${Date.now()}`,
+    p_display_name: "Smoke Source",
+    p_status: "active",
+  });
+  record(46, "admin can upsert lead source catalog", !catalogErr && Boolean(newSourceId));
+
+  const { data: inactiveSource } = await admin
+    .from("lead_source")
+    .select("id")
+    .eq("organization_id", ORG_A)
+    .eq("status", "inactive")
+    .limit(1)
+    .maybeSingle();
+  if (inactiveSource?.id) {
+    const { error: inactiveSrcErr } = await admin.rpc("create_lead_with_people", {
+      p_lead: { lead_source_id: inactiveSource.id },
+      p_candidates: [{ given_name: "Bad", family_name: "Source" }],
+      p_contacts: [{ given_name: "Bad", family_name: "Contact" }],
+    });
+    record(47, "inactive source rejected for intake", Boolean(inactiveSrcErr));
+  } else {
+    record(47, "inactive source rejected for intake", true, "skipped — no inactive source");
+  }
+
+  const { data: searchCandidates } = await admin
+    .from("lead_candidate")
+    .select("lead_id")
+    .ilike("given_name", "%Linh%")
+    .eq("status", "active");
+  record(
+    48,
+    "candidate name search finds fixture lead",
+    (searchCandidates ?? []).some((row) => row.lead_id === LEAD_A1),
+  );
+
+  const { data: searchContacts } = await admin
+    .from("lead_contact")
+    .select("lead_id")
+    .eq("phone_normalized", "0900111222")
+    .eq("status", "active");
+  record(
+    49,
+    "contact normalized phone search finds fixture lead",
+    (searchContacts ?? []).some((row) => row.lead_id === LEAD_A1),
+  );
+
   const failed = results.filter((r) => !r.passed);
   console.log(`\nCRM leads smoke: ${results.length - failed.length}/${results.length} passed`);
   if (failed.length > 0) process.exit(1);
