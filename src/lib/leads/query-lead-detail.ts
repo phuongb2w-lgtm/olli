@@ -101,6 +101,7 @@ export type LeadTimelineEntry =
 export type LeadDetail = {
   id: string;
   status: LeadStatus;
+  convertedAt: string | null;
   notesSummary: string | null;
   createdAt: string;
   sourceLabel: string | null;
@@ -129,7 +130,7 @@ export async function queryLeadDetail(
   const { data: lead, error: leadError } = await supabase
     .from("lead")
     .select(
-      "id, status, notes_summary, created_at, lead_source_id, lead_campaign_id, assigned_user_id, lost_reason_id, lost_notes, lost_at",
+      "id, status, converted_at, notes_summary, created_at, lead_source_id, lead_campaign_id, assigned_user_id, lost_reason_id, lost_notes, lost_at",
     )
     .eq("id", leadId)
     .maybeSingle();
@@ -385,6 +386,7 @@ export async function queryLeadDetail(
     detail: {
       id: lead.id,
       status: lead.status as LeadStatus,
+      convertedAt: lead.converted_at,
       notesSummary: lead.notes_summary,
       createdAt: lead.created_at,
       sourceLabel: source.data?.display_name ?? null,

@@ -31,6 +31,13 @@ export type LeadMutationState = {
     | "strong_match_ack_required"
     | "invalid_resolution"
     | "ineligible_target"
+    | "identity_not_ready"
+    | "duplicate_risk_changed"
+    | "relationship_mapping_required"
+    | "invalid_relationship_mapping"
+    | "invalid_enrollment_mapping"
+    | "capacity_reached"
+    | "overlap_conflict"
     | "mutation_error";
 };
 
@@ -57,6 +64,16 @@ function mapRpcError(message: string): LeadMutationState["error"] {
   if (message.includes("strong_match_ack_required")) return "strong_match_ack_required";
   if (message.includes("invalid_resolution")) return "invalid_resolution";
   if (message.includes("ineligible_target")) return "ineligible_target";
+  if (message.includes("identity_not_ready")) return "identity_not_ready";
+  if (message.includes("duplicate_risk_changed")) return "duplicate_risk_changed";
+  if (message.includes("relationship_mapping_required")) return "relationship_mapping_required";
+  if (message.includes("invalid_relationship_mapping")) return "invalid_relationship_mapping";
+  if (message.includes("invalid_enrollment_mapping")) return "invalid_enrollment_mapping";
+  if (message.includes("capacity_reached")) return "capacity_reached";
+  if (message.includes("overlap_conflict")) return "overlap_conflict";
+  if (message.includes("stale_candidate_resolution") || message.includes("stale_contact_resolution")) {
+    return "identity_not_ready";
+  }
   if (message.includes("lead_lifecycle_protected")) return "invalid_transition";
   if (message.includes("identity resolution must")) return "permission_denied";
   if (message.includes("Lead assignment must")) return "permission_denied";
@@ -572,6 +589,64 @@ export async function clearLeadContactIdentityAction(
   const { error } = await supabase.rpc("resolve_lead_contact_identity", {
     p_lead_contact_id: contactId,
     p_resolution_mode: undefined,
+  });
+
+  if (error) {
+    return { error: mapRpcError(error.message) };
+  }
+
+  revalidatePath("/crm/leads");
+  revalidatePath(`/crm/leads/${leadId}`);
+  return {};
+}
+
+export async function convertLeadAction(
+  _prev: LeadMutationState,
+  formData: FormData,
+): Promise<LeadMutationState> {
+  if (!(await can("lead.convert"))) {
+    return { error: "permission_denied" };
+  }
+  if (!(await getCurrentAppUser())) {
+    return { error: "permission_denied" };
+  }
+
+  const leadId = String(formData.get("leadId") ?? "");
+  if (!leadId) {
+    return { error: "mutation_error" };
+  }
+
+  const relationships: { lead_candidate_id: string; lead_contact_id: string }[] = [];
+  for (const value of formData.getAll("relationship")) {
+    const [candidateId, contactId] = String(value).split(":");
+    if (candidateId && contactId) {
+      relationships.push({ lead_candidate_id: candidateId, lead_contact_id: contactId });
+    }
+  }
+
+  const enrollments: {
+    lead_candidate_id: string;
+    class_id: string;
+    start_date: string;
+    status: string;
+  }[] = [];
+  for (const [key, value] of formData.entries()) {
+    if (key.startsWith("enrollmentClass_") && value) {
+      const candidateId = key.replace("enrollmentClass_", "");
+      enrollments.push({
+        lead_candidate_id: candidateId,
+        class_id: String(value),
+        start_date: new Date().toISOString().slice(0, 10),
+        status: "pending",
+      });
+    }
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("convert_lead", {
+    p_lead_id: leadId,
+    p_relationships: relationships,
+    p_enrollments: enrollments,
   });
 
   if (error) {

@@ -2159,6 +2159,7 @@ export type Database = {
       }
       lead_candidate: {
         Row: {
+          converted_student_id: string | null
           created_at: string
           created_by: string | null
           date_of_birth: string | null
@@ -2175,6 +2176,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          converted_student_id?: string | null
           created_at?: string
           created_by?: string | null
           date_of_birth?: string | null
@@ -2191,6 +2193,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          converted_student_id?: string | null
           created_at?: string
           created_by?: string | null
           date_of_birth?: string | null
@@ -2207,6 +2210,13 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "lead_candidate_converted_student_fk"
+            columns: ["organization_id", "converted_student_id"]
+            isOneToOne: false
+            referencedRelation: "student"
+            referencedColumns: ["organization_id", "id"]
+          },
           {
             foreignKeyName: "lead_candidate_organization_id_created_by_fkey"
             columns: ["organization_id", "created_by"]
@@ -2310,6 +2320,7 @@ export type Database = {
       }
       lead_contact: {
         Row: {
+          converted_guardian_id: string | null
           created_at: string
           created_by: string | null
           email: string | null
@@ -2329,6 +2340,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          converted_guardian_id?: string | null
           created_at?: string
           created_by?: string | null
           email?: string | null
@@ -2348,6 +2360,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          converted_guardian_id?: string | null
           created_at?: string
           created_by?: string | null
           email?: string | null
@@ -2367,6 +2380,13 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "lead_contact_converted_guardian_fk"
+            columns: ["organization_id", "converted_guardian_id"]
+            isOneToOne: false
+            referencedRelation: "guardian"
+            referencedColumns: ["organization_id", "id"]
+          },
           {
             foreignKeyName: "lead_contact_organization_id_created_by_fkey"
             columns: ["organization_id", "created_by"]
@@ -2450,6 +2470,349 @@ export type Database = {
             columns: ["organization_id", "resolved_by"]
             isOneToOne: false
             referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_conversion: {
+        Row: {
+          assigned_user_id: string | null
+          converted_at: string
+          converted_by: string
+          id: string
+          lead_campaign_id: string | null
+          lead_id: string
+          lead_source_id: string | null
+          metadata: Json
+          organization_id: string
+          referral_guardian_id: string | null
+          referral_student_id: string | null
+        }
+        Insert: {
+          assigned_user_id?: string | null
+          converted_at?: string
+          converted_by: string
+          id?: string
+          lead_campaign_id?: string | null
+          lead_id: string
+          lead_source_id?: string | null
+          metadata?: Json
+          organization_id: string
+          referral_guardian_id?: string | null
+          referral_student_id?: string | null
+        }
+        Update: {
+          assigned_user_id?: string | null
+          converted_at?: string
+          converted_by?: string
+          id?: string
+          lead_campaign_id?: string | null
+          lead_id?: string
+          lead_source_id?: string | null
+          metadata?: Json
+          organization_id?: string
+          referral_guardian_id?: string | null
+          referral_student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_conversion_organization_id_assigned_user_id_fkey"
+            columns: ["organization_id", "assigned_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_organization_id_converted_by_fkey"
+            columns: ["organization_id", "converted_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_organization_id_lead_campaign_id_fkey"
+            columns: ["organization_id", "lead_campaign_id"]
+            isOneToOne: false
+            referencedRelation: "lead_campaign"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_organization_id_lead_id_fkey"
+            columns: ["organization_id", "lead_id"]
+            isOneToOne: true
+            referencedRelation: "lead"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_organization_id_lead_source_id_fkey"
+            columns: ["organization_id", "lead_source_id"]
+            isOneToOne: false
+            referencedRelation: "lead_source"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_organization_id_referral_guardian_id_fkey"
+            columns: ["organization_id", "referral_guardian_id"]
+            isOneToOne: false
+            referencedRelation: "guardian"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_organization_id_referral_student_id_fkey"
+            columns: ["organization_id", "referral_student_id"]
+            isOneToOne: false
+            referencedRelation: "student"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_conversion_candidate: {
+        Row: {
+          id: string
+          lead_candidate_id: string
+          lead_conversion_id: string
+          organization_id: string
+          resolution_mode: string
+          student_id: string
+          was_created: boolean
+        }
+        Insert: {
+          id?: string
+          lead_candidate_id: string
+          lead_conversion_id: string
+          organization_id: string
+          resolution_mode: string
+          student_id: string
+          was_created: boolean
+        }
+        Update: {
+          id?: string
+          lead_candidate_id?: string
+          lead_conversion_id?: string
+          organization_id?: string
+          resolution_mode?: string
+          student_id?: string
+          was_created?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_conversion_candidate_organization_id_lead_candidate_i_fkey"
+            columns: ["organization_id", "lead_candidate_id"]
+            isOneToOne: false
+            referencedRelation: "lead_candidate"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_candidate_organization_id_lead_conversion__fkey"
+            columns: ["organization_id", "lead_conversion_id"]
+            isOneToOne: false
+            referencedRelation: "lead_conversion"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_candidate_organization_id_student_id_fkey"
+            columns: ["organization_id", "student_id"]
+            isOneToOne: false
+            referencedRelation: "student"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_conversion_contact: {
+        Row: {
+          guardian_id: string
+          id: string
+          lead_contact_id: string
+          lead_conversion_id: string
+          organization_id: string
+          resolution_mode: string
+          was_created: boolean
+        }
+        Insert: {
+          guardian_id: string
+          id?: string
+          lead_contact_id: string
+          lead_conversion_id: string
+          organization_id: string
+          resolution_mode: string
+          was_created: boolean
+        }
+        Update: {
+          guardian_id?: string
+          id?: string
+          lead_contact_id?: string
+          lead_conversion_id?: string
+          organization_id?: string
+          resolution_mode?: string
+          was_created?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_conversion_contact_organization_id_guardian_id_fkey"
+            columns: ["organization_id", "guardian_id"]
+            isOneToOne: false
+            referencedRelation: "guardian"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_contact_organization_id_lead_contact_id_fkey"
+            columns: ["organization_id", "lead_contact_id"]
+            isOneToOne: false
+            referencedRelation: "lead_contact"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_contact_organization_id_lead_conversion_id_fkey"
+            columns: ["organization_id", "lead_conversion_id"]
+            isOneToOne: false
+            referencedRelation: "lead_conversion"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_conversion_enrollment: {
+        Row: {
+          class_id: string
+          enrollment_id: string
+          id: string
+          lead_candidate_id: string
+          lead_conversion_id: string
+          organization_id: string
+        }
+        Insert: {
+          class_id: string
+          enrollment_id: string
+          id?: string
+          lead_candidate_id: string
+          lead_conversion_id: string
+          organization_id: string
+        }
+        Update: {
+          class_id?: string
+          enrollment_id?: string
+          id?: string
+          lead_candidate_id?: string
+          lead_conversion_id?: string
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_conversion_enrollment_organization_id_class_id_fkey"
+            columns: ["organization_id", "class_id"]
+            isOneToOne: false
+            referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_enrollment_organization_id_enrollment_id_fkey"
+            columns: ["organization_id", "enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_enrollment_organization_id_lead_candidate__fkey"
+            columns: ["organization_id", "lead_candidate_id"]
+            isOneToOne: false
+            referencedRelation: "lead_candidate"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_enrollment_organization_id_lead_conversion_fkey"
+            columns: ["organization_id", "lead_conversion_id"]
+            isOneToOne: false
+            referencedRelation: "lead_conversion"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      lead_conversion_student_guardian: {
+        Row: {
+          guardian_id: string
+          id: string
+          is_billing_contact: boolean
+          is_primary_contact: boolean
+          lead_candidate_id: string
+          lead_contact_id: string
+          lead_conversion_id: string
+          organization_id: string
+          relationship_type: string
+          student_guardian_id: string
+          student_id: string
+          was_created: boolean
+          was_reused: boolean
+        }
+        Insert: {
+          guardian_id: string
+          id?: string
+          is_billing_contact?: boolean
+          is_primary_contact?: boolean
+          lead_candidate_id: string
+          lead_contact_id: string
+          lead_conversion_id: string
+          organization_id: string
+          relationship_type: string
+          student_guardian_id: string
+          student_id: string
+          was_created: boolean
+          was_reused: boolean
+        }
+        Update: {
+          guardian_id?: string
+          id?: string
+          is_billing_contact?: boolean
+          is_primary_contact?: boolean
+          lead_candidate_id?: string
+          lead_contact_id?: string
+          lead_conversion_id?: string
+          organization_id?: string
+          relationship_type?: string
+          student_guardian_id?: string
+          student_id?: string
+          was_created?: boolean
+          was_reused?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_conversion_student_guard_organization_id_lead_candida_fkey"
+            columns: ["organization_id", "lead_candidate_id"]
+            isOneToOne: false
+            referencedRelation: "lead_candidate"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_student_guard_organization_id_lead_contact_fkey"
+            columns: ["organization_id", "lead_contact_id"]
+            isOneToOne: false
+            referencedRelation: "lead_contact"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_student_guard_organization_id_lead_convers_fkey"
+            columns: ["organization_id", "lead_conversion_id"]
+            isOneToOne: false
+            referencedRelation: "lead_conversion"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_student_guard_organization_id_student_guar_fkey"
+            columns: ["organization_id", "student_guardian_id"]
+            isOneToOne: false
+            referencedRelation: "student_guardian"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_student_guardi_organization_id_guardian_id_fkey"
+            columns: ["organization_id", "guardian_id"]
+            isOneToOne: false
+            referencedRelation: "guardian"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "lead_conversion_student_guardia_organization_id_student_id_fkey"
+            columns: ["organization_id", "student_id"]
+            isOneToOne: false
+            referencedRelation: "student"
             referencedColumns: ["organization_id", "id"]
           },
         ]
@@ -4665,6 +5028,34 @@ export type Database = {
         Args: { p_charge_id: string }
         Returns: string
       }
+      _conversion_build_result: {
+        Args: { p_conversion_id: string }
+        Returns: Json
+      }
+      _conversion_ensure_student_guardian: {
+        Args: {
+          p_actor: string
+          p_guardian_id: string
+          p_is_billing_contact: boolean
+          p_is_primary_contact: boolean
+          p_relationship_type: string
+          p_student_id: string
+        }
+        Returns: {
+          student_guardian_id: string
+          was_created: boolean
+          was_reused: boolean
+        }[]
+      }
+      _conversion_validate_enrollment: {
+        Args: {
+          p_class_id: string
+          p_exclude_enrollment_id?: string
+          p_start_date: string
+          p_status: string
+        }
+        Returns: undefined
+      }
       _insert_payment_allocations: {
         Args: { p_allocations: Json; p_batch_id?: string; p_payment_id: string }
         Returns: Json
@@ -4921,6 +5312,14 @@ export type Database = {
           p_notes?: string
         }
         Returns: string
+      }
+      convert_lead: {
+        Args: {
+          p_enrollments?: Json
+          p_lead_id: string
+          p_relationships?: Json
+        }
+        Returns: Json
       }
       create_capital_asset: {
         Args: {

@@ -395,6 +395,28 @@
       "nextTrialColumn": "Học thử tiếp theo",
       "scheduledBadge": "Đã lên lịch học thử"
     },
+    "conversion": {
+      "title": "Chuyển sang hồ sơ học vụ",
+      "intro": "Xem lại danh tính đã xác định, quan hệ và ghi danh tùy chọn trước khi chuyển đổi lead.",
+      "reviewCandidates": "Học viên tiềm năng",
+      "reviewContacts": "Liên hệ",
+      "relationshipsTitle": "Quan hệ học viên – người giám hộ",
+      "relationshipsHint": "Chọn liên hệ nào gắn với học viên tiềm năng nào. Bắt buộc khi lead có nhiều học viên.",
+      "enrollmentTitle": "Ghi danh tùy chọn",
+      "enrollmentOptional": "Ghi danh là tùy chọn. Chuyển đổi không ghi nhận thanh toán.",
+      "noEnrollment": "Không ghi danh",
+      "confirmation": "Thao tác này sẽ tạo hoặc tái sử dụng hồ sơ học viên và người giám hộ. Không tạo khoản thu hay công nợ.",
+      "confirmConvert": "Xác nhận chuyển đổi",
+      "converting": "Đang chuyển đổi…",
+      "convertedTitle": "Đã chuyển đổi",
+      "convertedAtLabel": "Chuyển đổi lúc",
+      "convertedAt": "Chuyển đổi lúc {date} bởi {by}",
+      "resultStudents": "Học viên",
+      "resultGuardians": "Người giám hộ",
+      "resultEnrollments": "Ghi danh",
+      "viewStudent": "Xem học viên",
+      "viewRoster": "Xem danh sách lớp"
+    },
     "identity": {
       "title": "Xác định danh tính",
       "intro": "Chọn mỗi học viên tiềm năng và liên hệ sẽ tái sử dụng học viên hoặc người giám hộ hiện có khi chuyển đổi, hay tạo bản ghi mới. Kết quả khớp chỉ là bằng chứng — hệ thống không tự động gộp dữ liệu.",
@@ -513,6 +535,13 @@
       "strong_match_ack_required": "Cần xác nhận đã xem bản ghi có thể trùng trước khi tạo mới.",
       "invalid_resolution": "Lựa chọn xác định danh tính không hợp lệ.",
       "ineligible_target": "Học viên hoặc người giám hộ đã chọn không đủ điều kiện để tái sử dụng.",
+      "identity_not_ready": "Phải hoàn tất và cập nhật xác định danh tính trước khi chuyển đổi.",
+      "duplicate_risk_changed": "Phát hiện bản ghi trùng khả năng cao mới. Vui lòng xem lại xác định danh tính.",
+      "relationship_mapping_required": "Hãy chỉ rõ liên hệ nào thuộc học viên tiềm năng nào trước khi chuyển đổi.",
+      "invalid_relationship_mapping": "Một hoặc nhiều liên kết học viên – người giám hộ không hợp lệ.",
+      "invalid_enrollment_mapping": "Một hoặc nhiều lựa chọn ghi danh không hợp lệ.",
+      "capacity_reached": "Lớp đã chọn không còn chỗ.",
+      "overlap_conflict": "Học viên đã có ghi danh trùng thời gian trong lớp này.",
       "mutation_error": "Không thể hoàn thành thao tác."
     },
     "followUp": {

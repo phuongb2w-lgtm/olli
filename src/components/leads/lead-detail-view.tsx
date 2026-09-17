@@ -3,6 +3,7 @@ import { LeadAssignmentPanel } from "@/components/leads/lead-assignment-panel";
 import { LeadDetailActions } from "@/components/leads/lead-detail-actions";
 import { LeadStatusBadge } from "@/components/leads/lead-status-badge";
 import { LeadIdentityPanel } from "@/components/leads/lead-identity-panel";
+import { LeadConversionPanel } from "@/components/leads/lead-conversion-panel";
 import { LeadTrialPanel } from "@/components/leads/lead-trial-panel";
 import type { EligibleAssignee } from "@/lib/leads/query-eligible-assignees";
 import type {
@@ -11,12 +12,15 @@ import type {
 } from "@/lib/leads/query-eligible-trial-classes";
 import type { LeadDetail } from "@/lib/leads/query-lead-detail";
 import type { LeadIdentityBundle } from "@/lib/leads/query-lead-identity";
+import type { LeadConversionDetail } from "@/lib/leads/query-lead-conversion";
 
 type Props = {
   detail: LeadDetail;
   identity: LeadIdentityBundle | null;
+  conversion: LeadConversionDetail | null;
   canUpdate: boolean;
   canAssign: boolean;
+  canConvert: boolean;
   assignees: EligibleAssignee[];
   eligibleClasses: EligibleTrialClass[];
   sessionsByClass: Record<string, TrialTeachingSession[]>;
@@ -30,13 +34,16 @@ function formatDateTime(value: string | null): string {
 export async function LeadDetailView({
   detail,
   identity,
+  conversion,
   canUpdate,
   canAssign,
+  canConvert,
   assignees,
   eligibleClasses,
   sessionsByClass,
 }: Props) {
   const t = await getTranslations("crm.detail");
+  const tConversion = await getTranslations("crm.conversion");
   const tActivity = await getTranslations("activity.lead");
   const tStatus = await getTranslations("status.lead");
   const tAssignment = await getTranslations("crm.assignment");
@@ -88,6 +95,12 @@ export async function LeadDetailView({
             <dt className="font-medium text-slate-600">{t("createdAt")}</dt>
             <dd className="text-slate-900">{formatDateTime(detail.createdAt)}</dd>
           </div>
+          {detail.convertedAt ? (
+            <div>
+              <dt className="font-medium text-slate-600">{tConversion("convertedAtLabel")}</dt>
+              <dd className="text-slate-900">{formatDateTime(detail.convertedAt)}</dd>
+            </div>
+          ) : null}
           {detail.lostReasonLabel ? (
             <>
               <div>
@@ -155,7 +168,20 @@ export async function LeadDetailView({
           candidates={detail.candidates}
           contacts={detail.contacts}
           identity={identity}
-          canUpdate={canUpdate}
+          canUpdate={canUpdate && detail.status !== "converted"}
+        />
+      ) : null}
+
+      {identity ? (
+        <LeadConversionPanel
+          leadId={detail.id}
+          status={detail.status}
+          candidates={detail.candidates}
+          contacts={detail.contacts}
+          identity={identity}
+          conversion={conversion}
+          eligibleClasses={eligibleClasses}
+          canConvert={canConvert}
         />
       ) : null}
 

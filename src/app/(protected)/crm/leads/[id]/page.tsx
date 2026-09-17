@@ -9,6 +9,7 @@ import {
 } from "@/lib/leads/query-eligible-trial-classes";
 import { queryLeadDetail } from "@/lib/leads/query-lead-detail";
 import { queryLeadIdentity } from "@/lib/leads/query-lead-identity";
+import { queryLeadConversion } from "@/lib/leads/query-lead-conversion";
 import type { TrialTeachingSession } from "@/lib/leads/query-eligible-trial-classes";
 import { createClient } from "@/lib/supabase/server";
 
@@ -24,6 +25,7 @@ export default async function LeadDetailPage({ params }: Props) {
   const hasRead = await can("lead.read");
   const hasUpdate = await can("lead.update");
   const hasAssign = await can("lead.assign");
+  const hasConvert = await can("lead.convert");
 
   if (!hasRead) {
     return (
@@ -79,12 +81,15 @@ export default async function LeadDetailPage({ params }: Props) {
     );
   }
 
-  const { bundle: identity } = await queryLeadIdentity(
-    supabase,
-    detail.id,
-    detail.candidates.map((c) => c.id),
-    detail.contacts.map((c) => c.id),
-  );
+  const [{ bundle: identity }, { conversion }] = await Promise.all([
+    queryLeadIdentity(
+      supabase,
+      detail.id,
+      detail.candidates.map((c) => c.id),
+      detail.contacts.map((c) => c.id),
+    ),
+    queryLeadConversion(supabase, detail.id),
+  ]);
 
   return (
     <div className="space-y-4">
@@ -94,8 +99,10 @@ export default async function LeadDetailPage({ params }: Props) {
       <LeadDetailView
         detail={detail}
         identity={identity}
+        conversion={conversion}
         canUpdate={hasUpdate}
         canAssign={hasAssign}
+        canConvert={hasConvert}
         assignees={assignees}
         eligibleClasses={eligibleClasses}
         sessionsByClass={sessionsByClass}

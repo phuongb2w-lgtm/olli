@@ -401,6 +401,77 @@ async function main() {
       beforeIdentityGuardians.count === afterIdentityGuardians.count,
   );
 
+  const { data: convLead } = await admin
+    .from("lead")
+    .insert({ organization_id: ORG_A, status: "qualified" })
+    .select("id")
+    .single();
+  const { data: convCandidate } = await admin
+    .from("lead_candidate")
+    .insert({
+      organization_id: ORG_A,
+      lead_id: convLead.id,
+      given_name: "ConvSmoke",
+      family_name: "Candidate",
+      is_primary_candidate: true,
+    })
+    .select("id")
+    .single();
+  const { data: convContact } = await admin
+    .from("lead_contact")
+    .insert({
+      organization_id: ORG_A,
+      lead_id: convLead.id,
+      given_name: "ConvSmoke",
+      family_name: "Contact",
+      phone: `09${Date.now().toString().slice(-8)}`,
+      is_primary_contact: true,
+      is_billing_contact: true,
+    })
+    .select("id")
+    .single();
+  await admin.rpc("resolve_lead_candidate_identity", {
+    p_lead_candidate_id: convCandidate.id,
+    p_resolution_mode: "create_new",
+  });
+  await admin.rpc("resolve_lead_contact_identity", {
+    p_lead_contact_id: convContact.id,
+    p_resolution_mode: "create_new",
+  });
+  const convBeforeStudents = await admin.from("student").select("id", { count: "exact", head: true });
+  const convBeforeCharges = await admin.from("charge").select("id", { count: "exact", head: true });
+  const { data: convResult, error: convErr } = await admin.rpc("convert_lead", {
+    p_lead_id: convLead.id,
+    p_relationships: [],
+    p_enrollments: [],
+  });
+  record(32, "convert lead without enrollment", !convErr && Boolean(convResult?.lead_conversion_id));
+  const { data: convAgain } = await admin.rpc("convert_lead", { p_lead_id: convLead.id });
+  record(
+    33,
+    "repeated conversion is idempotent",
+    convAgain?.already_converted === true && convAgain?.lead_conversion_id === convResult?.lead_conversion_id,
+  );
+  const convAfterStudents = await admin.from("student").select("id", { count: "exact", head: true });
+  const convAfterCharges = await admin.from("charge").select("id", { count: "exact", head: true });
+  record(
+    34,
+    "conversion creates student records",
+    (convAfterStudents.count ?? 0) > (convBeforeStudents.count ?? 0),
+  );
+  record(
+    35,
+    "conversion creates no charge side effects",
+    convBeforeCharges.count === convAfterCharges.count,
+  );
+  const { data: staffConvLead } = await admin
+    .from("lead")
+    .insert({ organization_id: ORG_A, status: "qualified" })
+    .select("id")
+    .single();
+  const { error: staffConvErr } = await staff.rpc("convert_lead", { p_lead_id: staffConvLead.id });
+  record(36, "staff without lead.convert cannot convert", Boolean(staffConvErr));
+
   const failed = results.filter((r) => !r.passed);
   console.log(`\nCRM leads smoke: ${results.length - failed.length}/${results.length} passed`);
   if (failed.length > 0) process.exit(1);

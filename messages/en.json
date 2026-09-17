@@ -395,6 +395,28 @@
       "nextTrialColumn": "Next trial",
       "scheduledBadge": "Trial scheduled"
     },
+    "conversion": {
+      "title": "Convert to academic records",
+      "intro": "Review resolved identities, relationships, and optional enrollment before converting this lead.",
+      "reviewCandidates": "Candidates",
+      "reviewContacts": "Contacts",
+      "relationshipsTitle": "Student–guardian relationships",
+      "relationshipsHint": "Select which contact is linked to each candidate. Required for multi-candidate leads.",
+      "enrollmentTitle": "Optional enrollment",
+      "enrollmentOptional": "Enrollment is optional. Conversion does not record a payment.",
+      "noEnrollment": "No enrollment",
+      "confirmation": "This will create or reuse canonical student and guardian records. No payment or charge is recorded.",
+      "confirmConvert": "Confirm conversion",
+      "converting": "Converting…",
+      "convertedTitle": "Converted",
+      "convertedAtLabel": "Converted at",
+      "convertedAt": "Converted on {date} by {by}",
+      "resultStudents": "Students",
+      "resultGuardians": "Guardians",
+      "resultEnrollments": "Enrollments",
+      "viewStudent": "View student",
+      "viewRoster": "View roster"
+    },
     "identity": {
       "title": "Identity resolution",
       "intro": "Choose whether each candidate and contact should reuse an existing student or guardian at conversion, or create new records. Matching is evidence only — nothing is merged automatically.",
@@ -513,6 +535,13 @@
       "strong_match_ack_required": "Acknowledge the possible existing record before creating a new one.",
       "invalid_resolution": "This identity resolution choice is not valid.",
       "ineligible_target": "The selected student or guardian is not eligible for reuse.",
+      "identity_not_ready": "Identity resolution must be complete and current before conversion.",
+      "duplicate_risk_changed": "A new likely duplicate was detected. Review identity resolution before converting.",
+      "relationship_mapping_required": "Specify which contacts belong to which candidates before converting.",
+      "invalid_relationship_mapping": "One or more student–guardian mappings are invalid.",
+      "invalid_enrollment_mapping": "One or more enrollment selections are invalid.",
+      "capacity_reached": "The selected class has no available capacity.",
+      "overlap_conflict": "The student already has an overlapping enrollment in this class.",
       "mutation_error": "Unable to complete this action."
     },
     "followUp": {
