@@ -82,6 +82,16 @@ export async function queryLeadList(
     if (params.status !== "all") {
       countQuery = countQuery.eq("status", params.status);
     }
+    if (params.sourceId === "unattributed") {
+      countQuery = countQuery.is("lead_source_id", null);
+    } else if (params.sourceId) {
+      countQuery = countQuery.eq("lead_source_id", params.sourceId);
+    }
+    if (params.campaignId === "unattributed") {
+      countQuery = countQuery.is("lead_campaign_id", null);
+    } else if (params.campaignId) {
+      countQuery = countQuery.eq("lead_campaign_id", params.campaignId);
+    }
     countQuery = applyOwnershipFilter(countQuery, params, currentUserId);
     if (matchingIds !== null) {
       countQuery = countQuery.in("id", [...matchingIds]);
@@ -113,6 +123,16 @@ export async function queryLeadList(
       .range(from, to);
     if (params.status !== "all") {
       pageQuery = pageQuery.eq("status", params.status);
+    }
+    if (params.sourceId === "unattributed") {
+      pageQuery = pageQuery.is("lead_source_id", null);
+    } else if (params.sourceId) {
+      pageQuery = pageQuery.eq("lead_source_id", params.sourceId);
+    }
+    if (params.campaignId === "unattributed") {
+      pageQuery = pageQuery.is("lead_campaign_id", null);
+    } else if (params.campaignId) {
+      pageQuery = pageQuery.eq("lead_campaign_id", params.campaignId);
     }
     pageQuery = applyOwnershipFilter(pageQuery, params, currentUserId);
     if (matchingIds !== null) {

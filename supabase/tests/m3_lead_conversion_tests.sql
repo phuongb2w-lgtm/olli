@@ -794,6 +794,66 @@ BEGIN
   PERFORM _m3_cv_as_super();
 END $$;
 
+-- 31: concurrent conversion cannot duplicate canonical outputs
+-- Limitation: single psql session cannot run two live FOR UPDATE transactions; this test
+-- validates row-lock idempotency plus UNIQUE enforcement that blocks duplicate handoffs.
+DO $$
+DECLARE
+  org uuid := 'a0000000-0000-4000-8000-000000000001';
+  v_lead uuid;
+  r1 jsonb;
+  r2 jsonb;
+  conv_cnt integer;
+  student_cnt integer;
+  guardian_cnt integer;
+  sg_cnt integer;
+  enroll_cnt integer;
+  cand_map_cnt integer;
+  contact_map_cnt integer;
+  dup_blocked boolean := false;
+  v_conv uuid;
+BEGIN
+  PERFORM _m3_cv_as_super();
+  v_lead := _m3_cv_setup_ready_lead(org);
+  PERFORM _m3_cv_as_auth('a1111111-1111-4111-8111-111111111111');
+  SELECT public.convert_lead(v_lead) INTO r1;
+  SELECT public.convert_lead(v_lead) INTO r2;
+  SELECT count(*) INTO conv_cnt FROM lead_conversion WHERE lead_id = v_lead;
+  SELECT count(*) INTO student_cnt FROM lead_conversion_candidate WHERE lead_conversion_id = (r1->>'lead_conversion_id')::uuid;
+  SELECT count(*) INTO guardian_cnt FROM lead_conversion_contact WHERE lead_conversion_id = (r1->>'lead_conversion_id')::uuid;
+  SELECT count(*) INTO sg_cnt FROM lead_conversion_student_guardian WHERE lead_conversion_id = (r1->>'lead_conversion_id')::uuid;
+  SELECT count(*) INTO enroll_cnt FROM lead_conversion_enrollment WHERE lead_conversion_id = (r1->>'lead_conversion_id')::uuid;
+  SELECT count(*) INTO cand_map_cnt FROM lead_conversion_candidate cc
+    JOIN lead_conversion lc ON lc.id = cc.lead_conversion_id WHERE lc.lead_id = v_lead;
+  SELECT count(*) INTO contact_map_cnt FROM lead_conversion_contact ct
+    JOIN lead_conversion lc ON lc.id = ct.lead_conversion_id WHERE lc.lead_id = v_lead;
+  v_conv := (r1->>'lead_conversion_id')::uuid;
+  PERFORM _m3_cv_as_super();
+  PERFORM set_config('olli.lead_conversion_mutation', 'true', true);
+  BEGIN
+    INSERT INTO lead_conversion (organization_id, lead_id, converted_by)
+    VALUES (org, v_lead, 'a1000000-0000-4000-8000-000000000001');
+  EXCEPTION WHEN unique_violation THEN dup_blocked := true;
+  END;
+  PERFORM set_config('olli.lead_conversion_mutation', 'false', true);
+  PERFORM _m3_cv_as_auth('a1111111-1111-4111-8111-111111111111');
+  PERFORM _m3_cv_record(
+    31,
+    'concurrent conversion cannot duplicate canonical outputs',
+    conv_cnt = 1
+      AND student_cnt = 1
+      AND guardian_cnt = 1
+      AND sg_cnt = 1
+      AND enroll_cnt = 0
+      AND cand_map_cnt = 1
+      AND contact_map_cnt = 1
+      AND (r2->>'already_converted')::boolean = true
+      AND r1->>'lead_conversion_id' = r2->>'lead_conversion_id'
+      AND dup_blocked
+  );
+  PERFORM _m3_cv_as_super();
+END $$;
+
 DO $$
 DECLARE org uuid := 'a0000000-0000-4000-8000-000000000001';
   v_lead uuid;
@@ -924,7 +984,43 @@ BEGIN
   PERFORM _m3_cv_as_super();
 END $$;
 
--- 46–48: security immutability
+-- 46: conversion actor cannot be spoofed by client
+DO $$
+DECLARE
+  org uuid := 'a0000000-0000-4000-8000-000000000001';
+  staff_auth uuid := 'a2222222-2222-4222-8222-222222222222';
+  staff_app uuid := 'a2000000-0000-4000-8000-000000000001';
+  admin_app uuid := 'a1000000-0000-4000-8000-000000000001';
+  v_role uuid;
+  v_lead uuid;
+  v_conv_by uuid;
+  v_hist_by uuid;
+BEGIN
+  PERFORM _m3_cv_as_super();
+  INSERT INTO role (organization_id, code, status) VALUES (org, 'temp_lead_converter_46', 'active')
+  RETURNING id INTO v_role;
+  INSERT INTO role_permission (role_id, permission_id)
+  SELECT v_role, p.id FROM permission p WHERE p.code IN ('lead.convert', 'lead.read');
+  INSERT INTO user_role (organization_id, user_id, role_id, effective_from, status)
+  VALUES (org, staff_app, v_role, CURRENT_DATE, 'active');
+  v_lead := _m3_cv_setup_ready_lead(org);
+  PERFORM _m3_cv_as_auth(staff_auth);
+  PERFORM public.convert_lead(v_lead);
+  SELECT converted_by INTO v_conv_by FROM lead_conversion WHERE lead_id = v_lead;
+  SELECT changed_by INTO v_hist_by
+  FROM lead_status_history
+  WHERE lead_id = v_lead AND to_status = 'converted'
+  ORDER BY changed_at DESC
+  LIMIT 1;
+  PERFORM _m3_cv_record(
+    46,
+    'conversion actor comes from authenticated app user context',
+    v_conv_by = staff_app AND v_hist_by = staff_app AND v_conv_by <> admin_app
+  );
+  PERFORM _m3_cv_as_super();
+END $$;
+
+-- 47–48: security immutability
 DO $$
 DECLARE org uuid := 'a0000000-0000-4000-8000-000000000001';
   v_lead uuid;

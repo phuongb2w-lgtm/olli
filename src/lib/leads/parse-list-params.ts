@@ -14,6 +14,8 @@ export type LeadListParams = {
   owner: LeadOwnershipFilter;
   ownerUserId: string | null;
   trial: LeadTrialFilter;
+  sourceId: string | null;
+  campaignId: string | null;
   page: number;
   pageSize: number;
 };
@@ -52,8 +54,14 @@ export function parseLeadListParams(
     100,
     parsePositiveInt(firstString(raw.pageSize), DEFAULT_LEAD_PAGE_SIZE),
   );
+  const sourceIdRaw = firstString(raw.sourceId).trim();
+  const sourceId =
+    sourceIdRaw === "unattributed" ? "unattributed" : sourceIdRaw || null;
+  const campaignIdRaw = firstString(raw.campaignId).trim();
+  const campaignId =
+    campaignIdRaw === "unattributed" ? "unattributed" : campaignIdRaw || null;
 
-  return { q, status, owner, ownerUserId, trial, page, pageSize };
+  return { q, status, owner, ownerUserId, trial, sourceId, campaignId, page, pageSize };
 }
 
 export function clampPage(page: number, totalCount: number, pageSize: number): number {

@@ -452,6 +452,62 @@ async function main() {
     "repeated conversion is idempotent",
     convAgain?.already_converted === true && convAgain?.lead_conversion_id === convResult?.lead_conversion_id,
   );
+
+  const { data: raceLead } = await admin
+    .from("lead")
+    .insert({ organization_id: ORG_A, status: "qualified" })
+    .select("id")
+    .single();
+  const { data: raceCandidate } = await admin
+    .from("lead_candidate")
+    .insert({
+      organization_id: ORG_A,
+      lead_id: raceLead.id,
+      given_name: "RaceSmoke",
+      family_name: "Candidate",
+      is_primary_candidate: true,
+    })
+    .select("id")
+    .single();
+  const { data: raceContact } = await admin
+    .from("lead_contact")
+    .insert({
+      organization_id: ORG_A,
+      lead_id: raceLead.id,
+      given_name: "RaceSmoke",
+      family_name: "Contact",
+      phone: `09${Date.now().toString().slice(-7)}1`,
+      is_primary_contact: true,
+      is_billing_contact: true,
+    })
+    .select("id")
+    .single();
+  await admin.rpc("resolve_lead_candidate_identity", {
+    p_lead_candidate_id: raceCandidate.id,
+    p_resolution_mode: "create_new",
+  });
+  await admin.rpc("resolve_lead_contact_identity", {
+    p_lead_contact_id: raceContact.id,
+    p_resolution_mode: "create_new",
+  });
+  const [raceA, raceB] = await Promise.all([
+    admin.rpc("convert_lead", { p_lead_id: raceLead.id, p_relationships: [], p_enrollments: [] }),
+    admin.rpc("convert_lead", { p_lead_id: raceLead.id, p_relationships: [], p_enrollments: [] }),
+  ]);
+  const { count: raceConvCount } = await admin
+    .from("lead_conversion")
+    .select("id", { count: "exact", head: true })
+    .eq("lead_id", raceLead.id);
+  const raceConvIdA = raceA.data?.lead_conversion_id ?? null;
+  const raceConvIdB = raceB.data?.lead_conversion_id ?? null;
+  record(
+    37,
+    "concurrent conversion requests produce one canonical handoff",
+    raceConvCount === 1 &&
+      raceConvIdA !== null &&
+      raceConvIdA === raceConvIdB &&
+      (!raceA.error || !raceB.error),
+  );
   const convAfterStudents = await admin.from("student").select("id", { count: "exact", head: true });
   const convAfterCharges = await admin.from("charge").select("id", { count: "exact", head: true });
   record(
@@ -471,6 +527,37 @@ async function main() {
     .single();
   const { error: staffConvErr } = await staff.rpc("convert_lead", { p_lead_id: staffConvLead.id });
   record(36, "staff without lead.convert cannot convert", Boolean(staffConvErr));
+
+  const { data: convActorRow } = await admin
+    .from("lead_conversion")
+    .select("converted_by")
+    .eq("lead_id", convLead.id)
+    .maybeSingle();
+  record(
+    38,
+    "conversion actor is authenticated app user not client-supplied",
+    convActorRow?.converted_by === "a1000000-0000-4000-8000-000000000001",
+  );
+
+  const { data: reportData, error: reportErr } = await admin.rpc("get_crm_attribution_report", {
+    p_start_date: new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10),
+    p_end_date: new Date().toISOString().slice(0, 10),
+  });
+  record(
+    39,
+    "admin can load CRM attribution report",
+    !reportErr && Boolean(reportData?.funnel) && Array.isArray(reportData?.sources),
+  );
+
+  const { data: readerReport, error: readerReportErr } = await reader.rpc("get_crm_attribution_report", {
+    p_start_date: new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10),
+    p_end_date: new Date().toISOString().slice(0, 10),
+  });
+  record(
+    40,
+    "reader without lead.read cannot load CRM attribution report",
+    Boolean(readerReportErr) || readerReport === null,
+  );
 
   const failed = results.filter((r) => !r.passed);
   console.log(`\nCRM leads smoke: ${results.length - failed.length}/${results.length} passed`);

@@ -5492,6 +5492,10 @@ export type Database = {
         Args: { p_scenario_id: string }
         Returns: Json
       }
+      get_crm_attribution_report: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
       get_enrollment_financial_summary: {
         Args: { p_enrollment_id: string }
         Returns: Json
