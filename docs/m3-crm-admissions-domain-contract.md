@@ -36,6 +36,8 @@ Lead / inquiry → consultation & follow-up → trial → conversion → Student
 
 **M3-T02 readiness:** Safe to begin schema design **after** this contract is accepted. No M1/M2 incompatibilities identified that require redesign of closed domains.
 
+**Implementation status (M3-T10 closeout, 2026-09-17):** M3 CLOSED at commit following `d0e026f`. See [`docs/m3-closeout.md`](./m3-closeout.md) for final architecture, test counts (565 DB / 549 Node smoke / 89 E2E), and production checklist. Eight M3 migrations (T02–T09) shipped; T10 added acceptance tests and closeout documentation only (no new migration).
+
 ---
 
 ## 2. Current Repository Inventory
