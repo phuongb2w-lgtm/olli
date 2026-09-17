@@ -22,6 +22,7 @@ import {
   validateTeacherAssignmentInput,
   type TeacherAssignmentFormValues,
 } from "@/lib/teaching/validate-teacher-assignment-input";
+import { mapTeachingRpcError } from "@/lib/teaching/map-teaching-rpc-error";
 
 export type TeachingActionState = {
   error?:
@@ -37,9 +38,13 @@ export type TeachingActionState = {
     | "room_conflict"
     | "teacher_conflict"
     | "schedule_not_active"
+    | "assignment_not_active"
     | "ambiguous_teacher"
     | "no_teacher"
     | "invalid_range"
+    | "invalid_schedule_range"
+    | "invalid_assignment_range"
+    | "duplicate_assignment"
     | "range_too_large"
     | "session_not_cancellable"
     | "session_not_completable";
@@ -61,35 +66,17 @@ async function assertClassInOrg(classId: string, organizationId: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("class")
-    .select("id, status, organization_id")
+    .select("id, status, organization_id, term_start_date, term_end_date")
     .eq("id", classId)
     .maybeSingle();
   if (!data || data.organization_id !== organizationId) return null;
-  return data as { id: string; status: ClassStatus; organization_id: string };
-}
-
-async function assertTeacherInOrg(teacherId: string, organizationId: string) {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("teacher")
-    .select("id, status, organization_id")
-    .eq("id", teacherId)
-    .maybeSingle();
-  if (!data || data.organization_id !== organizationId) return null;
-  if (data.status !== "active") return null;
-  return data;
-}
-
-async function assertRoomInOrg(roomId: string, organizationId: string, requireActive = true) {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("room")
-    .select("id, status, organization_id")
-    .eq("id", roomId)
-    .maybeSingle();
-  if (!data || data.organization_id !== organizationId) return null;
-  if (requireActive && data.status !== "active") return null;
-  return data;
+  return data as {
+    id: string;
+    status: ClassStatus;
+    organization_id: string;
+    term_start_date: string | null;
+    term_end_date: string | null;
+  };
 }
 
 function parseScheduleFields(formData: FormData): Partial<ScheduleFormValues> {
@@ -119,37 +106,26 @@ export async function createClassScheduleAction(
 
   const parsed = validateScheduleInput(parseScheduleFields(formData), {
     classStatus: classRow.status,
+    termStart: classRow.term_start_date,
+    termEnd: classRow.term_end_date,
   });
   if (!parsed.ok || !parsed.data) {
     return { error: "save_error", fieldErrors: parsed.fieldErrors, values: formDataToValues(formData) };
   }
 
-  if (parsed.data.roomId) {
-    const room = await assertRoomInOrg(parsed.data.roomId, user.organizationId);
-    if (!room) return { error: "invalid_room" };
-  }
-  if (parsed.data.teacherId) {
-    const teacher = await assertTeacherInOrg(parsed.data.teacherId, user.organizationId);
-    if (!teacher) return { error: "invalid_teacher" };
-  }
-
   const supabase = await createClient();
-  const { error } = await supabase.from("class_schedule").insert({
-    organization_id: user.organizationId,
-    class_id: classId,
-    weekday_code: parsed.data.weekdayCode,
-    start_time: parsed.data.startTime,
-    end_time: parsed.data.endTime,
-    effective_from: parsed.data.effectiveFrom,
-    effective_to: parsed.data.effectiveTo,
-    room_id: parsed.data.roomId,
-    teacher_id: parsed.data.teacherId,
-    status: "active",
-    created_by: user.appUserId,
-    updated_by: user.appUserId,
+  const { error } = await supabase.rpc("create_class_schedule", {
+    p_class_id: classId,
+    p_weekday_code: parsed.data.weekdayCode,
+    p_start_time: parsed.data.startTime,
+    p_end_time: parsed.data.endTime,
+    p_effective_from: parsed.data.effectiveFrom,
+    p_effective_to: parsed.data.effectiveTo ?? undefined,
+    p_room_id: parsed.data.roomId ?? undefined,
+    p_teacher_id: parsed.data.teacherId ?? undefined,
   });
 
-  if (error) return { error: "save_error" };
+  if (error) return { error: mapTeachingRpcError(error) };
   revalidateTeaching(classId);
   redirect(`/classes/${classId}/teaching?success=schedule_created`);
 }
@@ -170,18 +146,11 @@ export async function updateClassScheduleAction(
 
   const parsed = validateScheduleInput(parseScheduleFields(formData), {
     classStatus: classRow.status,
+    termStart: classRow.term_start_date,
+    termEnd: classRow.term_end_date,
   });
   if (!parsed.ok || !parsed.data) {
     return { error: "save_error", fieldErrors: parsed.fieldErrors, values: formDataToValues(formData) };
-  }
-
-  if (parsed.data.roomId) {
-    const room = await assertRoomInOrg(parsed.data.roomId, user.organizationId);
-    if (!room) return { error: "invalid_room" };
-  }
-  if (parsed.data.teacherId) {
-    const teacher = await assertTeacherInOrg(parsed.data.teacherId, user.organizationId);
-    if (!teacher) return { error: "invalid_teacher" };
   }
 
   const supabase = await createClient();
@@ -193,21 +162,18 @@ export async function updateClassScheduleAction(
     .maybeSingle();
   if (!existing) return { error: "not_found" };
 
-  const { error } = await supabase
-    .from("class_schedule")
-    .update({
-      weekday_code: parsed.data.weekdayCode,
-      start_time: parsed.data.startTime,
-      end_time: parsed.data.endTime,
-      effective_from: parsed.data.effectiveFrom,
-      effective_to: parsed.data.effectiveTo,
-      room_id: parsed.data.roomId,
-      teacher_id: parsed.data.teacherId,
-      updated_by: user.appUserId,
-    })
-    .eq("id", scheduleId);
+  const { error } = await supabase.rpc("update_class_schedule", {
+    p_schedule_id: scheduleId,
+    p_weekday_code: parsed.data.weekdayCode,
+    p_start_time: parsed.data.startTime,
+    p_end_time: parsed.data.endTime,
+    p_effective_from: parsed.data.effectiveFrom,
+    p_effective_to: parsed.data.effectiveTo ?? undefined,
+    p_room_id: parsed.data.roomId ?? undefined,
+    p_teacher_id: parsed.data.teacherId ?? undefined,
+  });
 
-  if (error) return { error: "save_error" };
+  if (error) return { error: mapTeachingRpcError(error) };
   revalidateTeaching(classId);
   redirect(`/classes/${classId}/teaching?success=schedule_updated`);
 }
@@ -227,13 +193,11 @@ export async function endClassScheduleAction(
   if (!classRow) return { error: "invalid_class" };
 
   const supabase = await createClient();
-  const { error } = await supabase
-    .from("class_schedule")
-    .update({ status: "ended", updated_by: user.appUserId })
-    .eq("id", scheduleId)
-    .eq("class_id", classId);
+  const { error } = await supabase.rpc("end_class_schedule", {
+    p_schedule_id: scheduleId,
+  });
 
-  if (error) return { error: "save_error" };
+  if (error) return { error: mapTeachingRpcError(error) };
   revalidateTeaching(classId);
   redirect(`/classes/${classId}/teaching?success=schedule_ended`);
 }
@@ -251,33 +215,29 @@ export async function createTeacherAssignmentAction(
   const classRow = await assertClassInOrg(classId, user.organizationId);
   if (!classRow) return { error: "invalid_class" };
 
-  const parsed = validateTeacherAssignmentInput({
-    teacherId: String(formData.get("teacherId") ?? ""),
-    roleCode: String(formData.get("roleCode") ?? "primary") as TeacherAssignmentFormValues["roleCode"],
-    effectiveFrom: String(formData.get("effectiveFrom") ?? ""),
-    effectiveTo: String(formData.get("effectiveTo") ?? ""),
-  });
+  const parsed = validateTeacherAssignmentInput(
+    {
+      teacherId: String(formData.get("teacherId") ?? ""),
+      roleCode: String(formData.get("roleCode") ?? "primary") as TeacherAssignmentFormValues["roleCode"],
+      effectiveFrom: String(formData.get("effectiveFrom") ?? ""),
+      effectiveTo: String(formData.get("effectiveTo") ?? ""),
+    },
+    { classStatus: classRow.status },
+  );
   if (!parsed.ok || !parsed.data) {
     return { error: "save_error", fieldErrors: parsed.fieldErrors, values: formDataToValues(formData) };
   }
 
-  const teacher = await assertTeacherInOrg(parsed.data.teacherId, user.organizationId);
-  if (!teacher) return { error: "invalid_teacher" };
-
   const supabase = await createClient();
-  const { error } = await supabase.from("class_teacher_assignment").insert({
-    organization_id: user.organizationId,
-    class_id: classId,
-    teacher_id: parsed.data.teacherId,
-    role_code: parsed.data.roleCode,
-    effective_from: parsed.data.effectiveFrom,
-    effective_to: parsed.data.effectiveTo,
-    status: "active",
-    created_by: user.appUserId,
-    updated_by: user.appUserId,
+  const { error } = await supabase.rpc("create_class_teacher_assignment", {
+    p_class_id: classId,
+    p_teacher_id: parsed.data.teacherId,
+    p_role_code: parsed.data.roleCode,
+    p_effective_from: parsed.data.effectiveFrom,
+    p_effective_to: parsed.data.effectiveTo ?? undefined,
   });
 
-  if (error) return { error: "save_error" };
+  if (error) return { error: mapTeachingRpcError(error) };
   revalidateTeaching(classId);
   redirect(`/classes/${classId}/teaching?success=teacher_assigned`);
 }
@@ -298,17 +258,12 @@ export async function endTeacherAssignmentAction(
   if (!classRow) return { error: "invalid_class" };
 
   const supabase = await createClient();
-  const { error } = await supabase
-    .from("class_teacher_assignment")
-    .update({
-      status: "ended",
-      effective_to: effectiveTo || new Date().toISOString().slice(0, 10),
-      updated_by: user.appUserId,
-    })
-    .eq("id", assignmentId)
-    .eq("class_id", classId);
+  const { error } = await supabase.rpc("end_class_teacher_assignment", {
+    p_assignment_id: assignmentId,
+    p_effective_to: effectiveTo || new Date().toISOString().slice(0, 10),
+  });
 
-  if (error) return { error: "save_error" };
+  if (error) return { error: mapTeachingRpcError(error) };
   revalidateTeaching(classId);
   redirect(`/classes/${classId}/teaching?success=teacher_ended`);
 }

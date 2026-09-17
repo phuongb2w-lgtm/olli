@@ -42,8 +42,17 @@ export function ScheduleForm({ classId, classCapacity, teachers, rooms, schedule
       {state.error === "class_closed" ? (
         <p className="text-sm text-red-700">{t("classClosed")}</p>
       ) : null}
-      {state.error === "invalid_room" ? (
+      {state.error === "invalid_schedule_range" ? (
+        <p className="text-sm text-red-700">{t("invalidScheduleRange")}</p>
+      ) : null}
+      {state.error === "schedule_not_active" ? (
+        <p className="text-sm text-red-700">{t("scheduleNotActive")}</p>
+      ) : null}
+      {state.error === "invalid_room" || state.error === "room_inactive" ? (
         <p className="text-sm text-red-700">{t("invalidRoom")}</p>
+      ) : null}
+      {state.error === "invalid_teacher" ? (
+        <p className="text-sm text-red-700">{t("invalidTeacher")}</p>
       ) : null}
       {state.error === "save_error" && !state.fieldErrors ? (
         <p className="text-sm text-red-700">{t("saveError")}</p>

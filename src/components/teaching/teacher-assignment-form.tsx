@@ -31,6 +31,15 @@ export function TeacherAssignmentForm({ classId, teachers }: Props) {
       {state.error === "invalid_teacher" ? (
         <p className="text-sm text-red-700">{t("invalidTeacher")}</p>
       ) : null}
+      {state.error === "class_closed" ? (
+        <p className="text-sm text-red-700">{t("classClosedAssignment")}</p>
+      ) : null}
+      {state.error === "invalid_assignment_range" ? (
+        <p className="text-sm text-red-700">{t("invalidAssignmentRange")}</p>
+      ) : null}
+      {state.error === "duplicate_assignment" ? (
+        <p className="text-sm text-red-700">{t("duplicateAssignment")}</p>
+      ) : null}
       {state.error === "save_error" && !state.fieldErrors ? (
         <p className="text-sm text-red-700">{t("saveError")}</p>
       ) : null}

@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -5108,6 +5108,14 @@ export type Database = {
         }
         Returns: Json
       }
+      _assert_class_open_for_teaching_create: {
+        Args: { p_class: Database["public"]["Tables"]["class"]["Row"] }
+        Returns: undefined
+      }
+      _assert_teaching_write_permission: {
+        Args: { p_mode: string }
+        Returns: undefined
+      }
       _build_payment_details: { Args: { p_payment_id: string }; Returns: Json }
       _cb_as_anon: { Args: never; Returns: undefined }
       _cb_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
@@ -5151,6 +5159,29 @@ export type Database = {
       _insert_payment_allocations: {
         Args: { p_allocations: Json; p_batch_id?: string; p_payment_id: string }
         Returns: Json
+      }
+      _load_class_for_teaching_mutation: {
+        Args: { p_class_id: string }
+        Returns: {
+          capacity: number | null
+          course_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          organization_id: string
+          status: string
+          term_end_date: string | null
+          term_start_date: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "class"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       _loc_as_anon: { Args: never; Returns: undefined }
       _loc_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
@@ -5240,8 +5271,29 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _validate_active_room_reference: {
+        Args: { p_org_id: string; p_room_id: string }
+        Returns: undefined
+      }
+      _validate_active_teacher_reference: {
+        Args: { p_org_id: string; p_teacher_id: string }
+        Returns: undefined
+      }
+      _validate_assignment_effective_range: {
+        Args: { p_effective_from: string; p_effective_to: string }
+        Returns: undefined
+      }
       _validate_lead_catalog_refs: {
         Args: { p_campaign_id: string; p_org_id: string; p_source_id: string }
+        Returns: undefined
+      }
+      _validate_schedule_effective_range: {
+        Args: {
+          p_effective_from: string
+          p_effective_to: string
+          p_term_end: string
+          p_term_start: string
+        }
         Returns: undefined
       }
       _weekday_code_to_dow: {
@@ -5462,6 +5514,29 @@ export type Database = {
         }
         Returns: string
       }
+      create_class_schedule: {
+        Args: {
+          p_class_id: string
+          p_effective_from: string
+          p_effective_to?: string
+          p_end_time: string
+          p_room_id?: string
+          p_start_time: string
+          p_teacher_id?: string
+          p_weekday_code: string
+        }
+        Returns: string
+      }
+      create_class_teacher_assignment: {
+        Args: {
+          p_class_id: string
+          p_effective_from: string
+          p_effective_to?: string
+          p_role_code: string
+          p_teacher_id: string
+        }
+        Returns: string
+      }
       create_cost_allocation_rule: {
         Args: {
           p_allocation_basis_code: string
@@ -5518,6 +5593,14 @@ export type Database = {
       }
       current_app_user_id: { Args: never; Returns: string }
       current_organization_id: { Args: never; Returns: string }
+      end_class_schedule: {
+        Args: { p_effective_to?: string; p_schedule_id: string }
+        Returns: string
+      }
+      end_class_teacher_assignment: {
+        Args: { p_assignment_id: string; p_effective_to?: string }
+        Returns: string
+      }
       end_cost_allocation_rule: {
         Args: { p_effective_to: string; p_rule_id: string }
         Returns: string
@@ -5963,6 +6046,28 @@ export type Database = {
           p_scenario_id: string
           p_scenario_name?: string
           p_staff_compensation_rule_id?: string
+        }
+        Returns: string
+      }
+      update_class_schedule: {
+        Args: {
+          p_effective_from: string
+          p_effective_to?: string
+          p_end_time: string
+          p_room_id?: string
+          p_schedule_id: string
+          p_start_time: string
+          p_teacher_id?: string
+          p_weekday_code: string
+        }
+        Returns: string
+      }
+      update_class_teacher_assignment: {
+        Args: {
+          p_assignment_id: string
+          p_effective_from: string
+          p_effective_to?: string
+          p_role_code: string
         }
         Returns: string
       }

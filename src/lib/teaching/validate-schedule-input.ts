@@ -90,6 +90,16 @@ export function validateScheduleInput(
     };
   }
 
+  if (effectiveFrom && options?.termStart && effectiveFrom < options.termStart) {
+    fieldErrors.effectiveFrom = "outsideClassTerm";
+  }
+  if (effectiveFrom && options?.termEnd && effectiveFrom > options.termEnd) {
+    fieldErrors.effectiveFrom = "outsideClassTerm";
+  }
+  if (effectiveTo && options?.termEnd && effectiveTo > options.termEnd) {
+    fieldErrors.effectiveTo = "outsideClassTerm";
+  }
+
   return {
     ok: Object.keys(fieldErrors).length === 0,
     fieldErrors,

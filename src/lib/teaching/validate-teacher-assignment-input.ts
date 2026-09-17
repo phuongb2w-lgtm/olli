@@ -19,7 +19,10 @@ export type TeacherAssignmentFormValues = {
   effectiveTo: string;
 };
 
-export function validateTeacherAssignmentInput(input: Partial<TeacherAssignmentFormValues>) {
+export function validateTeacherAssignmentInput(
+  input: Partial<TeacherAssignmentFormValues>,
+  options?: { classStatus?: "planned" | "trial" | "active" | "closed" },
+) {
   const fieldErrors: Partial<Record<keyof TeacherAssignmentFormValues, string>> = {};
   const teacherId = (input.teacherId ?? "").trim();
   const roleRaw = (input.roleCode ?? "primary").trim() as TeacherAssignmentRole;
@@ -43,6 +46,14 @@ export function validateTeacherAssignmentInput(input: Partial<TeacherAssignmentF
         fieldErrors.effectiveTo = "beforeStart";
       }
     }
+  }
+
+  if (options?.classStatus === "closed") {
+    return {
+      ok: false,
+      fieldErrors: { ...fieldErrors, effectiveFrom: "classClosed" },
+      data: null as null,
+    };
   }
 
   return {

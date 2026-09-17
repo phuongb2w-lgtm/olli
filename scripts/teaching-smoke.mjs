@@ -1472,6 +1472,102 @@ async function main() {
     !xferErr && Boolean(xferNewId),
   );
 
+  // M4-T03 timetable and assignment integrity (61-65)
+  const rpcCourseId = await createCourse(admin, "m4t3-rpc");
+  const rpcClass = await createClass(admin, rpcCourseId, "M4T3Rpc");
+  const rpcTeacherId = await createTeacher(admin, "RpcTeacher");
+  const rpcRoom = await createRoom(admin, "RpcRoom");
+
+  const { data: rpcScheduleId, error: rpcScheduleErr } = await admin.rpc("create_class_schedule", {
+    p_class_id: rpcClass.id,
+    p_weekday_code: "thu",
+    p_start_time: "14:00:00",
+    p_end_time: "15:30:00",
+    p_effective_from: "2028-09-01",
+    p_effective_to: null,
+    p_room_id: rpcRoom.id,
+    p_teacher_id: rpcTeacherId,
+  });
+  record(
+    61,
+    "create_class_schedule RPC creates valid timetable",
+    !rpcScheduleErr && Boolean(rpcScheduleId),
+  );
+
+  const { error: rpcEndScheduleErr } = await admin.rpc("end_class_schedule", {
+    p_schedule_id: rpcScheduleId,
+  });
+  const { data: endedSchedule } = await admin
+    .from("class_schedule")
+    .select("status")
+    .eq("id", rpcScheduleId)
+    .single();
+  const { error: rpcUpdateEndedErr } = await admin.rpc("update_class_schedule", {
+    p_schedule_id: rpcScheduleId,
+    p_weekday_code: "thu",
+    p_start_time: "15:00:00",
+    p_end_time: "16:00:00",
+    p_effective_from: "2028-09-01",
+    p_effective_to: null,
+    p_room_id: rpcRoom.id,
+    p_teacher_id: rpcTeacherId,
+  });
+  record(
+    62,
+    "end_class_schedule RPC ends timetable and blocks update",
+    !rpcEndScheduleErr &&
+      endedSchedule?.status === "ended" &&
+      Boolean(rpcUpdateEndedErr) &&
+      (rpcUpdateEndedErr.message ?? "").includes("schedule_not_active"),
+  );
+
+  const { data: rpcAssignmentId, error: rpcAssignErr } = await admin.rpc(
+    "create_class_teacher_assignment",
+    {
+      p_class_id: rpcClass.id,
+      p_teacher_id: rpcTeacherId,
+      p_role_code: "assistant",
+      p_effective_from: "2028-09-01",
+      p_effective_to: null,
+    },
+  );
+  record(
+    63,
+    "create_class_teacher_assignment RPC creates valid assignment",
+    !rpcAssignErr && Boolean(rpcAssignmentId),
+  );
+
+  const { error: rpcDupAssignErr } = await admin.rpc("create_class_teacher_assignment", {
+    p_class_id: rpcClass.id,
+    p_teacher_id: rpcTeacherId,
+    p_role_code: "assistant",
+    p_effective_from: "2028-09-01",
+    p_effective_to: null,
+  });
+  record(
+    64,
+    "duplicate class teacher assignment rejected",
+    Boolean(rpcDupAssignErr) && (rpcDupAssignErr.message ?? "").includes("duplicate_assignment"),
+  );
+
+  const m4ClosedCourseId = await createCourse(admin, "m4t3-closed");
+  const m4ClosedClass = await createClass(admin, m4ClosedCourseId, "M4T3Closed", { status: "closed" });
+  const { error: closedScheduleErr } = await admin.rpc("create_class_schedule", {
+    p_class_id: m4ClosedClass.id,
+    p_weekday_code: "fri",
+    p_start_time: "09:00:00",
+    p_end_time: "10:00:00",
+    p_effective_from: "2028-09-01",
+    p_effective_to: null,
+    p_room_id: null,
+    p_teacher_id: null,
+  });
+  record(
+    65,
+    "closed class rejects new timetable via RPC",
+    Boolean(closedScheduleErr) && (closedScheduleErr.message ?? "").includes("invalid_class_state"),
+  );
+
   const failed = results.filter((r) => !r.passed);
   console.log(`\nM1-T07 teaching smoke: ${results.length - failed.length}/${results.length} PASS`);
   if (failed.length > 0) {
