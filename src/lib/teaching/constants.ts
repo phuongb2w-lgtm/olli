@@ -16,6 +16,12 @@ export type TeacherAssignmentRole = (typeof TEACHER_ASSIGNMENT_ROLES)[number];
 export const ROOM_STATUSES = ["active", "inactive"] as const;
 export type RoomStatus = (typeof ROOM_STATUSES)[number];
 
+export const UNAVAILABILITY_BLOCK_TYPES = ["recurring", "one_off"] as const;
+export type UnavailabilityBlockType = (typeof UNAVAILABILITY_BLOCK_TYPES)[number];
+
+export const UNAVAILABILITY_STATUSES = ["active", "ended"] as const;
+export type UnavailabilityStatus = (typeof UNAVAILABILITY_STATUSES)[number];
+
 export const TEACHER_ELIGIBLE_STATUSES = ["active"] as const;
 
 /** Maximum inclusive generation span in days (application guard). */

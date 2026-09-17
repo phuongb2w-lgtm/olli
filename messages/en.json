@@ -727,6 +727,7 @@
     "roomName": "Room name",
     "roomCode": "Room code",
     "roomCapacity": "Capacity",
+    "roomNotes": "Notes",
     "weekday": "Weekday",
     "startTime": "Start time",
     "endTime": "End time",

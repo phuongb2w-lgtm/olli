@@ -727,6 +727,7 @@
     "roomName": "Tên phòng",
     "roomCode": "Mã phòng",
     "roomCapacity": "Sức chứa",
+    "roomNotes": "Ghi chú",
     "weekday": "Thứ",
     "startTime": "Giờ bắt đầu",
     "endTime": "Giờ kết thúc",

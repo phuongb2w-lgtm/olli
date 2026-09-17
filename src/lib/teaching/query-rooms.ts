@@ -6,13 +6,14 @@ export type RoomListItem = {
   name: string;
   code: string | null;
   capacity: number | null;
+  notes: string | null;
   status: RoomStatus;
 };
 
 export async function fetchRoomList(supabase: SupabaseClient): Promise<RoomListItem[]> {
   const { data, error } = await supabase
     .from("room")
-    .select("id, name, code, capacity, status")
+    .select("id, name, code, capacity, notes, status")
     .order("name");
   if (error || !data) return [];
   return data.map((row) => ({
@@ -20,6 +21,7 @@ export async function fetchRoomList(supabase: SupabaseClient): Promise<RoomListI
     name: row.name,
     code: row.code,
     capacity: row.capacity,
+    notes: row.notes ?? null,
     status: row.status as RoomStatus,
   }));
 }
@@ -30,7 +32,7 @@ export async function fetchRoomById(
 ): Promise<RoomListItem | null> {
   const { data, error } = await supabase
     .from("room")
-    .select("id, name, code, capacity, status")
+    .select("id, name, code, capacity, notes, status")
     .eq("id", roomId)
     .maybeSingle();
   if (error || !data) return null;
@@ -39,6 +41,7 @@ export async function fetchRoomById(
     name: data.name,
     code: data.code,
     capacity: data.capacity,
+    notes: data.notes ?? null,
     status: data.status as RoomStatus,
   };
 }

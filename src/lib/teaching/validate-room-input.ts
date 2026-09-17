@@ -4,6 +4,7 @@ export type RoomFormValues = {
   name: string;
   code: string;
   capacity: string;
+  notes: string;
   status: RoomStatus;
 };
 
@@ -12,12 +13,14 @@ export function validateRoomInput(input: Partial<RoomFormValues>) {
   const name = (input.name ?? "").trim();
   const code = (input.code ?? "").trim();
   const capacityRaw = (input.capacity ?? "").trim();
+  const notes = (input.notes ?? "").trim();
   const statusRaw = (input.status ?? "active").trim() as RoomStatus;
 
   if (!name) fieldErrors.name = "required";
   if (name.length > 200) fieldErrors.name = "tooLong";
 
   if (code.length > 50) fieldErrors.code = "tooLong";
+  if (notes.length > 500) fieldErrors.notes = "tooLong";
 
   let capacity: number | null = null;
   if (capacityRaw) {
@@ -35,6 +38,7 @@ export function validateRoomInput(input: Partial<RoomFormValues>) {
       name,
       code: code || null,
       capacity,
+      notes: notes || null,
       status: statusRaw,
     },
   };

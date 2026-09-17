@@ -4080,6 +4080,7 @@ export type Database = {
           created_by: string | null
           id: string
           name: string
+          notes: string | null
           organization_id: string
           status: string
           updated_at: string
@@ -4092,6 +4093,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           name: string
+          notes?: string | null
           organization_id: string
           status?: string
           updated_at?: string
@@ -4104,6 +4106,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           name?: string
+          notes?: string | null
           organization_id?: string
           status?: string
           updated_at?: string
@@ -4506,6 +4509,95 @@ export type Database = {
           },
           {
             foreignKeyName: "teacher_observation_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      teacher_unavailability: {
+        Row: {
+          block_type: string
+          created_at: string
+          created_by: string | null
+          effective_from: string | null
+          effective_to: string | null
+          end_time: string | null
+          ends_at: string | null
+          id: string
+          organization_id: string
+          reason: string | null
+          start_time: string | null
+          starts_at: string | null
+          status: string
+          teacher_id: string
+          updated_at: string
+          updated_by: string | null
+          weekday_code: string | null
+        }
+        Insert: {
+          block_type: string
+          created_at?: string
+          created_by?: string | null
+          effective_from?: string | null
+          effective_to?: string | null
+          end_time?: string | null
+          ends_at?: string | null
+          id?: string
+          organization_id: string
+          reason?: string | null
+          start_time?: string | null
+          starts_at?: string | null
+          status?: string
+          teacher_id: string
+          updated_at?: string
+          updated_by?: string | null
+          weekday_code?: string | null
+        }
+        Update: {
+          block_type?: string
+          created_at?: string
+          created_by?: string | null
+          effective_from?: string | null
+          effective_to?: string | null
+          end_time?: string | null
+          ends_at?: string | null
+          id?: string
+          organization_id?: string
+          reason?: string | null
+          start_time?: string | null
+          starts_at?: string | null
+          status?: string
+          teacher_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          weekday_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_unavailability_created_by_fk"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "teacher_unavailability_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_unavailability_organization_id_teacher_id_fkey"
+            columns: ["organization_id", "teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teacher"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "teacher_unavailability_updated_by_fk"
             columns: ["organization_id", "updated_by"]
             isOneToOne: false
             referencedRelation: "app_user"
@@ -5151,6 +5243,10 @@ export type Database = {
       _validate_lead_catalog_refs: {
         Args: { p_campaign_id: string; p_org_id: string; p_source_id: string }
         Returns: undefined
+      }
+      _weekday_code_to_dow: {
+        Args: { p_weekday_code: string }
+        Returns: number
       }
       activate_enrollment_financial_terms: {
         Args: { p_terms_id: string }
@@ -5816,6 +5912,14 @@ export type Database = {
           p_student_id?: string
         }
         Returns: Json
+      }
+      teacher_has_unavailability: {
+        Args: {
+          p_range_end: string
+          p_range_start: string
+          p_teacher_id: string
+        }
+        Returns: boolean
       }
       transfer_enrollment: {
         Args: {

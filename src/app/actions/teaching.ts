@@ -446,6 +446,7 @@ export async function createRoomAction(
     name: String(formData.get("name") ?? ""),
     code: String(formData.get("code") ?? ""),
     capacity: String(formData.get("capacity") ?? ""),
+    notes: String(formData.get("notes") ?? ""),
     status: String(formData.get("status") ?? "active") as RoomFormValues["status"],
   });
   if (!parsed.ok || !parsed.data) {
@@ -458,6 +459,7 @@ export async function createRoomAction(
     name: parsed.data.name,
     code: parsed.data.code,
     capacity: parsed.data.capacity,
+    notes: parsed.data.notes,
     status: parsed.data.status,
     created_by: user.appUserId,
     updated_by: user.appUserId,
@@ -482,6 +484,7 @@ export async function updateRoomAction(
     name: String(formData.get("name") ?? ""),
     code: String(formData.get("code") ?? ""),
     capacity: String(formData.get("capacity") ?? ""),
+    notes: String(formData.get("notes") ?? ""),
     status: String(formData.get("status") ?? "active") as RoomFormValues["status"],
   });
   if (!parsed.ok || !parsed.data) {
@@ -502,6 +505,7 @@ export async function updateRoomAction(
       name: parsed.data.name,
       code: parsed.data.code,
       capacity: parsed.data.capacity,
+      notes: parsed.data.notes,
       status: parsed.data.status,
       updated_by: user.appUserId,
     })
