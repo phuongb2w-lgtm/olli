@@ -26,6 +26,7 @@
     "admissions": "Tuyển sinh",
     "students": "Học viên",
     "classes": "Lớp học",
+    "operations": "Vận hành",
     "teachers": "Giáo viên",
     "finance": "Tài chính",
     "reports": "Báo cáo",
@@ -712,6 +713,36 @@
       "status_change": "Thay đổi trạng thái",
       "follow_up": "Hoàn thành theo dõi",
       "other": "Khác"
+    }
+  },
+  "operations": {
+    "title": "Vận hành",
+    "subtitle": "Lịch trung tâm cho hôm nay và các ngày tới.",
+    "dateFrom": "Từ ngày",
+    "dateTo": "Đến ngày",
+    "today": "Hôm nay",
+    "apply": "Áp dụng",
+    "classFilter": "Lớp",
+    "teacherFilter": "Giáo viên",
+    "roomFilter": "Phòng",
+    "allClasses": "Tất cả lớp",
+    "allTeachers": "Tất cả giáo viên",
+    "allRooms": "Tất cả phòng",
+    "empty": "Không có lịch trong khoảng thời gian này.",
+    "emptyValue": "—",
+    "noRoom": "Chưa có phòng",
+    "teacherUnresolved": "Chưa phân công giáo viên",
+    "teacherAmbiguous": "Phân công giáo viên chưa rõ",
+    "denied": "Bạn không có quyền xem vận hành.",
+    "loadError": "Không tải được lịch.",
+    "invalidRange": "Chọn khoảng ngày hợp lệ.",
+    "rangeTooLarge": "Khoảng ngày không được vượt quá 90 ngày.",
+    "status": {
+      "planned": "Dự kiến",
+      "sessionCreated": "Đã tạo buổi",
+      "cancelled": "Đã hủy",
+      "completed": "Đã hoàn thành",
+      "inProgress": "Đang diễn ra"
     }
   },
   "teaching": {

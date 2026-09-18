@@ -26,6 +26,7 @@
     "admissions": "Admissions",
     "students": "Students",
     "classes": "Classes",
+    "operations": "Operations",
     "teachers": "Teachers",
     "finance": "Finance",
     "reports": "Reports",
@@ -712,6 +713,36 @@
       "status_change": "Status change",
       "follow_up": "Follow-up completed",
       "other": "Other"
+    }
+  },
+  "operations": {
+    "title": "Operations",
+    "subtitle": "Center-wide schedule for today and upcoming days.",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "today": "Today",
+    "apply": "Apply",
+    "classFilter": "Class",
+    "teacherFilter": "Teacher",
+    "roomFilter": "Room",
+    "allClasses": "All classes",
+    "allTeachers": "All teachers",
+    "allRooms": "All rooms",
+    "empty": "Nothing scheduled in this range.",
+    "emptyValue": "—",
+    "noRoom": "No room",
+    "teacherUnresolved": "Teacher not assigned",
+    "teacherAmbiguous": "Teacher assignment unclear",
+    "denied": "You do not have permission to view operations.",
+    "loadError": "Unable to load the schedule.",
+    "invalidRange": "Choose a valid date range.",
+    "rangeTooLarge": "Date range cannot exceed 90 days.",
+    "status": {
+      "planned": "Planned",
+      "sessionCreated": "Session created",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "inProgress": "In progress"
     }
   },
   "teaching": {

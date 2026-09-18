@@ -5862,6 +5862,22 @@ export type Database = {
           class_status: string
         }[]
       }
+      list_operational_calendar: {
+        Args: {
+          p_class_id?: string
+          p_date_from: string
+          p_date_to: string
+          p_room_id?: string
+          p_teacher_id?: string
+        }
+        Returns: Database["public"]["CompositeTypes"]["operational_calendar_entry"][]
+        SetofOptions: {
+          from: "*"
+          to: "operational_calendar_entry"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       list_trial_teaching_sessions: {
         Args: { p_class_id: string }
         Returns: {
@@ -6227,6 +6243,23 @@ export type Database = {
       [_ in never]: never
     }
     CompositeTypes: {
+      operational_calendar_entry: {
+        entry_type: string | null
+        occurrence_date: string | null
+        starts_at: string | null
+        ends_at: string | null
+        class_id: string | null
+        class_name: string | null
+        class_schedule_id: string | null
+        teaching_session_id: string | null
+        session_status: string | null
+        teacher_id: string | null
+        teacher_resolution_status: string | null
+        teacher_display_name: string | null
+        room_id: string | null
+        room_name: string | null
+        room_code: string | null
+      }
       schedule_conflict_entry: {
         conflict_type: string | null
         occurrence_date: string | null
