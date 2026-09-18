@@ -75,6 +75,7 @@ async function main() {
 
   const admin = await signIn("org-a-admin@olli.local");
   const staff = await signIn("org-a-staff@olli.local");
+  const reader = await signIn("org-a-reader@olli.local");
 
   // 3: admin list_my_permissions includes executive
   const { data: adminPerms, error: adminPermErr } = await admin.rpc("list_my_permissions");
@@ -174,6 +175,46 @@ async function main() {
     11,
     "scheduled status is not delivered",
     isDelivered === false,
+  );
+
+  // 12–14: M5-T02 finance intelligence RPCs
+  const { data: overview, error: overviewErr } = await admin.rpc(
+    "get_finance_intelligence_overview",
+    {
+      p_start_date: "2026-01-01",
+      p_end_date: "2026-01-31",
+      p_compare_previous: true,
+    },
+  );
+  record(
+    12,
+    "finance intelligence overview callable",
+    !overviewErr && overview?.cash_collected?.current != null,
+    overviewErr?.message ?? "",
+  );
+
+  const { data: receivables, error: recErr } = await admin.rpc("sum_canonical_receivables");
+  record(
+    13,
+    "canonical receivables RPC callable",
+    !recErr && receivables?.total_outstanding != null,
+    recErr?.message ?? "",
+  );
+
+  const { error: readerOverviewErr } = await reader.rpc(
+    "get_finance_intelligence_overview",
+    {
+      p_start_date: "2026-01-01",
+      p_end_date: "2026-01-31",
+      p_compare_previous: false,
+    },
+  );
+  record(
+    14,
+    "reader without finance permission denied finance overview",
+    readerOverviewErr?.code === "42501" ||
+      readerOverviewErr?.message?.includes("permission"),
+    readerOverviewErr?.message ?? "",
   );
 
   const failed = results.filter((r) => !r.passed);

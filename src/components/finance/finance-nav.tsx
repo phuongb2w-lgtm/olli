@@ -6,9 +6,12 @@ import { useTranslations } from "next-intl";
 
 const items = [
   { key: "overview", href: "/finance" },
+  { key: "cashRevenue", href: "/finance/cash-revenue" },
+  { key: "receivables", href: "/finance/receivables" },
   { key: "payments", href: "/finance/payments" },
   { key: "costs", href: "/finance/costs" },
   { key: "classEconomics", href: "/finance/class-economics" },
+  { key: "consultantRevenue", href: "/finance/consultant-revenue" },
   { key: "simulator", href: "/finance/simulator" },
 ] as const;
 

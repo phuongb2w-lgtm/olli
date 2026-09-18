@@ -26,7 +26,8 @@ test.describe("M2-T10 finance UI", () => {
     await signIn(page, adminEmail);
     await page.goto("/finance");
     await expect(page.getByText(/recognized revenue|doanh thu đã ghi nhận/i)).toBeVisible();
-    await expect(page.getByText(/outstanding receivable|phải thu còn lại/i)).toBeVisible();
+    await expect(page.getByText(/outstanding tuition|học phí còn nợ/i)).toBeVisible();
+    await expect(page.getByText(/cash collected|tiền mặt đã thu/i)).toBeVisible();
   });
 
   test("3. enrollment summary distinguishes finance metrics labels", async ({ page }) => {
@@ -140,5 +141,28 @@ test.describe("M2-T10 finance UI", () => {
     await expect(
       page.getByText(/no payments recorded|chưa có thanh toán/i).or(page.locator("table tbody tr").first()),
     ).toBeVisible({ timeout: 10000 });
+  });
+
+  test("19. cash and revenue drill-down page renders", async ({ page }) => {
+    await signIn(page, adminEmail);
+    await page.goto("/finance/cash-revenue");
+    await expect(
+      page.getByRole("heading", { name: /cash & recognized revenue|tiền mặt & doanh thu đã ghi nhận/i }),
+    ).toBeVisible();
+  });
+
+  test("20. receivables page renders", async ({ page }) => {
+    await signIn(page, adminEmail);
+    await page.goto("/finance/receivables");
+    await expect(
+      page.getByRole("heading", { name: /outstanding tuition|học phí còn nợ/i }),
+    ).toBeVisible();
+  });
+
+  test("21. finance overview period filter renders", async ({ page }) => {
+    await signIn(page, adminEmail);
+    await page.goto("/finance");
+    await expect(page.locator('input[name="start"]')).toBeVisible();
+    await expect(page.locator('input[name="end"]')).toBeVisible();
   });
 });

@@ -11,9 +11,11 @@ export default async function FinanceLayout({
   const hasAnyFinance =
     (await can("charge.read")) ||
     (await can("payment.read")) ||
+    (await can("revenue.read")) ||
     (await can("expense.read")) ||
     (await can("class_economics.read")) ||
-    (await can("class_simulation.read"));
+    (await can("class_simulation.read")) ||
+    (await can("consultant_revenue.review"));
 
   if (!hasAnyFinance) {
     return (

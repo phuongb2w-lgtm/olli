@@ -5330,6 +5330,7 @@ export type Database = {
         Args: { p_class: Database["public"]["Tables"]["class"]["Row"] }
         Returns: undefined
       }
+      _assert_finance_intelligence_access: { Args: never; Returns: undefined }
       _assert_no_schedule_conflicts: {
         Args: {
           p_class_id: string
@@ -5523,6 +5524,16 @@ export type Database = {
       }
       _m3_tr_record: {
         Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m5_t02_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m5_t02_as_super: { Args: never; Returns: undefined }
+      _m5_t02_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m5_t02_seed_auth_user: {
+        Args: { p_auth: string; p_email: string }
         Returns: undefined
       }
       _payment_allocation_status: {
@@ -6066,6 +6077,10 @@ export type Database = {
         Args: { p_scenario_id: string }
         Returns: Json
       }
+      get_consultant_declaration_summary: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
       get_crm_attribution_report: {
         Args: { p_end_date: string; p_start_date: string }
         Returns: Json
@@ -6079,6 +6094,22 @@ export type Database = {
         Returns: Json
       }
       get_executive_reporting_access: { Args: never; Returns: Json }
+      get_finance_cash_by_method: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json[]
+      }
+      get_finance_intelligence_overview: {
+        Args: {
+          p_compare_previous?: boolean
+          p_end_date: string
+          p_start_date: string
+        }
+        Returns: Json
+      }
+      get_finance_period_costs: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
       get_lead_identity_resolution_status: {
         Args: { p_lead_id: string }
         Returns: Json
@@ -6189,6 +6220,46 @@ export type Database = {
           class_name: string
           class_status: string
         }[]
+      }
+      list_finance_cash_payments: {
+        Args: {
+          p_end_date: string
+          p_limit?: number
+          p_offset?: number
+          p_start_date: string
+        }
+        Returns: Json[]
+      }
+      list_finance_class_economics_summary: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json[]
+      }
+      list_finance_consultant_declarations: {
+        Args: {
+          p_end_date: string
+          p_limit?: number
+          p_offset?: number
+          p_start_date: string
+          p_status?: string
+        }
+        Returns: Json[]
+      }
+      list_finance_exceptions: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json[]
+      }
+      list_finance_receivables: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: Json[]
+      }
+      list_finance_recognition_events: {
+        Args: {
+          p_end_date: string
+          p_limit?: number
+          p_offset?: number
+          p_start_date: string
+        }
+        Returns: Json[]
       }
       list_my_permissions: { Args: never; Returns: string[] }
       list_operational_calendar: {
@@ -6360,6 +6431,10 @@ export type Database = {
       resolve_enrollment_billing_guardian_id: {
         Args: { p_enrollment_id: string }
         Returns: string
+      }
+      resolve_finance_comparison_period: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
       }
       resolve_lead_candidate_identity: {
         Args: {
@@ -6540,6 +6615,8 @@ export type Database = {
         Args: { p_end_date: string; p_start_date: string }
         Returns: number
       }
+      sum_canonical_receivables: { Args: never; Returns: Json }
+      sum_organization_service_obligation: { Args: never; Returns: number }
       sum_pending_consultant_declarations: {
         Args: { p_end_date: string; p_start_date: string }
         Returns: number
