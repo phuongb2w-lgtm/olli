@@ -1,15 +1,16 @@
 import { useTranslations } from "next-intl";
-import { AppNav } from "@/components/app-nav";
+import { AppNav, type VisibleNavItem } from "@/components/app-nav";
 import { LanguageSwitch } from "@/components/language-switch";
 import { SignOutButton } from "@/components/sign-out-button";
 import type { AppUserContext } from "@/types/app-user";
 
 type Props = {
   appUser: AppUserContext;
+  navItems: VisibleNavItem[];
   children: React.ReactNode;
 };
 
-export function AppShell({ appUser, children }: Props) {
+export function AppShell({ appUser, navItems, children }: Props) {
   const t = useTranslations();
 
   return (
@@ -33,7 +34,7 @@ export function AppShell({ appUser, children }: Props) {
       </header>
 
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 md:grid-cols-[220px_1fr]">
-        <AppNav />
+        <AppNav items={navItems} />
 
         <main className="space-y-6">{children}</main>
       </div>

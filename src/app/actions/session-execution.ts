@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getCurrentAppUser } from "@/lib/auth/get-identity-state";
 import { can } from "@/lib/permissions/can";
+import { fetchOrganizationTimezone } from "@/lib/reporting/fetch-organization-timezone";
 import { createClient } from "@/lib/supabase/server";
 import {
   isEnrollmentEligibleOnSessionDate,
@@ -52,6 +53,19 @@ async function loadSession(classId: string, sessionId: string) {
     .maybeSingle();
   if (!data) return null;
   return data;
+}
+
+async function resolveLoadedSessionDate(session: {
+  occurrence_date: string | null;
+  scheduled_start_at: string;
+}): Promise<string> {
+  const supabase = await createClient();
+  const timezone = await fetchOrganizationTimezone(supabase);
+  return resolveSessionOccurrenceDate({
+    occurrenceDate: session.occurrence_date,
+    scheduledStartAt: session.scheduled_start_at,
+    timezone,
+  });
 }
 
 async function assertEnrollmentForSession(
@@ -208,10 +222,7 @@ export async function recordAttendanceAction(
   const session = await loadSession(classId, sessionId);
   if (!session) return { error: "not_found" };
 
-  const sessionDate = resolveSessionOccurrenceDate({
-    occurrenceDate: session.occurrence_date,
-    scheduledStartAt: session.scheduled_start_at,
-  });
+  const sessionDate = await resolveLoadedSessionDate(session);
 
   const enrollmentCheck = await assertEnrollmentForSession(
     enrollmentId,
@@ -372,10 +383,7 @@ export async function saveObservationAction(
   const session = await loadSession(classId, sessionId);
   if (!session) return { error: "not_found" };
 
-  const sessionDate = resolveSessionOccurrenceDate({
-    occurrenceDate: session.occurrence_date,
-    scheduledStartAt: session.scheduled_start_at,
-  });
+  const sessionDate = await resolveLoadedSessionDate(session);
 
   const enrollmentCheck = await assertEnrollmentForSession(
     enrollmentId,

@@ -196,9 +196,13 @@ function isEnrollmentVisibleForAssessmentResult(enrollment, assessmentDate) {
   return true;
 }
 
-function resolveSessionOccurrenceDate(session) {
-  if (session.occurrenceDate) return session.occurrenceDate;
-  return session.scheduledStartAt.slice(0, 10);
+function resolveSessionOccurrenceDate(session, timezone = "Asia/Ho_Chi_Minh") {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(session.scheduledStartAt));
 }
 
 function formatStudentName(row) {

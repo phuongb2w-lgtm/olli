@@ -1014,6 +1014,103 @@ export type Database = {
           },
         ]
       }
+      consultant_revenue_declaration: {
+        Row: {
+          approved_payment_id: string | null
+          consultant_user_id: string
+          created_at: string
+          currency_code: string
+          declaration_date: string
+          declared_amount: number
+          declared_at: string
+          description: string | null
+          id: string
+          organization_id: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["consultant_revenue_declaration_status"]
+          updated_at: string
+        }
+        Insert: {
+          approved_payment_id?: string | null
+          consultant_user_id: string
+          created_at?: string
+          currency_code?: string
+          declaration_date: string
+          declared_amount: number
+          declared_at?: string
+          description?: string | null
+          id?: string
+          organization_id: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["consultant_revenue_declaration_status"]
+          updated_at?: string
+        }
+        Update: {
+          approved_payment_id?: string | null
+          consultant_user_id?: string
+          created_at?: string
+          currency_code?: string
+          declaration_date?: string
+          declared_amount?: number
+          declared_at?: string
+          description?: string | null
+          id?: string
+          organization_id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["consultant_revenue_declaration_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultant_revenue_declaration_approved_payment_id_fkey"
+            columns: ["approved_payment_id"]
+            isOneToOne: false
+            referencedRelation: "payment"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultant_revenue_declaration_consultant_user_id_fkey"
+            columns: ["consultant_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultant_revenue_declaration_org_consultant_fk"
+            columns: ["organization_id", "consultant_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_revenue_declaration_org_reviewer_fk"
+            columns: ["organization_id", "reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_revenue_declaration_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultant_revenue_declaration_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cost_allocation_rule: {
         Row: {
           allocation_basis_code: string
@@ -5739,6 +5836,10 @@ export type Database = {
         }
         Returns: Json
       }
+      count_canonical_financial_revenue: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: number
+      }
       create_capital_asset: {
         Args: {
           p_category_code?: string
@@ -5849,6 +5950,14 @@ export type Database = {
       }
       current_app_user_id: { Args: never; Returns: string }
       current_organization_id: { Args: never; Returns: string }
+      declare_consultant_revenue: {
+        Args: {
+          p_declaration_date: string
+          p_declared_amount: number
+          p_description?: string
+        }
+        Returns: string
+      }
       end_class_schedule: {
         Args: { p_effective_to?: string; p_schedule_id: string }
         Returns: string
@@ -5957,6 +6066,7 @@ export type Database = {
         Args: { p_enrollment_id: string }
         Returns: Json
       }
+      get_executive_reporting_access: { Args: never; Returns: Json }
       get_lead_identity_resolution_status: {
         Args: { p_lead_id: string }
         Returns: Json
@@ -6038,6 +6148,21 @@ export type Database = {
         Args: { p_class_id: string }
         Returns: boolean
       }
+      list_daily_operations: {
+        Args: {
+          p_class_id?: string
+          p_date: string
+          p_room_id?: string
+          p_teacher_id?: string
+        }
+        Returns: Database["public"]["CompositeTypes"]["operational_calendar_entry"][]
+        SetofOptions: {
+          from: "*"
+          to: "operational_calendar_entry"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       list_eligible_lead_assignees: {
         Args: never
         Returns: {
@@ -6053,26 +6178,12 @@ export type Database = {
           class_status: string
         }[]
       }
+      list_my_permissions: { Args: never; Returns: string[] }
       list_operational_calendar: {
         Args: {
           p_class_id?: string
           p_date_from: string
           p_date_to: string
-          p_room_id?: string
-          p_teacher_id?: string
-        }
-        Returns: Database["public"]["CompositeTypes"]["operational_calendar_entry"][]
-        SetofOptions: {
-          from: "*"
-          to: "operational_calendar_entry"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
-      list_daily_operations: {
-        Args: {
-          p_class_id?: string
-          p_date: string
           p_room_id?: string
           p_teacher_id?: string
         }
@@ -6270,6 +6381,16 @@ export type Database = {
           o_start: string
         }[]
       }
+      resolve_reporting_period: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Database["public"]["CompositeTypes"]["reporting_period_bounds"]
+        SetofOptions: {
+          from: "*"
+          to: "reporting_period_bounds"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       resolve_scenario_per_session_rate: {
         Args: {
           p_scenario: Database["public"]["Tables"]["class_financial_scenario"]["Row"]
@@ -6287,6 +6408,36 @@ export type Database = {
       reverse_payment_allocation: {
         Args: { p_allocation_id: string; p_notes?: string }
         Returns: Json
+      }
+      review_consultant_revenue_declaration: {
+        Args: {
+          p_action: string
+          p_declaration_id: string
+          p_review_notes?: string
+        }
+        Returns: {
+          approved_payment_id: string | null
+          consultant_user_id: string
+          created_at: string
+          currency_code: string
+          declaration_date: string
+          declared_amount: number
+          declared_at: string
+          description: string | null
+          id: string
+          organization_id: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["consultant_revenue_declaration_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "consultant_revenue_declaration"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       run_class_cost_allocation: {
         Args: { p_period_month: string }
@@ -6369,6 +6520,10 @@ export type Database = {
         }
         Returns: Json
       }
+      sum_pending_consultant_declarations: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: number
+      }
       teacher_has_unavailability: {
         Args: {
           p_range_end: string
@@ -6376,6 +6531,10 @@ export type Database = {
           p_teacher_id: string
         }
         Returns: boolean
+      }
+      teaching_session_operational_date: {
+        Args: { p_scheduled_start_at: string; p_timezone: string }
+        Returns: string
       }
       transfer_enrollment: {
         Args: {
@@ -6522,7 +6681,11 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      consultant_revenue_declaration_status:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "returned"
     }
     CompositeTypes: {
       operational_calendar_entry: {
@@ -6560,6 +6723,14 @@ export type Database = {
         unresolved_projected_minutes: number | null
         roomless_projected_session_count: number | null
         roomless_projected_minutes: number | null
+      }
+      reporting_period_bounds: {
+        organization_id: string | null
+        timezone: string | null
+        start_date: string | null
+        end_date: string | null
+        start_at_utc: string | null
+        end_at_exclusive: string | null
       }
       room_usage_row: {
         room_id: string | null
@@ -6723,7 +6894,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      consultant_revenue_declaration_status: [
+        "pending",
+        "approved",
+        "rejected",
+        "returned",
+      ],
+    },
   },
 } as const
 

@@ -37,10 +37,17 @@ export function isEnrollmentOperationalForAttendance(
   return enrollment.status === "active";
 }
 
+import { resolveSessionOperationalDate } from "@/lib/reporting/session-operational-date";
+
+/** Operational local date for roster, attendance, and reporting period placement. */
 export function resolveSessionOccurrenceDate(session: {
   occurrenceDate: string | null;
   scheduledStartAt: string;
+  timezone: string;
 }): string {
-  if (session.occurrenceDate) return session.occurrenceDate;
-  return session.scheduledStartAt.slice(0, 10);
+  void session.occurrenceDate;
+  return resolveSessionOperationalDate({
+    scheduledStartAt: session.scheduledStartAt,
+    timezone: session.timezone,
+  });
 }

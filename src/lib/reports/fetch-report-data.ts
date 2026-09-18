@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { EnrollmentStatus } from "@/lib/enrollments/constants";
 import type { AttendanceStatus } from "@/lib/session-execution/constants";
+import { fetchOrganizationTimezone } from "@/lib/reporting/fetch-organization-timezone";
 import { resolveSessionOccurrenceDate } from "@/lib/session-execution/roster-eligibility";
 import { enrollmentOverlapsPeriod, sessionDateInPeriod } from "./period";
 import type {
@@ -94,12 +95,15 @@ export async function fetchSessionsInPeriod(
     .order("scheduled_start_at");
   if (error || !data) return [];
 
+  const timezone = await fetchOrganizationTimezone(supabase);
+
   return data
     .map((row) => ({
       id: row.id,
       occurrenceDate: resolveSessionOccurrenceDate({
         occurrenceDate: row.occurrence_date,
         scheduledStartAt: row.scheduled_start_at,
+        timezone,
       }),
       status: row.status,
     }))

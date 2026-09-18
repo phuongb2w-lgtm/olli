@@ -1,11 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
+import type { PermissionCode } from "@/lib/permissions/codes";
 
-export type PermissionCode =
-  | "student.read"
-  | "student.create"
-  | "student.update"
-  | "organization.read"
-  | string;
+export type { PermissionCode };
 
 /** UX-only permission check; RLS remains authoritative. */
 export async function can(permissionCode: PermissionCode): Promise<boolean> {

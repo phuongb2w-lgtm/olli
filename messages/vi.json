@@ -27,12 +27,43 @@
     "students": "Học viên",
     "classes": "Lớp học",
     "operations": "Vận hành",
+    "mySchedule": "Lịch dạy của tôi",
+    "executive": "Tổng quan điều hành",
+    "users": "Người dùng & quyền",
     "teachers": "Giáo viên",
     "finance": "Tài chính",
     "reports": "Báo cáo",
     "settings": "Cài đặt",
     "comingSoon": "Sắp có",
     "foundationProof": "Kiểm chứng nền tảng"
+  },
+  "executive": {
+    "title": "Tổng quan điều hành",
+    "denied": "Báo cáo điều hành chỉ dành cho quản lý trung tâm.",
+    "foundationDescription": "Nền tảng báo cáo quản trị. Bảng điều khiển đa lĩnh vực sẽ có ở các tác vụ M5 sau.",
+    "accessConfirmed": "Đã xác nhận quyền truy cập báo cáo điều hành.",
+    "loadError": "Không thể xác minh quyền truy cập báo cáo điều hành."
+  },
+  "users": {
+    "title": "Người dùng & quyền",
+    "denied": "Bạn không có quyền quản lý người dùng.",
+    "foundationDescription": "Không gian quản lý tài khoản và phân quyền cho quản lý trung tâm.",
+    "manageHint": "Bạn có thể quản lý tài khoản và gán nhóm quyền.",
+    "readHint": "Bạn có thể xem tài khoản trong tổ chức."
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "denied": "Bạn không có quyền truy cập cài đặt.",
+    "crmSources": "Nguồn lead CRM",
+    "organizationFoundation": "Cài đặt tổ chức (placeholder nền tảng).",
+    "rolesFoundation": "Cấu hình vai trò và quyền (placeholder nền tảng)."
+  },
+  "roles": {
+    "centerManager": "Quản lý trung tâm",
+    "accountant": "Kế toán",
+    "consultant": "Tư vấn viên",
+    "academicOperations": "Vận hành học vụ",
+    "teacher": "Giáo viên"
   },
   "students": {
     "title": "Học viên",

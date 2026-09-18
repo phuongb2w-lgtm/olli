@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { EnrollmentStatus } from "@/lib/enrollments/constants";
 import type { AttendanceStatus, SessionExecutionStatus } from "./constants";
+import { fetchOrganizationTimezone } from "@/lib/reporting/fetch-organization-timezone";
 import {
   isEnrollmentVisibleOnSessionRoster,
   resolveSessionOccurrenceDate,
@@ -73,6 +74,7 @@ export async function fetchSessionExecutionContext(
 
   if (error || !data) return null;
 
+  const timezone = await fetchOrganizationTimezone(supabase);
   const teacher = Array.isArray(data.teacher) ? data.teacher[0] : data.teacher;
   const room = Array.isArray(data.room) ? data.room[0] : data.room;
   const classRow = Array.isArray(data.class) ? data.class[0] : data.class;
@@ -104,6 +106,7 @@ export async function fetchSessionExecutionContext(
     occurrenceDate: resolveSessionOccurrenceDate({
       occurrenceDate: data.occurrence_date,
       scheduledStartAt: data.scheduled_start_at,
+      timezone,
     }),
     teacherId: data.teacher_id,
     teacherName: teacher ? formatTeacherName(teacher) : "—",

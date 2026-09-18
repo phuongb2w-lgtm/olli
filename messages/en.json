@@ -27,12 +27,43 @@
     "students": "Students",
     "classes": "Classes",
     "operations": "Operations",
+    "mySchedule": "My schedule",
+    "executive": "Executive overview",
+    "users": "Users & permissions",
     "teachers": "Teachers",
     "finance": "Finance",
     "reports": "Reports",
     "settings": "Settings",
     "comingSoon": "Coming soon",
     "foundationProof": "Foundation proof"
+  },
+  "executive": {
+    "title": "Executive overview",
+    "denied": "Executive reporting is available to center managers only.",
+    "foundationDescription": "Management intelligence foundation. Full cross-domain dashboards arrive in later M5 tasks.",
+    "accessConfirmed": "Executive reporting access confirmed.",
+    "loadError": "Unable to verify executive reporting access."
+  },
+  "users": {
+    "title": "Users & permissions",
+    "denied": "You do not have permission to manage users.",
+    "foundationDescription": "User account and permission management workspace for center managers.",
+    "manageHint": "You can manage user accounts and assign permission groups.",
+    "readHint": "You can view user accounts in your organization."
+  },
+  "settings": {
+    "title": "Settings",
+    "denied": "You do not have permission to access settings.",
+    "crmSources": "CRM lead sources",
+    "organizationFoundation": "Organization settings (foundation placeholder).",
+    "rolesFoundation": "Role and permission configuration (foundation placeholder)."
+  },
+  "roles": {
+    "centerManager": "Center manager",
+    "accountant": "Accountant",
+    "consultant": "Consultant",
+    "academicOperations": "Academic operations",
+    "teacher": "Teacher"
   },
   "students": {
     "title": "Students",

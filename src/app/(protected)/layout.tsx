@@ -3,6 +3,11 @@ import { cookies } from "next/headers";
 import { AccessDenied } from "@/components/access-denied";
 import { AppShell } from "@/components/app-shell";
 import { getIdentityState } from "@/lib/auth/get-identity-state";
+import {
+  APP_NAV_ITEMS,
+  filterNavItemsByPermissions,
+} from "@/lib/navigation/app-navigation";
+import { loadUserPermissions } from "@/lib/navigation/load-user-permissions";
 import { isValidLocale, LOCALE_COOKIE } from "@/i18n/config";
 import { resolveLocale } from "@/i18n/resolve-locale";
 
@@ -32,5 +37,14 @@ export default async function ProtectedLayout({
     });
   }
 
-  return <AppShell appUser={identity.appUser}>{children}</AppShell>;
+  const permissions = await loadUserPermissions();
+  const navItems = filterNavItemsByPermissions(APP_NAV_ITEMS, permissions).map(
+    (item) => ({ key: item.key, href: item.href }),
+  );
+
+  return (
+    <AppShell appUser={identity.appUser} navItems={navItems}>
+      {children}
+    </AppShell>
+  );
 }
