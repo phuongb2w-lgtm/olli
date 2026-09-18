@@ -5840,6 +5840,14 @@ export type Database = {
         Args: { p_end_date: string; p_start_date: string }
         Returns: number
       }
+      count_delivered_teaching_sessions: {
+        Args: { p_class_id?: string; p_date_from: string; p_date_to: string }
+        Returns: number
+      }
+      count_materialized_teaching_sessions: {
+        Args: { p_class_id?: string; p_date_from: string; p_date_to: string }
+        Returns: number
+      }
       create_capital_asset: {
         Args: {
           p_category_code?: string
@@ -5950,6 +5958,10 @@ export type Database = {
       }
       current_app_user_id: { Args: never; Returns: string }
       current_organization_id: { Args: never; Returns: string }
+      declaration_has_canonical_payment: {
+        Args: { p_declaration_id: string }
+        Returns: boolean
+      }
       declare_consultant_revenue: {
         Args: {
           p_declaration_date: string
@@ -6520,6 +6532,14 @@ export type Database = {
         }
         Returns: Json
       }
+      sum_approved_consultant_declarations: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: number
+      }
+      sum_canonical_cash_collected: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: number
+      }
       sum_pending_consultant_declarations: {
         Args: { p_end_date: string; p_start_date: string }
         Returns: number
@@ -6530,6 +6550,18 @@ export type Database = {
           p_range_start: string
           p_teacher_id: string
         }
+        Returns: boolean
+      }
+      teaching_session_is_delivered: {
+        Args: { p_status: string }
+        Returns: boolean
+      }
+      teaching_session_is_materialized_cancelled: {
+        Args: { p_status: string }
+        Returns: boolean
+      }
+      teaching_session_is_materialized_non_delivered: {
+        Args: { p_status: string }
         Returns: boolean
       }
       teaching_session_operational_date: {

@@ -18,7 +18,7 @@ Finance is not auto-created at conversion (by design).
 |------|-------------|--------|
 | Declare | `declare_consultant_revenue` RPC | **Foundation added T01** |
 | Review | `review_consultant_revenue_declaration` RPC | Approve / reject / return |
-| Canonical ledger | `payment` / recognition (future linkage on approve) | Declarations ≠ booked until approved |
+| Canonical ledger | Separate `payment` recording; optional `approved_payment_id` link | Approval validates declaration only — does not auto-book |
 
 No duplicate entry: consultant declares once; accountant reviews same record.
 

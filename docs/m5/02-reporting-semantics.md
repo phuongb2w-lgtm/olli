@@ -25,7 +25,7 @@ Each M5 query must use this contract — no ad-hoc period math.
 | Concept | Canonical source | Notes |
 |---------|------------------|-------|
 | Consultant declared revenue | `consultant_revenue_declaration` | Status `pending` / `returned` — **not** booked revenue |
-| Approved consultant revenue | Declaration with `status = approved` | May link to `payment` when booked |
+| Approved consultant declaration | `status = approved` | Accountant validated; **not** cash, payment, or recognized revenue unless `approved_payment_id` links posted `payment` |
 | Cash collected | `payment` + `payment_allocation` | Operational cash recording |
 | Tuition obligation | `charge`, enrollment financial terms | Obligation, not cash |
 | Receivable | `charge_balance` view | Derived outstanding |
@@ -43,8 +43,10 @@ Each M5 query must use this contract — no ad-hoc period math.
 | `occurrence_date` | Identity / provenance / dedup key; **not** current operational date after reschedule |
 | Current teacher / room | `teaching_session.teacher_id`, `teaching_session.room_id` |
 | Cancelled sessions | Suppress schedule projections (M4) |
-| Planned vs delivered | Projected calendar entries vs materialized `teaching_session` rows |
-| Delivered | Completed (or in-progress/completed per KPI definition in later tasks) materialized sessions |
+| Projected occurrence | Operational calendar `entry_type = projected` | Not materialized; not delivered |
+| Materialized session | `teaching_session` row exists | Includes `scheduled`, `in_progress`, `completed` — **not** automatically delivered |
+| Cancelled session | `teaching_session.status = cancelled` | Not delivered; suppresses projection (M4) |
+| Delivered service | `teaching_session.status = completed` | M1 session execution; same evidence as M2/M4 delivered counts |
 
 Helper: `teaching_session_operational_date(timestamptz, timezone)`.
 
@@ -78,7 +80,7 @@ Stable identifiers in `src/lib/reporting/kpi-namespaces.ts`:
 - **Finance:** cash collected, recognized revenue, receivables, costs, class economics, pending declarations
 - **CRM:** intake, follow-ups, trials, conversions, personal declared/approved revenue, productivity
 - **Academic:** attendance, scores, observations, fulfillment
-- **Teaching ops:** scheduled, delivered, cancelled, rescheduled, workload, room usage, exceptions
+- **Teaching ops:** projected, materialized, delivered (completed only), cancelled, rescheduled, workload, room usage, exceptions
 - **Management:** executive overview, cross-domain exceptions (require `report.executive.read` for center-wide views)
 
 ## Authorization boundaries

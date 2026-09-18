@@ -136,6 +136,46 @@ async function main() {
     !pendingErr && !canonicalErr && Number(pending) >= 0 && Number(canonical) >= 0,
   );
 
+  // 9–11: semantic boundaries (T01.1)
+  const { data: matCount } = await admin.rpc("count_materialized_teaching_sessions", {
+    p_date_from: "2020-01-01",
+    p_date_to: "2099-12-31",
+    p_class_id: null,
+  });
+  const { data: delCount } = await admin.rpc("count_delivered_teaching_sessions", {
+    p_date_from: "2020-01-01",
+    p_date_to: "2099-12-31",
+    p_class_id: null,
+  });
+  record(
+    9,
+    "materialized session count >= delivered session count",
+    Number(matCount) >= Number(delCount),
+  );
+
+  const { data: approvedDecl } = await admin.rpc("sum_approved_consultant_declarations", {
+    p_start_date: "2020-01-01",
+    p_end_date: "2099-12-31",
+  });
+  const { data: cashCollected } = await admin.rpc("sum_canonical_cash_collected", {
+    p_start_date: "2020-01-01",
+    p_end_date: "2099-12-31",
+  });
+  record(
+    10,
+    "approved declarations and cash collected are separate RPCs",
+    Number(approvedDecl) >= 0 && Number(cashCollected) >= 0,
+  );
+
+  const { data: isDelivered } = await admin.rpc("teaching_session_is_delivered", {
+    p_status: "scheduled",
+  });
+  record(
+    11,
+    "scheduled status is not delivered",
+    isDelivered === false,
+  );
+
   const failed = results.filter((r) => !r.passed);
   console.log(`\nM5 foundation smoke: ${results.length - failed.length}/${results.length} passed`);
   if (failed.length > 0) process.exit(1);

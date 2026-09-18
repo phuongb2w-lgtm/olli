@@ -13,6 +13,8 @@ export const FINANCE_KPIS = {
   marketingSalesCosts: "finance.marketing_sales_costs",
   classContribution: "finance.class_contribution",
   pendingConsultantDeclarations: "finance.pending_consultant_declarations",
+  /** Accountant-validated declarations — NOT cash collected or recognized revenue. */
+  approvedConsultantDeclarations: "finance.approved_consultant_declarations",
 } as const;
 
 export const CRM_KPIS = {
@@ -21,7 +23,8 @@ export const CRM_KPIS = {
   trials: "crm.trials",
   conversions: "crm.conversions",
   personalDeclaredRevenue: "crm.personal_declared_revenue",
-  personalApprovedRevenue: "crm.personal_approved_revenue",
+  /** Approved declaration count/amount — not booked revenue. */
+  personalApprovedDeclaration: "crm.personal_approved_declaration",
   pipelineWorkload: "crm.pipeline_workload",
   consultantProductivity: "crm.consultant_productivity",
 } as const;
@@ -37,7 +40,14 @@ export const ACADEMIC_KPIS = {
 } as const;
 
 export const TEACHING_OPS_KPIS = {
-  scheduledSessions: "teaching_ops.scheduled_sessions",
+  /** Projected schedule occurrence — not materialized. */
+  projectedOccurrences: "teaching_ops.projected_occurrences",
+  /** Concrete teaching_session row (non-cancelled). Includes scheduled/in_progress — not delivered. */
+  materializedSessions: "teaching_ops.materialized_sessions",
+  /**
+   * Reserved: requires teaching_session.status = completed.
+   * Do not implement until read model uses canonical delivered evidence.
+   */
   deliveredSessions: "teaching_ops.delivered_sessions",
   cancelledSessions: "teaching_ops.cancelled_sessions",
   rescheduledSessions: "teaching_ops.rescheduled_sessions",

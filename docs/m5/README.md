@@ -32,6 +32,7 @@ There is **no separate HR role**. User management belongs to the Center Manager.
 - [Reporting semantics](./02-reporting-semantics.md)
 - [Permission / role audit](./03-permission-role-audit.md)
 - [Data-entry flow audit](./04-data-entry-flow-audit.md)
+- [Semantic boundaries (T01.1)](./05-semantic-boundaries.md)
 
 ## Code contracts
 
