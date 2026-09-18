@@ -44,6 +44,8 @@ test.describe("M1-T05 course and class operations", () => {
     await page.getByRole("button", { name: /save|lưu/i }).click();
     await expect(page).toHaveURL(/\/classes\?success=created/);
     await expect(page.getByText(/created successfully|tạo lớp học thành công/i)).toBeVisible();
+    await page.getByRole("searchbox", { name: /search|tìm kiếm/i }).fill(className);
+    await page.getByRole("button", { name: /apply|áp dụng/i }).click();
     await expect(page.getByRole("table").getByText(className)).toBeVisible();
   });
 

@@ -12,7 +12,9 @@ test.describe("M4-T06 session operations", () => {
   test("admin can open session ops from operations and see controls", async ({ page }) => {
     await signIn(page, "org-a-admin@olli.local");
     await page.goto("/operations/calendar?from=2036-01-07&to=2036-01-07");
-    await expect(page.getByRole("heading", { name: /operations|vận hành/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /operational calendar|lịch vận hành/i }),
+    ).toBeVisible();
 
     const sessionLink = page.locator('li[data-entry-type="session"] a').first();
     if ((await sessionLink.count()) === 0) {

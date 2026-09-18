@@ -72,6 +72,6 @@ END;
 $$;
 
 COMMENT ON FUNCTION public.list_daily_operations(date, uuid, uuid, uuid) IS
-  'Org-scoped daily operations for one local calendar day. Uses _list_operational_occurrences (scheduled local date for sessions; T05 projection dedup).';
+  'Org-scoped daily operations for one local calendar day. Materialized sessions are placed by current scheduled_start_at local date (reschedule-aware). Projections dedup on schedule+occurrence_date. Same semantics as list_operational_calendar (T06) and workload analytics (T07).';
 
 GRANT EXECUTE ON FUNCTION public.list_daily_operations(date, uuid, uuid, uuid) TO authenticated;

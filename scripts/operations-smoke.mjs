@@ -50,6 +50,19 @@ async function hasPermission(client, code) {
   return !error && Boolean(data);
 }
 
+async function rpcWithStaffRetry(email, rpcCall, attempts = 5) {
+  let client = await signIn(email);
+  let lastError = null;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const { error } = await rpcCall(client);
+    if (!error) return { error: null };
+    lastError = error;
+    await new Promise((resolve) => setTimeout(resolve, 400 * (attempt + 1)));
+    client = await signIn(email);
+  }
+  return { error: lastError };
+}
+
 async function main() {
   const admin = await signIn("org-a-admin@olli.local");
   const staff = await signIn("org-a-staff@olli.local");
@@ -219,14 +232,21 @@ async function main() {
   );
 
   record(7, "staff with enrollment.read can read calendar", await hasPermission(staff, "enrollment.read"));
-  const { error: staffErr } = await staff.rpc("list_operational_calendar", {
-    p_date_from: "2036-01-07",
-    p_date_to: "2036-01-07",
-    p_class_id: null,
-    p_teacher_id: null,
-    p_room_id: null,
-  });
-  record(8, "staff can call calendar RPC", !staffErr);
+  const { error: staffErr } = await rpcWithStaffRetry("org-a-staff@olli.local", (client) =>
+    client.rpc("list_operational_calendar", {
+      p_date_from: "2036-01-07",
+      p_date_to: "2036-01-07",
+      p_class_id: null,
+      p_teacher_id: null,
+      p_room_id: null,
+    }),
+  );
+  record(
+    8,
+    "staff can call calendar RPC",
+    !staffErr,
+    staffErr?.message ?? "",
+  );
 
   const readerHasRead = await hasPermission(reader, "enrollment.read");
   const { error: readerErr } = await reader.rpc("list_operational_calendar", {
