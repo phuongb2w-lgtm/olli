@@ -54,6 +54,24 @@ export function ScheduleForm({ classId, classCapacity, teachers, rooms, schedule
       {state.error === "invalid_teacher" ? (
         <p className="text-sm text-red-700">{t("invalidTeacher")}</p>
       ) : null}
+      {state.error === "teacher_unavailable" ? (
+        <p className="text-sm text-red-700">{t("teacherUnavailable")}</p>
+      ) : null}
+      {state.error === "teacher_conflict" ? (
+        <p className="text-sm text-red-700">{t("teacherConflict")}</p>
+      ) : null}
+      {state.error === "room_conflict" ? (
+        <p className="text-sm text-red-700">{t("roomConflict")}</p>
+      ) : null}
+      {state.error === "schedule_conflict" ? (
+        <p className="text-sm text-red-700">{t("scheduleConflict")}</p>
+      ) : null}
+      {state.error === "ambiguous_teacher" ? (
+        <p className="text-sm text-red-700">{t("ambiguousTeacher")}</p>
+      ) : null}
+      {state.error === "no_teacher" ? (
+        <p className="text-sm text-red-700">{t("noTeacher")}</p>
+      ) : null}
       {state.error === "save_error" && !state.fieldErrors ? (
         <p className="text-sm text-red-700">{t("saveError")}</p>
       ) : null}

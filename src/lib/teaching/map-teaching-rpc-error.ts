@@ -18,6 +18,12 @@ export function mapTeachingRpcError(
   if (msg.includes("schedule_not_active")) return "schedule_not_active";
   if (msg.includes("assignment_not_active")) return "assignment_not_active";
   if (msg.includes("duplicate_assignment") || error.code === "23505") return "duplicate_assignment";
+  if (msg.includes("teacher_unavailable")) return "teacher_unavailable";
+  if (msg.includes("teacher_double_booked")) return "teacher_conflict";
+  if (msg.includes("room_double_booked")) return "room_conflict";
+  if (msg.includes("ambiguous_teacher")) return "ambiguous_teacher";
+  if (msg.includes("no_teacher")) return "no_teacher";
+  if (error.code === "23P01" || msg.includes("schedule_conflict")) return "schedule_conflict";
 
   return "save_error";
 }

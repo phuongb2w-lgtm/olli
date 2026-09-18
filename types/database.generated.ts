@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -5112,6 +5112,22 @@ export type Database = {
         Args: { p_class: Database["public"]["Tables"]["class"]["Row"] }
         Returns: undefined
       }
+      _assert_no_schedule_conflicts: {
+        Args: {
+          p_class_id: string
+          p_effective_from: string
+          p_effective_to: string
+          p_end_time: string
+          p_exclude_schedule_id?: string
+          p_org_id: string
+          p_room_id: string
+          p_start_time: string
+          p_teacher_id: string
+          p_term_end?: string
+          p_weekday_code: string
+        }
+        Returns: undefined
+      }
       _assert_teaching_write_permission: {
         Args: { p_mode: string }
         Returns: undefined
@@ -5127,6 +5143,28 @@ export type Database = {
       _charge_collection_status: {
         Args: { p_charge_id: string }
         Returns: string
+      }
+      _collect_schedule_conflicts: {
+        Args: {
+          p_class_id: string
+          p_effective_from: string
+          p_effective_to: string
+          p_end_time: string
+          p_exclude_schedule_id?: string
+          p_org_id: string
+          p_room_id: string
+          p_start_time: string
+          p_teacher_id: string
+          p_term_end?: string
+          p_weekday_code: string
+        }
+        Returns: Database["public"]["CompositeTypes"]["schedule_conflict_entry"][]
+        SetofOptions: {
+          from: "*"
+          to: "schedule_conflict_entry"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       _conversion_build_result: {
         Args: { p_conversion_id: string }
@@ -5256,11 +5294,28 @@ export type Database = {
         Args: { p_items: Json; p_mode: string; p_terms_id: string }
         Returns: undefined
       }
+      _resolve_occurrence_teacher: {
+        Args: {
+          p_class_id: string
+          p_occurrence_date: string
+          p_org_id: string
+          p_schedule_teacher_id: string
+        }
+        Returns: Record<string, unknown>
+      }
       _resolve_payer_name_snapshot: {
         Args: {
           p_guardian_id: string
           p_override: string
           p_student_id: string
+        }
+        Returns: string
+      }
+      _schedule_conflict_eval_end: {
+        Args: {
+          p_effective_from: string
+          p_effective_to: string
+          p_term_end: string
         }
         Returns: string
       }
@@ -5412,6 +5467,26 @@ export type Database = {
       charge_effective_obligation: {
         Args: { p_charge_id: string }
         Returns: number
+      }
+      check_class_schedule_conflicts: {
+        Args: {
+          p_class_id: string
+          p_effective_from: string
+          p_effective_to?: string
+          p_end_time: string
+          p_exclude_schedule_id?: string
+          p_room_id?: string
+          p_start_time: string
+          p_teacher_id?: string
+          p_weekday_code: string
+        }
+        Returns: Database["public"]["CompositeTypes"]["schedule_conflict_entry"][]
+        SetofOptions: {
+          from: "*"
+          to: "schedule_conflict_entry"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       class_active_enrollment_count: {
         Args: { p_class_id: string; p_period_month: string }
@@ -6152,7 +6227,17 @@ export type Database = {
       [_ in never]: never
     }
     CompositeTypes: {
-      [_ in never]: never
+      schedule_conflict_entry: {
+        conflict_type: string | null
+        occurrence_date: string | null
+        starts_at: string | null
+        ends_at: string | null
+        teacher_id: string | null
+        room_id: string | null
+        conflicting_class_id: string | null
+        conflicting_schedule_id: string | null
+        conflicting_session_id: string | null
+      }
     }
   }
 }

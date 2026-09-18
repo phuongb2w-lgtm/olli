@@ -658,15 +658,15 @@ SELECT _m4_unavail_expect_fail(
   $$
 );
 
--- 22: generate_teaching_sessions unchanged despite unavailability
+-- 22: generate_teaching_sessions rejects teacher unavailability (M4-T04)
 DO $$
 DECLARE
   v_org uuid := 'a0000000-0000-4000-8000-000000000001';
   v_class uuid;
   v_teacher uuid;
   v_schedule uuid;
-  v_inserted integer;
   v_unavail boolean;
+  v_rejected boolean := false;
 BEGIN
   PERFORM _m4_unavail_as_super();
   SELECT c.id INTO v_class FROM class c WHERE c.organization_id = v_org LIMIT 1;
@@ -697,13 +697,16 @@ BEGIN
     timestamptz '2027-03-03 19:30:00+07'
   ) INTO v_unavail;
 
-  SELECT public.generate_teaching_sessions(v_schedule, '2027-03-01', '2027-03-31')
-  INTO v_inserted;
+  BEGIN
+    PERFORM public.generate_teaching_sessions(v_schedule, '2027-03-01', '2027-03-31');
+  EXCEPTION WHEN OTHERS THEN
+    v_rejected := SQLERRM LIKE '%teacher_unavailable%';
+  END;
 
   PERFORM _m4_unavail_record(
     22,
-    'generate_teaching_sessions unchanged despite unavailability',
-    v_unavail = true AND v_inserted >= 1
+    'generate_teaching_sessions rejects teacher unavailability',
+    v_unavail = true AND v_rejected
   );
 END $$;
 

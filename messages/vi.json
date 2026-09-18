@@ -766,6 +766,7 @@
     "roomCapacityWarning": "Sĩ số lớp vượt sức chứa phòng.",
     "roomConflict": "Phòng đã được đặt trong khung giờ này.",
     "teacherConflict": "Giáo viên đã có lịch trùng khung giờ.",
+    "teacherUnavailable": "Giáo viên không có mặt trong khung giờ này.",
     "scheduleConflict": "Xung đột lịch (phòng hoặc giáo viên trùng).",
     "ambiguousTeacher": "Không thể sinh buổi học: cần đúng một giáo viên chính hoặc chọn giáo viên theo lịch.",
     "noTeacher": "Không thể sinh buổi học: không có giáo viên phù hợp trong khoảng ngày.",

@@ -766,6 +766,7 @@
     "roomCapacityWarning": "Class capacity exceeds room capacity.",
     "roomConflict": "Room is already booked for this time.",
     "teacherConflict": "Teacher is already scheduled for this time.",
+    "teacherUnavailable": "Teacher is unavailable for this time.",
     "scheduleConflict": "Schedule conflict detected (room or teacher overlap).",
     "ambiguousTeacher": "Cannot generate sessions: assign exactly one primary teacher or set a schedule teacher.",
     "noTeacher": "Cannot generate sessions: no eligible teacher for this date range.",

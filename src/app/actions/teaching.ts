@@ -37,6 +37,7 @@ export type TeachingActionState = {
     | "schedule_conflict"
     | "room_conflict"
     | "teacher_conflict"
+    | "teacher_unavailable"
     | "schedule_not_active"
     | "assignment_not_active"
     | "ambiguous_teacher"
@@ -299,10 +300,9 @@ export async function generateSessionsAction(
   });
 
   if (error) {
+    const mapped = mapTeachingRpcError(error);
+    if (mapped !== "save_error") return { error: mapped };
     const msg = error.message ?? "";
-    if (msg.includes("ambiguous_teacher")) return { error: "ambiguous_teacher" };
-    if (msg.includes("no_teacher")) return { error: "no_teacher" };
-    if (msg.includes("schedule_not_active")) return { error: "schedule_not_active" };
     if (msg.includes("invalid_range") || msg.includes("range_too_large")) {
       return { error: msg.includes("range_too_large") ? "range_too_large" : "invalid_range" };
     }

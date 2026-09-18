@@ -36,6 +36,15 @@ export function GenerateSessionsForm({
       {state.error === "no_teacher" ? (
         <p className="text-xs text-red-700">{t("noTeacher")}</p>
       ) : null}
+      {state.error === "teacher_unavailable" ? (
+        <p className="text-xs text-red-700">{t("teacherUnavailable")}</p>
+      ) : null}
+      {state.error === "teacher_conflict" ? (
+        <p className="text-xs text-red-700">{t("teacherConflict")}</p>
+      ) : null}
+      {state.error === "room_conflict" ? (
+        <p className="text-xs text-red-700">{t("roomConflict")}</p>
+      ) : null}
       {state.error === "schedule_conflict" ? (
         <p className="text-xs text-red-700">{t("scheduleConflict")}</p>
       ) : null}

@@ -152,7 +152,17 @@ function isConflictError(error) {
   if (!error) return false;
   if (error.code === "23P01") return true;
   const msg = error.message ?? "";
-  return msg.includes("schedule_conflict") || msg.includes("exclusion");
+  return (
+    msg.includes("schedule_conflict") ||
+    msg.includes("teacher_double_booked") ||
+    msg.includes("room_double_booked") ||
+    msg.includes("exclusion")
+  );
+}
+
+function isTeacherUnavailableError(error) {
+  if (!error) return false;
+  return (error.message ?? "").includes("teacher_unavailable");
 }
 
 function localTimeFromUtc(iso, timeZone = "Asia/Ho_Chi_Minh") {
@@ -1566,6 +1576,205 @@ async function main() {
     65,
     "closed class rejects new timetable via RPC",
     Boolean(closedScheduleErr) && (closedScheduleErr.message ?? "").includes("invalid_class_state"),
+  );
+
+  // M4-T04 conflict detection (66-72)
+  const t04CourseId = await createCourse(admin, "m4t4-conflict");
+  const t04Class = await createClass(admin, t04CourseId, "M4T4Conflict", {
+    termStart: "2029-01-01",
+    termEnd: "2029-06-30",
+  });
+  const t04TeacherA = await createTeacher(admin, "T04A");
+  const t04TeacherB = await createTeacher(admin, "T04B");
+  const t04Room = await createRoom(admin, "T04Room");
+
+  await insertSchedule(admin, t04Class.id, {
+    weekdayCode: "mon",
+    startTime: "10:00:00",
+    endTime: "11:00:00",
+    effectiveFrom: "2029-01-01",
+    roomId: t04Room.id,
+    teacherId: t04TeacherA,
+  });
+
+  const { data: previewConflicts, error: previewErr } = await admin.rpc(
+    "check_class_schedule_conflicts",
+    {
+      p_class_id: t04Class.id,
+      p_weekday_code: "mon",
+      p_start_time: "10:30:00",
+      p_end_time: "11:30:00",
+      p_effective_from: "2029-01-01",
+      p_effective_to: "2029-01-31",
+      p_room_id: t04Room.id,
+      p_teacher_id: t04TeacherB,
+      p_exclude_schedule_id: null,
+    },
+  );
+  record(
+    66,
+    "conflict preview returns structured conflicts",
+    !previewErr &&
+      Array.isArray(previewConflicts) &&
+      previewConflicts.length >= 1 &&
+      Boolean(previewConflicts[0]?.conflict_type) &&
+      Boolean(previewConflicts[0]?.occurrence_date),
+  );
+
+  const t04UnavailClass = await createClass(admin, t04CourseId, "T04Unavail", {
+    termStart: "2029-02-01",
+    termEnd: "2029-06-30",
+  });
+  await admin.from("teacher_unavailability").insert({
+    organization_id: ORG_A,
+    teacher_id: t04TeacherA,
+    block_type: "recurring",
+    weekday_code: "tue",
+    start_time: "09:00:00",
+    end_time: "17:00:00",
+    effective_from: "2029-02-01",
+    status: "active",
+    created_by: APP_A_ADMIN,
+    updated_by: APP_A_ADMIN,
+  });
+  const t04UnavailSched = await insertSchedule(admin, t04UnavailClass.id, {
+    weekdayCode: "tue",
+    startTime: "10:00:00",
+    endTime: "11:00:00",
+    effectiveFrom: "2029-02-01",
+    teacherId: t04TeacherA,
+  });
+  const t04UnavailGen = await generateSessions(
+    admin,
+    t04UnavailSched.data.id,
+    "2029-02-06",
+    "2029-02-06",
+  );
+  record(
+    67,
+    "teacher unavailable blocks session generation",
+    Boolean(t04UnavailGen.error) && isTeacherUnavailableError(t04UnavailGen.error),
+  );
+
+  const t04RoomConflictClass = await createClass(admin, t04CourseId, "T04RoomConf", {
+    termStart: "2029-03-01",
+    termEnd: "2029-06-30",
+  });
+  await insertSchedule(admin, t04RoomConflictClass.id, {
+    weekdayCode: "wed",
+    startTime: "14:00:00",
+    endTime: "15:00:00",
+    effectiveFrom: "2029-03-01",
+    roomId: t04Room.id,
+    teacherId: t04TeacherA,
+  });
+  const { error: roomConflictCreateErr } = await admin.rpc("create_class_schedule", {
+    p_class_id: t04RoomConflictClass.id,
+    p_weekday_code: "wed",
+    p_start_time: "14:30:00",
+    p_end_time: "15:30:00",
+    p_effective_from: "2029-03-01",
+    p_effective_to: "2029-03-31",
+    p_room_id: t04Room.id,
+    p_teacher_id: t04TeacherB,
+  });
+  record(
+    68,
+    "room conflict rejected on schedule create",
+    Boolean(roomConflictCreateErr) &&
+      (roomConflictCreateErr.message ?? "").includes("room_double_booked"),
+  );
+
+  const t04TeacherConflictClass = await createClass(admin, t04CourseId, "T04TeacherConf", {
+    termStart: "2029-04-01",
+    termEnd: "2029-06-30",
+  });
+  const t04Room2 = await createRoom(admin, "T04Room2");
+  await insertSchedule(admin, t04TeacherConflictClass.id, {
+    weekdayCode: "thu",
+    startTime: "16:00:00",
+    endTime: "17:00:00",
+    effectiveFrom: "2029-04-01",
+    roomId: t04Room.id,
+    teacherId: t04TeacherA,
+  });
+  const { error: teacherConflictCreateErr } = await admin.rpc("create_class_schedule", {
+    p_class_id: t04TeacherConflictClass.id,
+    p_weekday_code: "thu",
+    p_start_time: "16:30:00",
+    p_end_time: "17:30:00",
+    p_effective_from: "2029-04-01",
+    p_effective_to: "2029-04-30",
+    p_room_id: t04Room2.id,
+    p_teacher_id: t04TeacherA,
+  });
+  record(
+    69,
+    "teacher conflict rejected on schedule create",
+    Boolean(teacherConflictCreateErr) &&
+      (teacherConflictCreateErr.message ?? "").includes("teacher_double_booked"),
+  );
+
+  const t04OkClass = await createClass(admin, t04CourseId, "T04Ok", {
+    termStart: "2029-05-01",
+    termEnd: "2029-06-30",
+  });
+  const { data: okScheduleId, error: okScheduleErr } = await admin.rpc("create_class_schedule", {
+    p_class_id: t04OkClass.id,
+    p_weekday_code: "fri",
+    p_start_time: "08:00:00",
+    p_end_time: "09:00:00",
+    p_effective_from: "2029-05-01",
+    p_effective_to: "2029-05-31",
+    p_room_id: t04Room2.id,
+    p_teacher_id: t04TeacherB,
+  });
+  record(
+    70,
+    "non-conflicting schedule saved via RPC",
+    !okScheduleErr && Boolean(okScheduleId),
+  );
+
+  const t04GenOk = await generateSessions(admin, okScheduleId, "2029-05-04", "2029-05-04");
+  record(
+    71,
+    "non-conflicting session generation succeeds",
+    !t04GenOk.error && (t04GenOk.data ?? 0) >= 1,
+  );
+
+  const t04PrimaryClass = await createClass(admin, t04CourseId, "T04Primary", {
+    termStart: "2029-06-01",
+    termEnd: "2029-06-30",
+  });
+  await insertAssignment(admin, t04PrimaryClass.id, {
+    teacherId: t04TeacherA,
+    roleCode: "primary",
+    effectiveFrom: "2029-06-01",
+  });
+  await insertSchedule(admin, t04PrimaryClass.id, {
+    weekdayCode: "sat",
+    startTime: "09:00:00",
+    endTime: "10:00:00",
+    effectiveFrom: "2029-06-01",
+    roomId: t04Room2.id,
+    teacherId: t04TeacherA,
+  });
+  const { data: primaryPreview } = await admin.rpc("check_class_schedule_conflicts", {
+    p_class_id: t04PrimaryClass.id,
+    p_weekday_code: "sat",
+    p_start_time: "09:00:00",
+    p_end_time: "10:00:00",
+    p_effective_from: "2029-06-01",
+    p_effective_to: "2029-06-30",
+    p_room_id: t04Room2.id,
+    p_teacher_id: null,
+    p_exclude_schedule_id: null,
+  });
+  record(
+    72,
+    "fallback primary teacher used in conflict preview",
+    Array.isArray(primaryPreview) &&
+      primaryPreview.some((c) => c.conflict_type === "teacher_double_booked"),
   );
 
   const failed = results.filter((r) => !r.passed);
