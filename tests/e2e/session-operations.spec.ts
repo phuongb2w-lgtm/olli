@@ -11,7 +11,7 @@ async function signIn(page: import("@playwright/test").Page, email: string, pass
 test.describe("M4-T06 session operations", () => {
   test("admin can open session ops from operations and see controls", async ({ page }) => {
     await signIn(page, "org-a-admin@olli.local");
-    await page.goto("/operations?from=2036-01-07&to=2036-01-07");
+    await page.goto("/operations/calendar?from=2036-01-07&to=2036-01-07");
     await expect(page.getByRole("heading", { name: /operations|vận hành/i })).toBeVisible();
 
     const sessionLink = page.locator('li[data-entry-type="session"] a').first();
@@ -30,7 +30,7 @@ test.describe("M4-T06 session operations", () => {
 
   test("projected entries link to class teaching without mutation panel", async ({ page }) => {
     await signIn(page, "org-a-admin@olli.local");
-    await page.goto("/operations?from=2036-01-21&to=2036-01-21");
+    await page.goto("/operations/calendar?from=2036-01-21&to=2036-01-21");
     const projectedLink = page.locator('li[data-entry-type="projected"] a').first();
     if ((await projectedLink.count()) === 0) {
       test.skip();
@@ -50,7 +50,7 @@ test.describe("M4-T06 session operations", () => {
   test("EN locale renders session operations labels", async ({ page }) => {
     await signIn(page, "org-a-admin@olli.local");
     await page.goto("/?locale=en");
-    await page.goto("/operations?from=2036-01-07&to=2036-01-07");
+    await page.goto("/operations/calendar?from=2036-01-07&to=2036-01-07");
     const sessionLink = page.locator('li[data-entry-type="session"] a').first();
     if ((await sessionLink.count()) === 0) {
       test.skip();
@@ -65,7 +65,7 @@ test.describe("M4-T06 session operations", () => {
   test("VI locale renders session operations labels", async ({ page }) => {
     await signIn(page, "org-a-admin@olli.local");
     await page.goto("/?locale=vi");
-    await page.goto("/operations?from=2036-01-07&to=2036-01-07");
+    await page.goto("/operations/calendar?from=2036-01-07&to=2036-01-07");
     const sessionLink = page.locator('li[data-entry-type="session"] a').first();
     if ((await sessionLink.count()) === 0) {
       test.skip();

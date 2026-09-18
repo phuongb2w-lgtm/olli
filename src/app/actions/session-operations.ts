@@ -16,6 +16,12 @@ function revalidateSessionSurfaces(classId: string, sessionId: string) {
   revalidatePath(`/classes/${classId}/teaching`);
   revalidatePath(`/classes/${classId}/teaching/sessions/${sessionId}`);
   revalidatePath("/operations");
+  revalidatePath("/operations/calendar");
+  revalidatePath("/operations/workload");
+}
+
+function dailyRedirect(dailyDate: string, success: string): never {
+  redirect(`/operations?date=${encodeURIComponent(dailyDate)}&success=${success}`);
 }
 
 export async function rescheduleTeachingSessionAction(
@@ -32,6 +38,8 @@ export async function rescheduleTeachingSessionAction(
   const startLocal = String(formData.get("scheduledStart") ?? "").trim();
   const endLocal = String(formData.get("scheduledEnd") ?? "").trim();
   const reason = String(formData.get("reason") ?? "").trim();
+  const returnTo = String(formData.get("returnTo") ?? "").trim();
+  const dailyDate = String(formData.get("dailyDate") ?? "").trim();
 
   if (!sessionId || !classId) return { error: "not_found" };
   if (!reason) return { error: "reason_required" };
@@ -53,6 +61,10 @@ export async function rescheduleTeachingSessionAction(
 
   if (error) return { error: mapSessionOpsRpcError(error) };
   revalidateSessionSurfaces(classId, sessionId);
+
+  if (returnTo === "daily" && dailyDate) {
+    dailyRedirect(dailyDate, "rescheduled");
+  }
   redirect(`/classes/${classId}/teaching/sessions/${sessionId}?success=rescheduled`);
 }
 
@@ -69,6 +81,7 @@ export async function cancelTeachingSessionAction(
   const sessionId = String(formData.get("sessionId") ?? "").trim();
   const reason = String(formData.get("reason") ?? "").trim();
   const returnTo = String(formData.get("returnTo") ?? "").trim();
+  const dailyDate = String(formData.get("dailyDate") ?? "").trim();
 
   if (!sessionId) return { error: "not_found" };
   if (!reason) return { error: "reason_required" };
@@ -82,8 +95,15 @@ export async function cancelTeachingSessionAction(
   if (error) return { error: mapSessionOpsRpcError(error) };
 
   if (classId) revalidateSessionSurfaces(classId, sessionId);
-  else revalidatePath("/operations");
+  else {
+    revalidatePath("/operations");
+    revalidatePath("/operations/calendar");
+    revalidatePath("/operations/workload");
+  }
 
+  if (returnTo === "daily" && dailyDate) {
+    dailyRedirect(dailyDate, "cancelled");
+  }
   if (returnTo === "teaching" && classId) {
     redirect(`/classes/${classId}/teaching?success=session_cancelled`);
   }
@@ -106,6 +126,8 @@ export async function substituteSessionTeacherAction(
   const sessionId = String(formData.get("sessionId") ?? "").trim();
   const teacherId = String(formData.get("teacherId") ?? "").trim();
   const reason = String(formData.get("reason") ?? "").trim();
+  const returnTo = String(formData.get("returnTo") ?? "").trim();
+  const dailyDate = String(formData.get("dailyDate") ?? "").trim();
 
   if (!sessionId || !classId) return { error: "not_found" };
   if (!teacherId) return { error: "invalid_teacher" };
@@ -120,6 +142,10 @@ export async function substituteSessionTeacherAction(
 
   if (error) return { error: mapSessionOpsRpcError(error) };
   revalidateSessionSurfaces(classId, sessionId);
+
+  if (returnTo === "daily" && dailyDate) {
+    dailyRedirect(dailyDate, "teacher_substituted");
+  }
   redirect(`/classes/${classId}/teaching/sessions/${sessionId}?success=teacher_substituted`);
 }
 
@@ -136,6 +162,8 @@ export async function changeSessionRoomAction(
   const sessionId = String(formData.get("sessionId") ?? "").trim();
   const roomIdRaw = String(formData.get("roomId") ?? "").trim();
   const reason = String(formData.get("reason") ?? "").trim();
+  const returnTo = String(formData.get("returnTo") ?? "").trim();
+  const dailyDate = String(formData.get("dailyDate") ?? "").trim();
   const roomId = roomIdRaw.length > 0 ? roomIdRaw : null;
 
   if (!sessionId || !classId) return { error: "not_found" };
@@ -156,5 +184,9 @@ export async function changeSessionRoomAction(
 
   if (error) return { error: mapSessionOpsRpcError(error) };
   revalidateSessionSurfaces(classId, sessionId);
+
+  if (returnTo === "daily" && dailyDate) {
+    dailyRedirect(dailyDate, "room_changed");
+  }
   redirect(`/classes/${classId}/teaching/sessions/${sessionId}?success=room_changed`);
 }

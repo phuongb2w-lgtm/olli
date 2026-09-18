@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 const items = [
-  { key: "calendar", href: "/operations" },
-  { key: "workload", href: "/operations/workload" },
+  { key: "today", href: "/operations", exact: true },
+  { key: "calendar", href: "/operations/calendar", exact: false },
+  { key: "workload", href: "/operations/workload", exact: false },
 ] as const;
 
 export function OperationsSubnav() {
@@ -16,10 +17,9 @@ export function OperationsSubnav() {
   return (
     <nav className="flex gap-2 border-b border-slate-200 pb-2" aria-label={t("subnavLabel")}>
       {items.map((item) => {
-        const isActive =
-          item.href === "/operations"
-            ? pathname === "/operations"
-            : pathname.startsWith(item.href);
+        const isActive = item.exact
+          ? pathname === item.href
+          : pathname.startsWith(item.href);
         return (
           <Link
             key={item.key}

@@ -18,15 +18,17 @@ test.describe("M4-T05 operational calendar", () => {
     await signIn(page, adminEmail);
     await page.getByRole("link", { name: /operations|vận hành/i }).click();
     await expect(page).toHaveURL(/\/operations/);
-    await expect(page.getByRole("heading", { level: 1, name: /operations|vận hành/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /daily|hôm nay|operations|vận hành/i })).toBeVisible();
+    await page.getByRole("link", { name: /calendar|lịch vận hành/i }).click();
+    await expect(page).toHaveURL(/\/operations\/calendar/);
     await expect(page.getByRole("button", { name: /today|hôm nay/i })).toBeVisible();
     await expect(page.getByLabel(/from|từ ngày/i)).toBeVisible();
   });
 
   test("staff can view operations calendar", async ({ page }) => {
     await signIn(page, staffEmail);
-    await page.goto("/operations");
-    await expect(page.getByRole("heading", { level: 1, name: /operations|vận hành/i })).toBeVisible();
+    await page.goto("/operations/calendar");
+    await expect(page.getByRole("heading", { level: 1, name: /calendar|lịch/i })).toBeVisible();
     await expect(page.getByText(/do not have permission|không có quyền/i)).toHaveCount(0);
   });
 
@@ -40,8 +42,8 @@ test.describe("M4-T05 operational calendar", () => {
     await signIn(page, adminEmail);
     await page.getByLabel(/language|ngôn ngữ/i).selectOption("en");
     // Fixtures from operations-smoke use 2036-01 dates when verify runs the full suite.
-    await page.goto("/operations?from=2036-01-07&to=2036-01-21");
-    await expect(page.getByRole("heading", { level: 1, name: /operations/i })).toBeVisible();
+    await page.goto("/operations/calendar?from=2036-01-07&to=2036-01-21");
+    await expect(page.getByRole("heading", { level: 1, name: /calendar|operations/i })).toBeVisible();
 
     const sessionItems = page.locator('li[data-entry-type="session"]');
     const projectedItems = page.locator('li[data-entry-type="projected"]');
@@ -66,18 +68,18 @@ test.describe("M4-T05 operational calendar", () => {
 
   test("teacher and room filters are available", async ({ page }) => {
     await signIn(page, adminEmail);
-    await page.goto("/operations");
+    await page.goto("/operations/calendar");
     await page.locator("#teacherId").selectOption({ index: 0 });
     await page.locator("#roomId").selectOption({ index: 0 });
     await page.getByRole("button", { name: /apply|áp dụng/i }).click();
-    await expect(page).toHaveURL(/\/operations/);
+    await expect(page).toHaveURL(/\/operations\/calendar/);
   });
 
   test("EN locale renders operations labels", async ({ page }) => {
     await signIn(page, adminEmail);
     await page.getByLabel(/language|ngôn ngữ/i).selectOption("en");
-    await page.goto("/operations");
-    await expect(page.getByRole("heading", { level: 1, name: /^operations$/i })).toBeVisible();
+    await page.goto("/operations/calendar");
+    await expect(page.getByRole("heading", { level: 1, name: /calendar|operations/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /^today$/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /^apply$/i })).toBeVisible();
   });
@@ -86,8 +88,8 @@ test.describe("M4-T05 operational calendar", () => {
     await signIn(page, adminEmail);
     await page.getByLabel(/language|ngôn ngữ/i).selectOption("vi");
     await expect(page.getByRole("button", { name: /đăng xuất/i })).toBeVisible();
-    await page.goto("/operations");
-    await expect(page.getByRole("heading", { level: 1, name: /vận hành/i })).toBeVisible();
+    await page.goto("/operations/calendar");
+    await expect(page.getByRole("heading", { level: 1, name: /lịch/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /hôm nay/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /áp dụng/i })).toBeVisible();
   });

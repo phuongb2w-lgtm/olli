@@ -33,7 +33,9 @@ export type OperationalCalendarFilters = {
   roomId?: string | null;
 };
 
-function mapEntry(row: Record<string, unknown>): OperationalCalendarEntry {
+export function mapOperationalCalendarEntry(
+  row: Record<string, unknown>,
+): OperationalCalendarEntry {
   return {
     entryType: row.entry_type as OperationalCalendarEntryType,
     occurrenceDate: String(row.occurrence_date),
@@ -77,5 +79,5 @@ export async function fetchOperationalCalendar(
   }
 
   const rows = (data ?? []) as Record<string, unknown>[];
-  return { entries: rows.map(mapEntry), error: null };
+  return { entries: rows.map(mapOperationalCalendarEntry), error: null };
 }

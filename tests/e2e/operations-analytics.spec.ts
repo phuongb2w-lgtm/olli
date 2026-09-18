@@ -80,8 +80,10 @@ test.describe("M4-T07 operations analytics", () => {
   test("operations subnav links calendar and workload", async ({ page }) => {
     await signIn(page, adminEmail);
     await page.goto("/operations/workload");
-    await page.getByRole("link", { name: /^calendar$|^lịch$/i }).click();
+    await page.getByRole("link", { name: /today|hôm nay/i }).click();
     await expect(page).toHaveURL(/\/operations$/);
+    await page.getByRole("link", { name: /calendar|lịch vận hành/i }).click();
+    await expect(page).toHaveURL(/\/operations\/calendar/);
     await page.getByRole("link", { name: /workload|khối lượng/i }).click();
     await expect(page).toHaveURL(/\/operations\/workload/);
   });

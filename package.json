@@ -27,6 +27,7 @@
     "test:operations": "node scripts/operations-smoke.mjs",
     "test:session-operations": "node scripts/session-operations-smoke.mjs",
     "test:operations-analytics": "node scripts/operations-analytics-smoke.mjs",
+    "test:operations-daily": "node scripts/operations-daily-smoke.mjs",
     "test:session-execution": "node scripts/session-execution-smoke.mjs",
     "test:assessments": "node scripts/assessment-smoke.mjs",
     "test:reporting": "node scripts/reports-smoke.mjs",
@@ -41,7 +42,7 @@
     "test:types:stale": "node scripts/check-generated-types.mjs",
     "db:inventory": "node scripts/generate-security-inventory.mjs",
     "test:foundation": "npm run db:verify && npm run test:api && npm run test:app",
-    "verify": "npm run db:verify && npm run test:i18n && npm run test:env && npm run lint && npm run typecheck && npm run build && npm run test:api && npm run test:students && npm run test:guardians && npm run test:academic && npm run test:enrollments && npm run test:teaching && npm run test:operations && npm run test:session-operations && npm run test:operations-analytics && npm run test:session-execution && npm run test:assessments && npm run test:reporting && npm run test:m1-acceptance && npm run test:m3-acceptance && npm run test:crm && npm run test:app"
+    "verify": "npm run db:verify && npm run test:i18n && npm run test:env && npm run lint && npm run typecheck && npm run build && npm run test:api && npm run test:students && npm run test:guardians && npm run test:academic && npm run test:enrollments && npm run test:teaching && npm run test:operations && npm run test:session-operations && npm run test:operations-analytics && npm run test:operations-daily && npm run test:session-execution && npm run test:assessments && npm run test:reporting && npm run test:m1-acceptance && npm run test:m3-acceptance && npm run test:crm && npm run test:app"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

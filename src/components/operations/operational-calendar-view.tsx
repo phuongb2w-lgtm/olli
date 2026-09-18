@@ -77,12 +77,12 @@ export function OperationalCalendarView({
 
   function goToday() {
     const today = new Date().toISOString().slice(0, 10);
-    router.push(`/operations?from=${today}&to=${today}`);
+    router.push(`/operations/calendar?from=${today}&to=${today}`);
   }
 
   return (
     <div className="space-y-6">
-      <form method="get" action="/operations" className="space-y-4 rounded-lg border border-slate-200 bg-white p-4">
+      <form method="get" action="/operations/calendar" className="space-y-4 rounded-lg border border-slate-200 bg-white p-4">
         <div className="flex flex-wrap items-end gap-3">
           <div>
             <label htmlFor="from" className="block text-xs font-medium text-slate-600">

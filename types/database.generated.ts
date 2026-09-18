@@ -6069,6 +6069,21 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      list_daily_operations: {
+        Args: {
+          p_class_id?: string
+          p_date: string
+          p_room_id?: string
+          p_teacher_id?: string
+        }
+        Returns: Database["public"]["CompositeTypes"]["operational_calendar_entry"][]
+        SetofOptions: {
+          from: "*"
+          to: "operational_calendar_entry"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       list_room_usage: {
         Args: {
           p_class_id?: string
