@@ -792,6 +792,7 @@
     "upcomingSessions": "Buổi học sắp tới",
     "historicalSessions": "Buổi học trước đây",
     "cancelSession": "Hủy buổi học",
+    "cancelReasonPlaceholder": "Lý do…",
     "completeSession": "Hoàn thành buổi học",
     "openSession": "Mở buổi học",
     "roomCapacityWarning": "Sĩ số lớp vượt sức chứa phòng.",
@@ -848,6 +849,59 @@
       "session_completed": "Đã đánh dấu hoàn thành buổi học.",
       "created": "Đã tạo phòng học.",
       "updated": "Đã cập nhật phòng học."
+    }
+  },
+  "sessionOperations": {
+    "title": "Thao tác buổi học",
+    "subtitle": "Đổi lịch, hủy, thay giáo viên hoặc đổi phòng cho buổi học này.",
+    "reschedule": "Đổi lịch",
+    "cancelSession": "Hủy buổi học",
+    "substituteTeacher": "Thay giáo viên",
+    "changeRoom": "Đổi phòng",
+    "reason": "Lý do",
+    "reasonOptional": "Lý do (tuỳ chọn)",
+    "newStart": "Bắt đầu mới",
+    "newEnd": "Kết thúc mới",
+    "newTeacher": "Giáo viên mới",
+    "newRoom": "Phòng mới",
+    "noRoom": "Không có phòng",
+    "saving": "Đang lưu…",
+    "mutationsUnavailable": "Chỉ buổi học ở trạng thái đã lên lịch mới có thể thay đổi.",
+    "changeHistory": "Lịch sử thay đổi",
+    "noHistory": "Chưa có thay đổi vận hành nào.",
+    "changeTypes": {
+      "rescheduled": "Đã đổi lịch",
+      "cancelled": "Đã hủy",
+      "teacher_substituted": "Đã thay giáo viên",
+      "room_changed": "Đã đổi phòng"
+    },
+    "success": {
+      "rescheduled": "Đã đổi lịch buổi học.",
+      "cancelled": "Đã hủy buổi học.",
+      "teacher_substituted": "Đã thay giáo viên.",
+      "room_changed": "Đã đổi phòng."
+    },
+    "errors": {
+      "permission_denied": "Bạn không có quyền thực hiện thao tác này.",
+      "save_error": "Không thể lưu thay đổi.",
+      "not_found": "Không tìm thấy buổi học.",
+      "session_not_found": "Không tìm thấy buổi học.",
+      "invalid_session_state": "Không thể thay đổi buổi học ở trạng thái hiện tại.",
+      "reason_required": "Cần nhập lý do.",
+      "same_schedule_time": "Hãy chọn thời gian khác.",
+      "same_teacher": "Hãy chọn giáo viên khác.",
+      "same_room": "Hãy chọn phòng khác.",
+      "financial_effect_exists": "Buổi học đã có ghi nhận tài chính và không thể hủy.",
+      "attendance_already_recorded": "Đã ghi điểm danh; không thể hủy buổi học.",
+      "already_cancelled": "Buổi học đã bị hủy.",
+      "invalid_interval": "Nhập khoảng thời gian hợp lệ.",
+      "teacher_unavailable": "Giáo viên không rảnh vào thời gian này.",
+      "teacher_conflict": "Giáo viên đã có lịch vào thời gian này.",
+      "room_conflict": "Phòng đã có lịch vào thời gian này.",
+      "room_inactive": "Phòng đã chọn không còn hoạt động.",
+      "invalid_teacher": "Chọn giáo viên hợp lệ.",
+      "invalid_room": "Chọn phòng hợp lệ.",
+      "schedule_conflict": "Phát hiện xung đột lịch."
     }
   },
   "sessionExecution": {

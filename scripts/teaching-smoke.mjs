@@ -1017,10 +1017,10 @@ async function main() {
     .from("attendance")
     .select("id", { count: "exact", head: true });
   if (cancelTarget?.id) {
-    await admin
-      .from("teaching_session")
-      .update({ status: "cancelled", updated_by: APP_A_ADMIN })
-      .eq("id", cancelTarget.id);
+    await admin.rpc("cancel_teaching_session", {
+      p_session_id: cancelTarget.id,
+      p_reason: "Teaching smoke cancel",
+    });
   }
   const { data: cancelledRow } = await admin
     .from("teaching_session")
@@ -1052,6 +1052,10 @@ async function main() {
     .eq("class_schedule_id", completeSchedule.data.id)
     .maybeSingle();
   if (completeTarget?.id) {
+    await admin
+      .from("teaching_session")
+      .update({ status: "in_progress", updated_by: APP_A_ADMIN })
+      .eq("id", completeTarget.id);
     await admin
       .from("teaching_session")
       .update({ status: "completed", updated_by: APP_A_ADMIN })
@@ -1169,10 +1173,10 @@ async function main() {
     .eq("class_schedule_id", freeSched.data.id)
     .maybeSingle();
   if (freeSession?.id) {
-    await admin
-      .from("teaching_session")
-      .update({ status: "cancelled", updated_by: APP_A_ADMIN })
-      .eq("id", freeSession.id);
+    await admin.rpc("cancel_teaching_session", {
+      p_session_id: freeSession.id,
+      p_reason: "Free room for overlap smoke",
+    });
   }
   const freeSched2 = await insertSchedule(admin, freeClass.id, {
     weekdayCode: "sun",

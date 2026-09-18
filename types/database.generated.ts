@@ -4705,6 +4705,109 @@ export type Database = {
           },
         ]
       }
+      teaching_session_change: {
+        Row: {
+          actor_id: string
+          change_type: string
+          id: string
+          new_room_id: string | null
+          new_scheduled_end_at: string | null
+          new_scheduled_start_at: string | null
+          new_status: string | null
+          new_teacher_id: string | null
+          occurred_at: string
+          organization_id: string
+          previous_room_id: string | null
+          previous_scheduled_end_at: string | null
+          previous_scheduled_start_at: string | null
+          previous_status: string | null
+          previous_teacher_id: string | null
+          reason: string | null
+          teaching_session_id: string
+        }
+        Insert: {
+          actor_id: string
+          change_type: string
+          id?: string
+          new_room_id?: string | null
+          new_scheduled_end_at?: string | null
+          new_scheduled_start_at?: string | null
+          new_status?: string | null
+          new_teacher_id?: string | null
+          occurred_at?: string
+          organization_id: string
+          previous_room_id?: string | null
+          previous_scheduled_end_at?: string | null
+          previous_scheduled_start_at?: string | null
+          previous_status?: string | null
+          previous_teacher_id?: string | null
+          reason?: string | null
+          teaching_session_id: string
+        }
+        Update: {
+          actor_id?: string
+          change_type?: string
+          id?: string
+          new_room_id?: string | null
+          new_scheduled_end_at?: string | null
+          new_scheduled_start_at?: string | null
+          new_status?: string | null
+          new_teacher_id?: string | null
+          occurred_at?: string
+          organization_id?: string
+          previous_room_id?: string | null
+          previous_scheduled_end_at?: string | null
+          previous_scheduled_start_at?: string | null
+          previous_status?: string | null
+          previous_teacher_id?: string | null
+          reason?: string | null
+          teaching_session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teaching_session_change_organization_id_actor_id_fkey"
+            columns: ["organization_id", "actor_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "teaching_session_change_organization_id_new_room_id_fkey"
+            columns: ["organization_id", "new_room_id"]
+            isOneToOne: false
+            referencedRelation: "room"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "teaching_session_change_organization_id_new_teacher_id_fkey"
+            columns: ["organization_id", "new_teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teacher"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "teaching_session_change_organization_id_previous_room_id_fkey"
+            columns: ["organization_id", "previous_room_id"]
+            isOneToOne: false
+            referencedRelation: "room"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "teaching_session_change_organization_id_previous_teacher_i_fkey"
+            columns: ["organization_id", "previous_teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teacher"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "teaching_session_change_organization_id_teaching_session_i_fkey"
+            columns: ["organization_id", "teaching_session_id"]
+            isOneToOne: false
+            referencedRelation: "teaching_session"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       tuition_plan: {
         Row: {
           amount: number
@@ -5108,6 +5211,24 @@ export type Database = {
         }
         Returns: Json
       }
+      _append_teaching_session_change: {
+        Args: {
+          p_change_type: string
+          p_new_end?: string
+          p_new_room?: string
+          p_new_start?: string
+          p_new_status?: string
+          p_new_teacher?: string
+          p_prev_end?: string
+          p_prev_room?: string
+          p_prev_start?: string
+          p_prev_status?: string
+          p_prev_teacher?: string
+          p_reason: string
+          p_session_id: string
+        }
+        Returns: string
+      }
       _assert_class_open_for_teaching_create: {
         Args: { p_class: Database["public"]["Tables"]["class"]["Row"] }
         Returns: undefined
@@ -5128,18 +5249,22 @@ export type Database = {
         }
         Returns: undefined
       }
+      _assert_session_interval_ok: {
+        Args: {
+          p_ends_at: string
+          p_exclude_session_id: string
+          p_org_id: string
+          p_room_id: string
+          p_starts_at: string
+          p_teacher_id: string
+        }
+        Returns: undefined
+      }
       _assert_teaching_write_permission: {
         Args: { p_mode: string }
         Returns: undefined
       }
       _build_payment_details: { Args: { p_payment_id: string }; Returns: Json }
-      _cb_as_anon: { Args: never; Returns: undefined }
-      _cb_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _cb_as_super: { Args: never; Returns: undefined }
-      _cb_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
       _charge_collection_status: {
         Args: { p_charge_id: string }
         Returns: string
@@ -5221,63 +5346,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      _loc_as_anon: { Args: never; Returns: undefined }
-      _loc_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _loc_as_super: { Args: never; Returns: undefined }
-      _loc_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_as_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _m3_as_as_super: { Args: never; Returns: undefined }
-      _m3_as_expect_fail: {
-        Args: { sql_text: string; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_as_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_crm_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _m3_crm_as_super: { Args: never; Returns: undefined }
-      _m3_crm_expect_fail: {
-        Args: { sql_text: string; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_crm_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_lc_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _m3_lc_as_super: { Args: never; Returns: undefined }
-      _m3_lc_expect_fail: {
-        Args: { sql_text: string; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_lc_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_ow_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _m3_ow_as_super: { Args: never; Returns: undefined }
-      _m3_ow_expect_fail: {
-        Args: { sql_text: string; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_ow_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_tr_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _m3_tr_as_super: { Args: never; Returns: undefined }
-      _m3_tr_expect_fail: {
-        Args: { sql_text: string; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_tr_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -5319,12 +5387,13 @@ export type Database = {
         }
         Returns: string
       }
-      _sec_as_anon: { Args: never; Returns: undefined }
-      _sec_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _sec_as_super: { Args: never; Returns: undefined }
-      _sec_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
+      _session_has_attendance: {
+        Args: { p_session_id: string }
+        Returns: boolean
+      }
+      _session_has_posted_financial_effects: {
+        Args: { p_session_id: string }
+        Returns: boolean
       }
       _validate_active_room_reference: {
         Args: { p_org_id: string; p_room_id: string }
@@ -5456,8 +5525,20 @@ export type Database = {
         Args: { p_note?: string; p_trial_id: string }
         Returns: Json
       }
+      cancel_teaching_session: {
+        Args: { p_reason: string; p_session_id: string }
+        Returns: string
+      }
       capital_asset_period_month: {
         Args: { p_period_number: number; p_placed_in_service: string }
+        Returns: string
+      }
+      change_session_room: {
+        Args: {
+          p_new_room_id?: string
+          p_reason?: string
+          p_session_id: string
+        }
         Returns: string
       }
       charge_allocated_amount: {
@@ -5878,6 +5959,34 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      list_teaching_session_changes: {
+        Args: { p_session_id: string }
+        Returns: {
+          actor_id: string
+          change_type: string
+          id: string
+          new_room_id: string | null
+          new_scheduled_end_at: string | null
+          new_scheduled_start_at: string | null
+          new_status: string | null
+          new_teacher_id: string | null
+          occurred_at: string
+          organization_id: string
+          previous_room_id: string | null
+          previous_scheduled_end_at: string | null
+          previous_scheduled_start_at: string | null
+          previous_status: string | null
+          previous_teacher_id: string | null
+          reason: string | null
+          teaching_session_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "teaching_session_change"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       list_trial_teaching_sessions: {
         Args: { p_class_id: string }
         Returns: {
@@ -5947,6 +6056,15 @@ export type Database = {
           p_trial_id: string
         }
         Returns: Json
+      }
+      reschedule_teaching_session: {
+        Args: {
+          p_reason: string
+          p_scheduled_end_at: string
+          p_scheduled_start_at: string
+          p_session_id: string
+        }
+        Returns: string
       }
       resolve_allocation_rule: {
         Args: {
@@ -6078,6 +6196,14 @@ export type Database = {
           p_useful_life_months: number
         }
         Returns: number
+      }
+      substitute_session_teacher: {
+        Args: {
+          p_new_teacher_id: string
+          p_reason: string
+          p_session_id: string
+        }
+        Returns: string
       }
       suggest_payment_allocation: {
         Args: {

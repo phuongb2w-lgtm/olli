@@ -327,6 +327,7 @@ export async function cancelSessionAction(
 
   const classId = String(formData.get("classId") ?? "").trim();
   const sessionId = String(formData.get("sessionId") ?? "").trim();
+  const reason = String(formData.get("reason") ?? "").trim() || "Cancelled from teaching list";
   const classRow = await assertClassInOrg(classId, user.organizationId);
   if (!classRow) return { error: "invalid_class" };
 
@@ -338,17 +339,25 @@ export async function cancelSessionAction(
     .eq("class_id", classId)
     .maybeSingle();
   if (!session) return { error: "not_found" };
-  if (session.status !== "scheduled" && session.status !== "in_progress") {
+  if (session.status !== "scheduled") {
     return { error: "session_not_cancellable" };
   }
 
-  const { error } = await supabase
-    .from("teaching_session")
-    .update({ status: "cancelled", updated_by: user.appUserId })
-    .eq("id", sessionId);
+  const { error } = await supabase.rpc("cancel_teaching_session", {
+    p_session_id: sessionId,
+    p_reason: reason,
+  });
 
-  if (error) return { error: "save_error" };
+  if (error) {
+    const mapped = mapTeachingRpcError(error);
+    if (mapped !== "save_error") return { error: mapped };
+    if (error.message?.includes("invalid_session_state")) return { error: "session_not_cancellable" };
+    if (error.message?.includes("attendance_already_recorded")) return { error: "session_not_cancellable" };
+    if (error.message?.includes("financial_effect_exists")) return { error: "session_not_cancellable" };
+    return { error: "save_error" };
+  }
   revalidateTeaching(classId);
+  revalidatePath("/operations");
   redirect(`/classes/${classId}/teaching?success=session_cancelled`);
 }
 

@@ -1259,10 +1259,27 @@ async function main() {
   for (const [date, status] of Object.entries(statusByDate)) {
     const session = attSessionsByDate.get(date);
     if (session && session.status !== status) {
-      await admin
-        .from("teaching_session")
-        .update({ status, updated_by: APP_A_ADMIN })
-        .eq("id", session.id);
+      if (status === "cancelled") {
+        const { error } = await adminUser.rpc("cancel_teaching_session", {
+          p_session_id: session.id,
+          p_reason: "Reports smoke cancel fixture",
+        });
+        if (error) throw new Error(`cancel fixture failed: ${error.message}`);
+      } else if (status === "completed") {
+        await admin
+          .from("teaching_session")
+          .update({ status: "in_progress", updated_by: APP_A_ADMIN })
+          .eq("id", session.id);
+        await admin
+          .from("teaching_session")
+          .update({ status: "completed", updated_by: APP_A_ADMIN })
+          .eq("id", session.id);
+      } else {
+        await admin
+          .from("teaching_session")
+          .update({ status, updated_by: APP_A_ADMIN })
+          .eq("id", session.id);
+      }
       session.status = status;
     }
   }

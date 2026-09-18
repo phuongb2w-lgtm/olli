@@ -166,20 +166,22 @@ export async function cancelSessionExecutionAction(
 
   const classId = String(formData.get("classId") ?? "").trim();
   const sessionId = String(formData.get("sessionId") ?? "").trim();
+  const reason = String(formData.get("reason") ?? "").trim() || "Cancelled from session execution";
   const session = await loadSession(classId, sessionId);
   if (!session) return { error: "not_found" };
-  if (session.status !== "scheduled" && session.status !== "in_progress") {
+  if (session.status !== "scheduled") {
     return { error: "invalid_session_status" };
   }
 
   const supabase = await createClient();
-  const { error } = await supabase
-    .from("teaching_session")
-    .update({ status: "cancelled", updated_by: user.appUserId })
-    .eq("id", sessionId);
+  const { error } = await supabase.rpc("cancel_teaching_session", {
+    p_session_id: sessionId,
+    p_reason: reason,
+  });
 
   if (error) return { error: "save_error" };
   revalidateSession(classId, sessionId);
+  revalidatePath("/operations");
   redirect(`/classes/${classId}/teaching/sessions/${sessionId}?success=cancelled`);
 }
 

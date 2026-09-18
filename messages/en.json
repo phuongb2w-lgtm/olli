@@ -792,6 +792,7 @@
     "upcomingSessions": "Upcoming sessions",
     "historicalSessions": "Historical sessions",
     "cancelSession": "Cancel session",
+    "cancelReasonPlaceholder": "Reason…",
     "completeSession": "Complete session",
     "openSession": "Open session",
     "roomCapacityWarning": "Class capacity exceeds room capacity.",
@@ -848,6 +849,59 @@
       "session_completed": "Session marked completed.",
       "created": "Room created successfully.",
       "updated": "Room updated successfully."
+    }
+  },
+  "sessionOperations": {
+    "title": "Session operations",
+    "subtitle": "Reschedule, cancel, substitute teacher, or change room for this session.",
+    "reschedule": "Reschedule",
+    "cancelSession": "Cancel session",
+    "substituteTeacher": "Substitute teacher",
+    "changeRoom": "Change room",
+    "reason": "Reason",
+    "reasonOptional": "Reason (optional)",
+    "newStart": "New start",
+    "newEnd": "New end",
+    "newTeacher": "New teacher",
+    "newRoom": "New room",
+    "noRoom": "No room",
+    "saving": "Saving…",
+    "mutationsUnavailable": "Operational changes are only available for scheduled sessions.",
+    "changeHistory": "Change history",
+    "noHistory": "No operational changes recorded yet.",
+    "changeTypes": {
+      "rescheduled": "Rescheduled",
+      "cancelled": "Cancelled",
+      "teacher_substituted": "Teacher substituted",
+      "room_changed": "Room changed"
+    },
+    "success": {
+      "rescheduled": "Session rescheduled.",
+      "cancelled": "Session cancelled.",
+      "teacher_substituted": "Teacher substituted.",
+      "room_changed": "Room changed."
+    },
+    "errors": {
+      "permission_denied": "You do not have permission for this action.",
+      "save_error": "Unable to save changes.",
+      "not_found": "Session not found.",
+      "session_not_found": "Session not found.",
+      "invalid_session_state": "This session cannot be changed in its current state.",
+      "reason_required": "A reason is required.",
+      "same_schedule_time": "Choose a different time.",
+      "same_teacher": "Choose a different teacher.",
+      "same_room": "Choose a different room.",
+      "financial_effect_exists": "This session has posted financial records and cannot be cancelled.",
+      "attendance_already_recorded": "Attendance already recorded; cancellation is blocked.",
+      "already_cancelled": "Session is already cancelled.",
+      "invalid_interval": "Enter a valid time range.",
+      "teacher_unavailable": "Teacher is unavailable for this time.",
+      "teacher_conflict": "Teacher is already booked for this time.",
+      "room_conflict": "Room is already booked for this time.",
+      "room_inactive": "Selected room is inactive.",
+      "invalid_teacher": "Select a valid teacher.",
+      "invalid_room": "Select a valid room.",
+      "schedule_conflict": "Scheduling conflict detected."
     }
   },
   "sessionExecution": {

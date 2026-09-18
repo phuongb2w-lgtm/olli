@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
+import { SessionOperationsPanel } from "@/components/session-execution/session-operations-panel";
 import { SessionRoster } from "@/components/session-execution/session-roster";
 import { SessionStatusActions } from "@/components/session-execution/session-status-actions";
 import { formatDateTime } from "@/lib/formatting";
@@ -12,6 +13,7 @@ import {
   fetchSessionExecutionContext,
   fetchSessionRoster,
 } from "@/lib/session-execution/query-session-execution";
+import { listTeachingSessionChanges } from "@/lib/teaching/query-session-changes";
 import type { Locale } from "@/i18n/config";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +46,7 @@ export default async function SessionExecutionPage({ params, searchParams }: Pro
   const canReadObservation = await can("observation.read");
   const canRecordObservation = await can("observation.record");
   const canManageSession = await can("enrollment.update");
+  const canReadOps = await can("enrollment.read");
 
   const supabase = await createClient();
   const context = await fetchSessionExecutionContext(supabase, classId, sessionId);
@@ -57,6 +60,18 @@ export default async function SessionExecutionPage({ params, searchParams }: Pro
       ? await fetchObservationIndicators(supabase)
       : [];
   const progress = countAttendanceProgress(roster);
+  const changes = canReadOps
+    ? await listTeachingSessionChanges(supabase, sessionId)
+    : [];
+
+  const [{ data: teachers }, { data: rooms }] = await Promise.all([
+    supabase
+      .from("teacher")
+      .select("id, given_name, family_name")
+      .eq("status", "active")
+      .order("family_name"),
+    supabase.from("room").select("id, name, code").eq("status", "active").order("name"),
+  ]);
 
   const success = rawParams.success;
   const successKey = typeof success === "string" ? success : undefined;
@@ -64,6 +79,13 @@ export default async function SessionExecutionPage({ params, searchParams }: Pro
     context.roomName ??
     context.locationFallback ??
     t("noLocation");
+
+  const tOps = await getTranslations("sessionOperations");
+  const opsSuccess =
+    successKey &&
+    ["rescheduled", "cancelled", "teacher_substituted", "room_changed"].includes(successKey)
+      ? tOps(`success.${successKey}`)
+      : null;
 
   return (
     <div className="space-y-8">
@@ -123,7 +145,7 @@ export default async function SessionExecutionPage({ params, searchParams }: Pro
 
         {successKey ? (
           <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-800" role="status">
-            {t(`success.${successKey}`)}
+            {opsSuccess ?? t(`success.${successKey}`)}
           </p>
         ) : null}
       </header>
@@ -137,6 +159,28 @@ export default async function SessionExecutionPage({ params, searchParams }: Pro
             notRecordedCount={progress.notRecorded}
           />
         </section>
+      ) : null}
+
+      {canReadOps ? (
+        <SessionOperationsPanel
+          classId={classId}
+          sessionId={sessionId}
+          status={context.status}
+          scheduledStartAt={context.scheduledStartAt}
+          scheduledEndAt={context.scheduledEndAt}
+          teacherId={context.teacherId}
+          roomId={context.roomId}
+          teachers={(teachers ?? []).map((row) => ({
+            id: row.id,
+            label: `${row.given_name} ${row.family_name}`.trim(),
+          }))}
+          rooms={(rooms ?? []).map((row) => ({
+            id: row.id,
+            label: row.code ? `${row.name} (${row.code})` : row.name,
+          }))}
+          changes={changes}
+          canMutate={canManageSession}
+        />
       ) : null}
 
       <section className="space-y-4">

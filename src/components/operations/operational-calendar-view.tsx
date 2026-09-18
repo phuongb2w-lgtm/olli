@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { OperationalCalendarEntry } from "@/lib/teaching/query-operational-calendar";
@@ -221,7 +222,21 @@ export function OperationalCalendarView({
                   <p className="text-sm font-medium text-slate-900">
                     <span className="tabular-nums">{timeLabel}</span>
                     <span className="mx-2 text-slate-300">·</span>
-                    {entry.className}
+                    {entry.entryType === "session" && entry.teachingSessionId ? (
+                      <Link
+                        href={`/classes/${entry.classId}/teaching/sessions/${entry.teachingSessionId}`}
+                        className="underline decoration-slate-300 underline-offset-2 hover:decoration-slate-700"
+                      >
+                        {entry.className}
+                      </Link>
+                    ) : (
+                      <Link
+                        href={`/classes/${entry.classId}/teaching`}
+                        className="underline decoration-slate-300 underline-offset-2 hover:decoration-slate-700"
+                      >
+                        {entry.className}
+                      </Link>
+                    )}
                   </p>
                   <p className="text-sm text-slate-600">
                     {teacherLabel}

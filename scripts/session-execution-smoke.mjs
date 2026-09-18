@@ -994,10 +994,10 @@ async function main() {
   );
 
   const cancelFixture = await setupClassSession(admin, "Cancel", { sessionDate: "2028-10-30", weekdayCode: "mon" });
-  await admin
-    .from("teaching_session")
-    .update({ status: "cancelled", updated_by: APP_A_ADMIN })
-    .eq("id", cancelFixture.session.id);
+  await admin.rpc("cancel_teaching_session", {
+    p_session_id: cancelFixture.session.id,
+    p_reason: "Session execution smoke cancel",
+  });
   const { data: cancelledSession } = await admin
     .from("teaching_session")
     .select("id, status")

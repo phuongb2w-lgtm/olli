@@ -32,28 +32,39 @@ export function SessionActions({ classId, sessionId, status }: Props) {
 
   return (
     <div className="flex flex-wrap gap-2">
-      <form action={completeAction}>
-        <input type="hidden" name="classId" value={classId} />
-        <input type="hidden" name="sessionId" value={sessionId} />
-        <button
-          type="submit"
-          disabled={completePending}
-          className="rounded-md border border-slate-300 px-2 py-1 text-xs font-medium text-slate-900 disabled:opacity-50"
-        >
-          {completePending ? t("saving") : t("completeSession")}
-        </button>
-      </form>
-      <form action={cancelAction}>
-        <input type="hidden" name="classId" value={classId} />
-        <input type="hidden" name="sessionId" value={sessionId} />
-        <button
-          type="submit"
-          disabled={cancelPending}
-          className="rounded-md border border-red-300 px-2 py-1 text-xs font-medium text-red-800 disabled:opacity-50"
-        >
-          {cancelPending ? t("saving") : t("cancelSession")}
-        </button>
-      </form>
+      {status === "in_progress" || status === "scheduled" ? (
+        <form action={completeAction}>
+          <input type="hidden" name="classId" value={classId} />
+          <input type="hidden" name="sessionId" value={sessionId} />
+          <button
+            type="submit"
+            disabled={completePending}
+            className="rounded-md border border-slate-300 px-2 py-1 text-xs font-medium text-slate-900 disabled:opacity-50"
+          >
+            {completePending ? t("saving") : t("completeSession")}
+          </button>
+        </form>
+      ) : null}
+      {status === "scheduled" ? (
+        <form action={cancelAction} className="flex flex-wrap items-center gap-1">
+          <input type="hidden" name="classId" value={classId} />
+          <input type="hidden" name="sessionId" value={sessionId} />
+          <input
+            type="text"
+            name="reason"
+            required
+            placeholder={t("cancelReasonPlaceholder")}
+            className="w-36 rounded border border-slate-300 px-1.5 py-1 text-xs"
+          />
+          <button
+            type="submit"
+            disabled={cancelPending}
+            className="rounded-md border border-red-300 px-2 py-1 text-xs font-medium text-red-800 disabled:opacity-50"
+          >
+            {cancelPending ? t("saving") : t("cancelSession")}
+          </button>
+        </form>
+      ) : null}
       {cancelState.error || completeState.error ? (
         <p className="w-full text-xs text-red-700">{t("saveError")}</p>
       ) : null}
