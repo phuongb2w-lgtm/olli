@@ -5265,6 +5265,13 @@ export type Database = {
         Returns: undefined
       }
       _build_payment_details: { Args: { p_payment_id: string }; Returns: Json }
+      _cb_as_anon: { Args: never; Returns: undefined }
+      _cb_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _cb_as_super: { Args: never; Returns: undefined }
+      _cb_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _charge_collection_status: {
         Args: { p_charge_id: string }
         Returns: string
@@ -5323,6 +5330,24 @@ export type Database = {
         Args: { p_allocations: Json; p_batch_id?: string; p_payment_id: string }
         Returns: Json
       }
+      _list_operational_occurrences: {
+        Args: {
+          p_class_id?: string
+          p_date_from: string
+          p_date_to: string
+          p_org_id: string
+          p_room_id?: string
+          p_teacher_id?: string
+          p_timezone: string
+        }
+        Returns: Database["public"]["CompositeTypes"]["operational_occurrence_row"][]
+        SetofOptions: {
+          from: "*"
+          to: "operational_occurrence_row"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       _load_class_for_teaching_mutation: {
         Args: { p_class_id: string }
         Returns: {
@@ -5345,6 +5370,63 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      _loc_as_anon: { Args: never; Returns: undefined }
+      _loc_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _loc_as_super: { Args: never; Returns: undefined }
+      _loc_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_as_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_as_as_super: { Args: never; Returns: undefined }
+      _m3_as_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_as_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_crm_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_crm_as_super: { Args: never; Returns: undefined }
+      _m3_crm_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_crm_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_lc_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_lc_as_super: { Args: never; Returns: undefined }
+      _m3_lc_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_lc_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_ow_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_ow_as_super: { Args: never; Returns: undefined }
+      _m3_ow_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_ow_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_tr_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_tr_as_super: { Args: never; Returns: undefined }
+      _m3_tr_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_tr_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
       }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
@@ -5387,6 +5469,13 @@ export type Database = {
         }
         Returns: string
       }
+      _sec_as_anon: { Args: never; Returns: undefined }
+      _sec_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _sec_as_super: { Args: never; Returns: undefined }
+      _sec_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _session_has_attendance: {
         Args: { p_session_id: string }
         Returns: boolean
@@ -5401,6 +5490,17 @@ export type Database = {
       }
       _validate_active_teacher_reference: {
         Args: { p_org_id: string; p_teacher_id: string }
+        Returns: undefined
+      }
+      _validate_analytics_range: {
+        Args: {
+          p_class_id?: string
+          p_date_from: string
+          p_date_to: string
+          p_org_id: string
+          p_room_id?: string
+          p_teacher_id?: string
+        }
         Returns: undefined
       }
       _validate_assignment_effective_range: {
@@ -5861,6 +5961,16 @@ export type Database = {
         Args: { p_lead_id: string }
         Returns: Json
       }
+      get_operational_planning_gaps: {
+        Args: { p_class_id?: string; p_date_from: string; p_date_to: string }
+        Returns: Database["public"]["CompositeTypes"]["operational_planning_gaps_row"]
+        SetofOptions: {
+          from: "*"
+          to: "operational_planning_gaps_row"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_organization_cost_reconciliation: {
         Args: { p_period_month: string }
         Returns: Json
@@ -5955,6 +6065,37 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "operational_calendar_entry"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      list_room_usage: {
+        Args: {
+          p_class_id?: string
+          p_date_from: string
+          p_date_to: string
+          p_room_id?: string
+        }
+        Returns: Database["public"]["CompositeTypes"]["room_usage_row"][]
+        SetofOptions: {
+          from: "*"
+          to: "room_usage_row"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      list_teacher_workload: {
+        Args: {
+          p_class_id?: string
+          p_date_from: string
+          p_date_to: string
+          p_room_id?: string
+          p_teacher_id?: string
+        }
+        Returns: Database["public"]["CompositeTypes"]["teacher_workload_row"][]
+        SetofOptions: {
+          from: "*"
+          to: "teacher_workload_row"
           isOneToOne: false
           isSetofReturn: true
         }
@@ -6386,6 +6527,39 @@ export type Database = {
         room_name: string | null
         room_code: string | null
       }
+      operational_occurrence_row: {
+        source_type: string | null
+        operational_date: string | null
+        starts_at: string | null
+        ends_at: string | null
+        class_id: string | null
+        class_schedule_id: string | null
+        teaching_session_id: string | null
+        session_status: string | null
+        teacher_id: string | null
+        teacher_resolution_status: string | null
+        room_id: string | null
+      }
+      operational_planning_gaps_row: {
+        unresolved_projected_session_count: number | null
+        unresolved_projected_minutes: number | null
+        roomless_projected_session_count: number | null
+        roomless_projected_minutes: number | null
+      }
+      room_usage_row: {
+        room_id: string | null
+        room_name: string | null
+        room_code: string | null
+        materialized_session_count: number | null
+        materialized_booked_minutes: number | null
+        projected_session_count: number | null
+        projected_booked_minutes: number | null
+        completed_session_count: number | null
+        delivered_scheduled_minutes: number | null
+        actual_delivered_minutes: number | null
+        cancelled_session_count: number | null
+        distinct_class_count: number | null
+      }
       schedule_conflict_entry: {
         conflict_type: string | null
         occurrence_date: string | null
@@ -6396,6 +6570,20 @@ export type Database = {
         conflicting_class_id: string | null
         conflicting_schedule_id: string | null
         conflicting_session_id: string | null
+      }
+      teacher_workload_row: {
+        teacher_id: string | null
+        teacher_display_name: string | null
+        materialized_session_count: number | null
+        materialized_scheduled_minutes: number | null
+        projected_session_count: number | null
+        projected_minutes: number | null
+        completed_session_count: number | null
+        delivered_scheduled_minutes: number | null
+        actual_delivered_minutes: number | null
+        in_progress_session_count: number | null
+        cancelled_session_count: number | null
+        distinct_class_count: number | null
       }
     }
   }

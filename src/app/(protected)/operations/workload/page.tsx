@@ -1,9 +1,14 @@
 import { getTranslations } from "next-intl/server";
-import { OperationalCalendarView } from "@/components/operations/operational-calendar-view";
 import { OperationsSubnav } from "@/components/operations/operations-subnav";
+import { WorkloadAnalyticsView } from "@/components/operations/workload-analytics-view";
 import { can } from "@/lib/permissions/can";
 import { createClient } from "@/lib/supabase/server";
-import { fetchOperationalCalendar } from "@/lib/teaching/query-operational-calendar";
+import {
+  currentMonthRange,
+  fetchOperationalPlanningGaps,
+  fetchRoomUsage,
+  fetchTeacherWorkload,
+} from "@/lib/teaching/query-workload-analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -16,19 +21,25 @@ function firstParam(value: string | string[] | undefined): string {
   return value ?? "";
 }
 
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-export default async function OperationsPage({ searchParams }: Props) {
-  const t = await getTranslations("operations");
+export default async function OperationsWorkloadPage({ searchParams }: Props) {
+  const t = await getTranslations("operationsAnalytics");
   const raw = await searchParams;
   const hasRead = await can("enrollment.read");
+
+  const defaultRange = currentMonthRange();
+  const dateFrom = firstParam(raw.from) || defaultRange.from;
+  const dateTo = firstParam(raw.to) || defaultRange.to;
+  const classId = firstParam(raw.classId);
+  const teacherId = firstParam(raw.teacherId);
+  const roomId = firstParam(raw.roomId);
 
   if (!hasRead) {
     return (
       <div className="space-y-4">
-        <h1 className="text-xl font-semibold text-slate-900">{t("title")}</h1>
+        <header>
+          <h1 className="text-xl font-semibold text-slate-900">{t("title")}</h1>
+        </header>
+        <OperationsSubnav />
         <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-600">
           <p>{t("denied")}</p>
         </section>
@@ -36,21 +47,19 @@ export default async function OperationsPage({ searchParams }: Props) {
     );
   }
 
-  const dateFrom = firstParam(raw.from) || todayIso();
-  const dateTo = firstParam(raw.to) || dateFrom;
-  const classId = firstParam(raw.classId);
-  const teacherId = firstParam(raw.teacherId);
-  const roomId = firstParam(raw.roomId);
-
   const supabase = await createClient();
-  const [{ entries, error }, classesRes, teachersRes, roomsRes, orgRes] = await Promise.all([
-    fetchOperationalCalendar(supabase, {
-      dateFrom,
-      dateTo,
-      classId: classId || null,
-      teacherId: teacherId || null,
-      roomId: roomId || null,
-    }),
+  const filters = {
+    dateFrom,
+    dateTo,
+    classId: classId || null,
+    teacherId: teacherId || null,
+    roomId: roomId || null,
+  };
+
+  const [teacherRes, roomRes, gapsRes, classesRes, teachersRes, roomsRes] = await Promise.all([
+    fetchTeacherWorkload(supabase, filters),
+    fetchRoomUsage(supabase, filters),
+    fetchOperationalPlanningGaps(supabase, dateFrom, dateTo, classId || null),
     supabase.from("class").select("id, name").order("name"),
     supabase
       .from("teacher")
@@ -58,8 +67,9 @@ export default async function OperationsPage({ searchParams }: Props) {
       .eq("status", "active")
       .order("family_name"),
     supabase.from("room").select("id, name, code").eq("status", "active").order("name"),
-    supabase.from("organization").select("timezone").limit(1).maybeSingle(),
   ]);
+
+  const error = teacherRes.error ?? roomRes.error ?? gapsRes.error;
 
   const classes = (classesRes.data ?? []).map((c) => ({ id: c.id, label: c.name }));
   const teachers = (teachersRes.data ?? []).map((teach) => ({
@@ -80,7 +90,7 @@ export default async function OperationsPage({ searchParams }: Props) {
 
       <OperationsSubnav />
 
-      <OperationalCalendarView
+      <WorkloadAnalyticsView
         dateFrom={dateFrom}
         dateTo={dateTo}
         classId={classId}
@@ -89,9 +99,10 @@ export default async function OperationsPage({ searchParams }: Props) {
         classes={classes}
         teachers={teachers}
         rooms={rooms}
-        entries={entries}
+        teacherRows={teacherRes.rows}
+        roomRows={roomRes.rows}
+        planningGaps={gapsRes.gaps}
         error={error}
-        timezone={orgRes.data?.timezone ?? "Asia/Ho_Chi_Minh"}
       />
     </div>
   );
