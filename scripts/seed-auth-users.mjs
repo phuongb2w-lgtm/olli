@@ -13,6 +13,8 @@ const users = [
   { id: "b1111111-1111-4111-8111-111111111111", email: "org-b-admin@olli.local" },
   { id: "b2222222-2222-4222-8222-222222222222", email: "org-b-staff@olli.local" },
   { id: "c1111111-1111-4111-8111-111111111111", email: "unmapped@olli.local" },
+  { id: "c3333333-3333-4333-8333-333333333333", email: "m5-t03-academic@olli.local" },
+  { id: "c2222222-2222-4222-8222-222222222222", email: "m5-t03-teacher@olli.local" },
   { id: "a3333333-3333-4333-8333-333333333333", email: "disabled@olli.local" },
   { id: "a4444444-4444-4444-8444-444444444444", email: "org-a-reader@olli.local" },
   { id: "a5555555-5555-4555-8555-555555555555", email: "org-a-no-student@olli.local" },

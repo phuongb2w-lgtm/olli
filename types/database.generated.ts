@@ -5438,6 +5438,13 @@ export type Database = {
         Returns: undefined
       }
       _build_payment_details: { Args: { p_payment_id: string }; Returns: Json }
+      _cb_as_anon: { Args: never; Returns: undefined }
+      _cb_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _cb_as_super: { Args: never; Returns: undefined }
+      _cb_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _charge_collection_status: {
         Args: { p_charge_id: string }
         Returns: string
@@ -5537,6 +5544,73 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      _loc_as_anon: { Args: never; Returns: undefined }
+      _loc_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _loc_as_super: { Args: never; Returns: undefined }
+      _loc_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_as_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_as_as_super: { Args: never; Returns: undefined }
+      _m3_as_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_as_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_crm_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_crm_as_super: { Args: never; Returns: undefined }
+      _m3_crm_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_crm_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_lc_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_lc_as_super: { Args: never; Returns: undefined }
+      _m3_lc_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_lc_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_ow_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_ow_as_super: { Args: never; Returns: undefined }
+      _m3_ow_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_ow_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_tr_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m3_tr_as_super: { Args: never; Returns: undefined }
+      _m3_tr_expect_fail: {
+        Args: { sql_text: string; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m3_tr_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m5_t02_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m5_t02_as_super: { Args: never; Returns: undefined }
+      _m5_t02_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m5_t02_seed_auth_user: {
+        Args: { p_auth: string; p_email: string }
+        Returns: undefined
+      }
       _m5_t03_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _m5_t03_as_super: { Args: never; Returns: undefined }
       _m5_t03_record: {
@@ -5587,6 +5661,13 @@ export type Database = {
           p_term_end: string
         }
         Returns: string
+      }
+      _sec_as_anon: { Args: never; Returns: undefined }
+      _sec_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _sec_as_super: { Args: never; Returns: undefined }
+      _sec_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
       }
       _session_has_attendance: {
         Args: { p_session_id: string }

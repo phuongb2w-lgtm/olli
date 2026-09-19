@@ -236,7 +236,7 @@ async function main() {
     client.rpc("list_operational_calendar", {
       p_date_from: "2036-01-07",
       p_date_to: "2036-01-07",
-      p_class_id: null,
+      p_class_id: classRow.id,
       p_teacher_id: null,
       p_room_id: null,
     }),

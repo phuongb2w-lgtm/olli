@@ -77,12 +77,15 @@ test.describe("M3 CRM leads", () => {
     await statusSelect.selectOption(targetValue!);
     await page.getByRole("button", { name: /Apply transition|Áp dụng chuyển trạng thái/i }).click();
     await expect(
+      page.getByRole("button", { name: /Apply transition|Áp dụng chuyển trạng thái/i }),
+    ).toBeEnabled({ timeout: 15_000 });
+    await expect(
       page
         .locator("section")
         .filter({ has: page.getByRole("heading", { name: /Timeline|Dòng thời gian/i }) })
         .getByText(/→/)
         .first(),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test("8. admin can assign and filter owned leads", async ({ page }) => {

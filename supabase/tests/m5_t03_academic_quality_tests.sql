@@ -71,7 +71,7 @@ BEGIN
   PERFORM _m5_t03_as_super();
 
   IF NOT EXISTS (SELECT 1 FROM app_user WHERE email = 'm5-t03-academic@olli.local') THEN
-    v_auth := 'c1111111-1111-4111-8111-111111111111';
+    v_auth := 'c3333333-3333-4333-8333-333333333333';
     PERFORM _m5_t03_seed_auth_user(v_auth, 'm5-t03-academic@olli.local');
     INSERT INTO role (organization_id, code) VALUES (v_org, 'm5_t03_academic_ops') RETURNING id INTO v_role;
     INSERT INTO role_permission (role_id, permission_id)
@@ -228,7 +228,7 @@ END $$;
 DO $$
 DECLARE v_ok boolean := false;
 BEGIN
-  PERFORM _m5_t03_as_auth('c1111111-1111-4111-8111-111111111111');
+  PERFORM _m5_t03_as_auth('c3333333-3333-4333-8333-333333333333');
   BEGIN
     PERFORM public.list_academic_review_queue('attendance_pending', 10, 0);
     v_ok := true;
@@ -255,7 +255,7 @@ BEGIN
 
   SELECT count(*) INTO v_before FROM attendance WHERE id = v_att;
 
-  PERFORM _m5_t03_as_auth('c1111111-1111-4111-8111-111111111111');
+  PERFORM _m5_t03_as_auth('c3333333-3333-4333-8333-333333333333');
   PERFORM public.review_attendance(v_att, 'confirm', 'OK');
 
   SELECT count(*) INTO v_after FROM attendance WHERE id = v_att;
@@ -353,7 +353,7 @@ BEGIN
   PERFORM _m5_t03_as_auth('c2222222-2222-4222-8222-222222222222');
   PERFORM public.submit_assessment_result(v_before);
 
-  PERFORM _m5_t03_as_auth('c1111111-1111-4111-8111-111111111111');
+  PERFORM _m5_t03_as_auth('c3333333-3333-4333-8333-333333333333');
   PERFORM public.review_assessment_result(v_before, 'confirm', 'Confirmed');
 
   SELECT status INTO v_status FROM assessment_result WHERE id = v_before;
@@ -401,7 +401,7 @@ BEGIN
   PERFORM _m5_t03_as_super();
   SELECT id INTO v_result FROM assessment_result WHERE status = 'finalized' LIMIT 1;
 
-  PERFORM _m5_t03_as_auth('c1111111-1111-4111-8111-111111111111');
+  PERFORM _m5_t03_as_auth('c3333333-3333-4333-8333-333333333333');
   PERFORM public.review_assessment_result(v_result, 'correct', 'Audit correction');
 
   SELECT status INTO v_status FROM assessment_result WHERE id = v_result;
@@ -432,7 +432,7 @@ BEGIN
   ) VALUES (v_org, v_enr, v_class, v_teacher, now(), v_comment, 'recorded')
   RETURNING id INTO v_obs;
 
-  PERFORM _m5_t03_as_auth('c1111111-1111-4111-8111-111111111111');
+  PERFORM _m5_t03_as_auth('c3333333-3333-4333-8333-333333333333');
   PERFORM public.translate_teacher_observation(v_obs, 'Translated text', 'en');
 
   SELECT comment INTO v_comment FROM teacher_observation WHERE id = v_obs;
@@ -683,7 +683,7 @@ END $$;
 DO $$
 DECLARE v_ok boolean := false;
 BEGIN
-  PERFORM _m5_t03_as_auth('c1111111-1111-4111-8111-111111111111');
+  PERFORM _m5_t03_as_auth('c3333333-3333-4333-8333-333333333333');
   BEGIN
     PERFORM public.list_academic_review_queue('attendance_pending', 5, 0);
     v_ok := true;
