@@ -90,6 +90,7 @@
       "return": "Return for correction",
       "submit": "Submit for review",
       "translate": "Save translation",
+      "correctScore": "Mark for correction",
       "reviewStatusDraft": "Draft",
       "reviewStatusSubmitted": "Awaiting confirmation",
       "reviewStatusConfirmed": "Confirmed",
