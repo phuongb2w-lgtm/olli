@@ -47,7 +47,76 @@
     "qualityLink": "Báo cáo chất lượng học thuật",
     "qualityDescription": "Buổi học đã dạy, điểm danh, bài kiểm tra và hàng đợi xác nhận học thuật.",
     "admissionsLink": "Báo cáo CRM & tuyển sinh",
-    "admissionsDescription": "Lead mới, hoạt động phễu, học thử, chuyển đổi và năng suất tư vấn viên."
+    "admissionsDescription": "Lead mới, hoạt động phễu, học thử, chuyển đổi và năng suất tư vấn viên.",
+    "operationsLink": "Báo cáo vận hành giảng dạy",
+    "operationsDescription": "Buổi học đã dạy, đổi lịch, thay giáo viên, khối lượng giảng dạy và sử dụng phòng."
+  },
+  "teachingOps": {
+    "intelligence": {
+      "title": "Vận hành giảng dạy",
+      "denied": "Báo cáo vận hành toàn trung tâm chỉ dành cho quản lý trung tâm.",
+      "loadError": "Không thể tải báo cáo vận hành giảng dạy.",
+      "backToExecutive": "Quay lại tổng quan điều hành",
+      "semanticsNote": "Buổi dự kiến tách biệt với buổi đã vật hóa. Đã hoàn thành chỉ khi trạng thái completed.",
+      "comparisonHint": "So với {start} đến {end}",
+      "deliveredSessions": "Buổi học đã hoàn thành",
+      "materializedSessions": "{count, plural, one {# buổi đã vật hóa} other {# buổi đã vật hóa}}",
+      "projectedOccurrences": "Buổi dự kiến",
+      "projectedSeparateNote": "Tách biệt khỏi buổi đã vật hóa",
+      "scheduledSessions": "Buổi đã lên lịch",
+      "deliveryRatioSublabel": "Tỷ lệ hoàn thành {rate} (completed / materialized không hủy)",
+      "cancelledSessions": "Buổi học đã hủy",
+      "rescheduleEvents": "Sự kiện đổi lịch",
+      "rescheduleSessions": "{count, plural, one {# buổi bị ảnh hưởng} other {# buổi bị ảnh hưởng}}",
+      "substitutionEvents": "Sự kiện thay giáo viên",
+      "roomChangeEvents": "Sự kiện đổi phòng",
+      "exceptionsTitle": "Ngoại lệ vận hành",
+      "exceptionsEmpty": "Không có ngoại lệ vận hành trong kỳ này.",
+      "viewDrillDown": "Xem",
+      "workloadSection": "Khối lượng giảng dạy & sử dụng phòng",
+      "workloadDrillDown": "Mở chi tiết khối lượng & phòng học"
+    },
+    "workspace": {
+      "title": "Thông tin vận hành",
+      "subtitle": "Chỉ số lên lịch, lịch sử thay đổi và ngoại lệ vận hành.",
+      "denied": "Bạn không có quyền xem thông tin vận hành toàn trung tâm.",
+      "loadError": "Không thể tải thông tin vận hành.",
+      "projectedOccurrences": "Buổi dự kiến",
+      "materializedSessions": "Buổi đã vật hóa",
+      "deliveredSessions": "Buổi học đã hoàn thành",
+      "cancelledSessions": "Buổi học đã hủy",
+      "changesSummary": "Thay đổi vận hành trong kỳ",
+      "rescheduleEvents": "Sự kiện đổi lịch",
+      "cancellationEvents": "Sự kiện hủy buổi",
+      "substitutionEvents": "Sự kiện thay giáo viên",
+      "roomChangeEvents": "Sự kiện đổi phòng",
+      "affectedSessions": "{count, plural, one {# buổi} other {# buổi}}",
+      "workloadLink": "Khối lượng giáo viên & sử dụng phòng",
+      "dailyOpsLink": "Vận hành hàng ngày",
+      "recentChanges": "Thay đổi gần đây",
+      "changesEmpty": "Không có thay đổi vận hành trong kỳ này.",
+      "exceptionsTitle": "Ngoại lệ vận hành",
+      "exceptionsEmpty": "Không có ngoại lệ vận hành trong kỳ này.",
+      "viewDrillDown": "Xem",
+      "changeTypes": {
+        "rescheduled": "Đổi lịch",
+        "cancelled": "Đã hủy",
+        "teacherSubstituted": "Thay giáo viên",
+        "roomChanged": "Đổi phòng"
+      }
+    },
+    "personal": {
+      "title": "Giảng dạy của tôi",
+      "subtitle": "Buổi học được giao và giờ giảng trong kỳ đã chọn.",
+      "denied": "Chỉ số cá nhân có khi tài khoản được liên kết với hồ sơ giáo viên.",
+      "upcomingSessions": "Buổi sắp tới",
+      "scheduledSessions": "Buổi đã lên lịch",
+      "scheduledHours": "đã lên lịch",
+      "completedSessions": "Buổi đã hoàn thành",
+      "teachingHours": "giờ giảng",
+      "projectedSessions": "Buổi dự kiến",
+      "cancelledSessions": "Buổi đã hủy"
+    }
   },
   "academic": {
     "intelligence": {
@@ -895,7 +964,9 @@
     "subnav": {
       "today": "Hôm nay",
       "calendar": "Lịch vận hành",
-      "workload": "Khối lượng & phòng học"
+      "workload": "Khối lượng & phòng học",
+      "intelligence": "Thông tin vận hành",
+      "myTeaching": "Giảng dạy của tôi"
     },
     "status": {
       "planned": "Dự kiến",

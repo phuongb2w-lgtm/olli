@@ -5438,6 +5438,11 @@ export type Database = {
         }
         Returns: undefined
       }
+      _assert_teaching_ops_executive_access: { Args: never; Returns: undefined }
+      _assert_teaching_ops_scheduling_access: {
+        Args: never
+        Returns: undefined
+      }
       _assert_teaching_write_permission: {
         Args: { p_mode: string }
         Returns: undefined
@@ -5504,10 +5509,12 @@ export type Database = {
         }
         Returns: undefined
       }
+      _current_linked_teacher_id: { Args: never; Returns: string }
       _insert_payment_allocations: {
         Args: { p_allocations: Json; p_batch_id?: string; p_payment_id: string }
         Returns: Json
       }
+      _is_teacher_only_app_user: { Args: never; Returns: boolean }
       _list_operational_occurrences: {
         Args: {
           p_class_id?: string
@@ -5646,6 +5653,24 @@ export type Database = {
         Args: { p_auth: string; p_email: string }
         Returns: undefined
       }
+      _m5_t05_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m5_t05_as_super: { Args: never; Returns: undefined }
+      _m5_t05_make_session: {
+        Args: {
+          p_end: string
+          p_label: string
+          p_occ: string
+          p_org?: string
+          p_start: string
+          p_status: string
+        }
+        Returns: string
+      }
+      _m5_t05_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m5_t05_weekday: { Args: { p_date: string }; Returns: string }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -5701,6 +5726,16 @@ export type Database = {
       _session_has_posted_financial_effects: {
         Args: { p_session_id: string }
         Returns: boolean
+      }
+      _teaching_ops_materialized_session_metrics: {
+        Args: {
+          p_class_id?: string
+          p_end_date: string
+          p_org_id: string
+          p_start_date: string
+          p_timezone: string
+        }
+        Returns: Json
       }
       _validate_active_room_reference: {
         Args: { p_org_id: string; p_room_id: string }
@@ -6290,6 +6325,10 @@ export type Database = {
         Args: { p_lead_id: string }
         Returns: Json
       }
+      get_my_teaching_ops_overview: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
       get_operational_planning_gaps: {
         Args: { p_class_id?: string; p_date_from: string; p_date_to: string }
         Returns: Database["public"]["CompositeTypes"]["operational_planning_gaps_row"]
@@ -6311,6 +6350,22 @@ export type Database = {
           p_period_to: string
           p_scenario_id: string
         }
+        Returns: Json
+      }
+      get_teaching_ops_change_metrics: {
+        Args: { p_class_id?: string; p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
+      get_teaching_ops_intelligence_overview: {
+        Args: {
+          p_compare_previous?: boolean
+          p_end_date: string
+          p_start_date: string
+        }
+        Returns: Json
+      }
+      get_teaching_ops_session_metrics: {
+        Args: { p_class_id?: string; p_end_date: string; p_start_date: string }
         Returns: Json
       }
       has_permission: { Args: { p_code: string }; Returns: boolean }
@@ -6501,6 +6556,10 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      list_teaching_ops_exceptions: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json[]
+      }
       list_teaching_session_changes: {
         Args: { p_session_id: string }
         Returns: {
@@ -6528,6 +6587,18 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      list_teaching_session_operational_changes: {
+        Args: {
+          p_change_type?: string
+          p_class_id?: string
+          p_end_date: string
+          p_limit?: number
+          p_offset?: number
+          p_start_date: string
+          p_teacher_id?: string
+        }
+        Returns: Json[]
       }
       list_trial_teaching_sessions: {
         Args: { p_class_id: string }

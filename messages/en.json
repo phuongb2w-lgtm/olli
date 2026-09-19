@@ -47,7 +47,76 @@
     "qualityLink": "Academic quality intelligence",
     "qualityDescription": "Teaching delivery, attendance, assessments, and academic review backlog.",
     "admissionsLink": "CRM & admissions intelligence",
-    "admissionsDescription": "Lead intake, pipeline activity, trials, conversions, and consultant productivity."
+    "admissionsDescription": "Lead intake, pipeline activity, trials, conversions, and consultant productivity.",
+    "operationsLink": "Teaching operations intelligence",
+    "operationsDescription": "Session delivery, reschedules, substitutions, teacher workload, and room usage."
+  },
+  "teachingOps": {
+    "intelligence": {
+      "title": "Teaching operations",
+      "denied": "Center-wide teaching operations reporting is available to center managers only.",
+      "loadError": "Unable to load teaching operations overview.",
+      "backToExecutive": "Back to executive overview",
+      "semanticsNote": "Projected occurrences are distinct from materialized sessions. Delivered means status completed only.",
+      "comparisonHint": "Compared with {start} to {end}",
+      "deliveredSessions": "Completed sessions",
+      "materializedSessions": "{count, plural, one {# materialized session} other {# materialized sessions}}",
+      "projectedOccurrences": "Projected occurrences",
+      "projectedSeparateNote": "Separate from materialized sessions",
+      "scheduledSessions": "Scheduled sessions",
+      "deliveryRatioSublabel": "Delivery ratio {rate} (completed / non-cancelled materialized)",
+      "cancelledSessions": "Cancelled sessions",
+      "rescheduleEvents": "Reschedule events",
+      "rescheduleSessions": "{count, plural, one {# session affected} other {# sessions affected}}",
+      "substitutionEvents": "Teacher substitution events",
+      "roomChangeEvents": "Room change events",
+      "exceptionsTitle": "Operational exceptions",
+      "exceptionsEmpty": "No operational exceptions in this period.",
+      "viewDrillDown": "View",
+      "workloadSection": "Teacher workload & room usage",
+      "workloadDrillDown": "Open workload & room usage drill-down"
+    },
+    "workspace": {
+      "title": "Operations intelligence",
+      "subtitle": "Scheduling metrics, change history, and operational exceptions.",
+      "denied": "You do not have permission to view center-wide operations intelligence.",
+      "loadError": "Unable to load operations intelligence.",
+      "projectedOccurrences": "Projected occurrences",
+      "materializedSessions": "Materialized sessions",
+      "deliveredSessions": "Completed sessions",
+      "cancelledSessions": "Cancelled sessions",
+      "changesSummary": "Operational changes in period",
+      "rescheduleEvents": "Reschedule events",
+      "cancellationEvents": "Cancellation events",
+      "substitutionEvents": "Substitution events",
+      "roomChangeEvents": "Room change events",
+      "affectedSessions": "{count, plural, one {# session} other {# sessions}}",
+      "workloadLink": "Teacher workload & room usage",
+      "dailyOpsLink": "Daily operations",
+      "recentChanges": "Recent changes",
+      "changesEmpty": "No operational changes in this period.",
+      "exceptionsTitle": "Operational exceptions",
+      "exceptionsEmpty": "No operational exceptions in this period.",
+      "viewDrillDown": "View",
+      "changeTypes": {
+        "rescheduled": "Rescheduled",
+        "cancelled": "Cancelled",
+        "teacherSubstituted": "Teacher substituted",
+        "roomChanged": "Room changed"
+      }
+    },
+    "personal": {
+      "title": "My teaching",
+      "subtitle": "Your assigned sessions and teaching hours in the selected period.",
+      "denied": "Personal teaching metrics are available when your user account is linked to a teacher profile.",
+      "upcomingSessions": "Upcoming sessions",
+      "scheduledSessions": "Scheduled sessions",
+      "scheduledHours": "scheduled",
+      "completedSessions": "Completed sessions",
+      "teachingHours": "teaching hours",
+      "projectedSessions": "Projected sessions",
+      "cancelledSessions": "Cancelled sessions"
+    }
   },
   "academic": {
     "intelligence": {
@@ -895,7 +964,9 @@
     "subnav": {
       "today": "Today",
       "calendar": "Calendar",
-      "workload": "Workload & rooms"
+      "workload": "Workload & rooms",
+      "intelligence": "Intelligence",
+      "myTeaching": "My teaching"
     },
     "status": {
       "planned": "Planned",

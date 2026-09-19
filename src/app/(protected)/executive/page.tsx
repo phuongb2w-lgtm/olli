@@ -35,6 +35,10 @@ export default async function ExecutiveOverviewPage() {
           {t("admissionsLink")}
         </Link>
         <p className="mt-2 text-slate-600">{t("admissionsDescription")}</p>
+        <Link href="/executive/operations" className="mt-3 block font-medium underline">
+          {t("operationsLink")}
+        </Link>
+        <p className="mt-2 text-slate-600">{t("operationsDescription")}</p>
         <p className="mt-3">{t("accessConfirmed")}</p>
         {error ? (
           <p className="mt-2 text-red-600">{t("loadError")}</p>

@@ -8,6 +8,8 @@ const items = [
   { key: "today", href: "/operations", exact: true },
   { key: "calendar", href: "/operations/calendar", exact: false },
   { key: "workload", href: "/operations/workload", exact: false },
+  { key: "intelligence", href: "/operations/intelligence", exact: false },
+  { key: "myTeaching", href: "/operations/my-teaching", exact: false },
 ] as const;
 
 export function OperationsSubnav() {
