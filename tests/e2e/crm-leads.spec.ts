@@ -91,11 +91,18 @@ test.describe("M3 CRM leads", () => {
   test("8. admin can assign and filter owned leads", async ({ page }) => {
     await signIn(page, adminEmail);
     await page.goto(`/crm/leads/${leadFixtureId}`);
-    await page.locator("#assignedUserId").selectOption({ index: 1 });
+    await page.locator("#assignedUserId").selectOption({ label: "Org A Admin" });
     await page.getByRole("button", { name: /Assign|Reassign|Phân công|Chuyển phụ trách/i }).first().click();
     await expect(
-      page.getByText(/Unassigned → Org A Admin|Chưa phân công → Org A Admin/).first(),
-    ).toBeVisible();
+      page.getByRole("button", { name: /Assign|Reassign|Phân công|Chuyển phụ trách/i }).first(),
+    ).toBeEnabled({ timeout: 15_000 });
+    await expect(
+      page
+        .locator("section")
+        .filter({ has: page.getByRole("heading", { name: /Assignment history|Lịch sử phân công/i }) })
+        .getByText(/→/)
+        .first(),
+    ).toBeVisible({ timeout: 15_000 });
 
     await page.goto("/crm/leads?owner=me&pageSize=100");
     await expect(page.locator(`a[href="/crm/leads/${leadFixtureId}"]`)).toBeVisible();

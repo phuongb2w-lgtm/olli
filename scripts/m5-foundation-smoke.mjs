@@ -249,6 +249,35 @@ async function main() {
     readerAcademicErr?.message ?? "",
   );
 
+  // 17–18: M5-T04 CRM admissions intelligence RPCs
+  const { data: crmOverview, error: crmOverviewErr } = await admin.rpc(
+    "get_crm_admissions_overview",
+    {
+      p_start_date: "2026-01-01",
+      p_end_date: "2026-01-31",
+      p_compare_previous: false,
+    },
+  );
+  record(
+    17,
+    "CRM admissions overview callable for manager",
+    !crmOverviewErr && crmOverview?.leadIntake != null,
+    crmOverviewErr?.message ?? "",
+  );
+
+  const { error: readerCrmErr } = await reader.rpc("get_crm_admissions_overview", {
+    p_start_date: "2026-01-01",
+    p_end_date: "2026-01-31",
+    p_compare_previous: false,
+  });
+  record(
+    18,
+    "reader denied CRM admissions executive overview",
+    readerCrmErr?.code === "42501" ||
+      readerCrmErr?.message?.includes("permission"),
+    readerCrmErr?.message ?? "",
+  );
+
   const failed = results.filter((r) => !r.passed);
   console.log(`\nM5 foundation smoke: ${results.length - failed.length}/${results.length} passed`);
   if (failed.length > 0) process.exit(1);

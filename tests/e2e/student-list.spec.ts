@@ -83,7 +83,7 @@ test.describe("M1-T02 student list", () => {
 
   test("21b. no-results state", async ({ page }) => {
     await signIn(page, adminEmail);
-    await page.goto("/students?q=zzzznotfound999");
+    await page.goto("/students?q=zzzznotfoundxxx");
     await expect(page.getByText(/no students found|không tìm thấy học viên/i)).toBeVisible();
   });
 });

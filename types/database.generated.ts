@@ -5405,6 +5405,11 @@ export type Database = {
         Args: { p_class: Database["public"]["Tables"]["class"]["Row"] }
         Returns: undefined
       }
+      _assert_consultant_crm_personal_access: {
+        Args: never
+        Returns: undefined
+      }
+      _assert_crm_executive_access: { Args: never; Returns: undefined }
       _assert_finance_intelligence_access: { Args: never; Returns: undefined }
       _assert_no_schedule_conflicts: {
         Args: {
@@ -5618,6 +5623,16 @@ export type Database = {
         Returns: undefined
       }
       _m5_t03_seed_auth_user: {
+        Args: { p_auth: string; p_email: string }
+        Returns: undefined
+      }
+      _m5_t04_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m5_t04_as_super: { Args: never; Returns: undefined }
+      _m5_t04_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m5_t04_seed_auth_user: {
         Args: { p_auth: string; p_email: string }
         Returns: undefined
       }
@@ -6187,11 +6202,48 @@ export type Database = {
         Args: { p_scenario_id: string }
         Returns: Json
       }
+      get_consultant_crm_overview: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
       get_consultant_declaration_summary: {
         Args: { p_end_date: string; p_start_date: string }
         Returns: Json
       }
+      get_crm_activity_metrics: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
+      get_crm_admissions_overview: {
+        Args: {
+          p_compare_previous?: boolean
+          p_end_date: string
+          p_start_date: string
+        }
+        Returns: Json
+      }
       get_crm_attribution_report: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
+      get_crm_consultant_productivity: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
+      get_crm_conversion_metrics: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
+      get_crm_lead_intake_metrics: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
+      get_crm_pipeline_snapshot: { Args: never; Returns: Json }
+      get_crm_source_metrics: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
+      get_crm_trial_metrics: {
         Args: { p_end_date: string; p_start_date: string }
         Returns: Json
       }
@@ -6307,6 +6359,14 @@ export type Database = {
       }
       list_academic_review_queue: {
         Args: { p_limit?: number; p_offset?: number; p_queue_type: string }
+        Returns: Json[]
+      }
+      list_consultant_work_queue: {
+        Args: { p_limit?: number }
+        Returns: Json[]
+      }
+      list_crm_admissions_exceptions: {
+        Args: { p_end_date: string; p_start_date: string }
         Returns: Json[]
       }
       list_daily_operations: {

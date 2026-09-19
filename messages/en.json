@@ -45,7 +45,9 @@
     "accessConfirmed": "Executive reporting access confirmed.",
     "loadError": "Unable to verify executive reporting access.",
     "qualityLink": "Academic quality intelligence",
-    "qualityDescription": "Teaching delivery, attendance, assessments, and academic review backlog."
+    "qualityDescription": "Teaching delivery, attendance, assessments, and academic review backlog.",
+    "admissionsLink": "CRM & admissions intelligence",
+    "admissionsDescription": "Lead intake, pipeline activity, trials, conversions, and consultant productivity."
   },
   "academic": {
     "intelligence": {
@@ -423,9 +425,67 @@
     "title": "Admissions",
     "subtitle": "Lead pipeline, trials, and conversion reporting",
     "nav": {
+      "myWork": "My work",
       "leads": "Leads",
       "reports": "Reports",
       "settings": "Settings"
+    },
+    "intelligence": {
+      "title": "CRM & admissions intelligence",
+      "denied": "Center-wide CRM intelligence is available to center managers only.",
+      "loadError": "Unable to load CRM admissions overview.",
+      "backToExecutive": "Back to executive overview",
+      "semanticsNote": "Period events use canonical timestamps (created_at, occurred_at, converted_at, completed_at). Cohort conversion rate uses leads created in the same period.",
+      "leadsCreated": "Leads created",
+      "unassignedLeads": "{count, plural, one {# unassigned} other {# unassigned}}",
+      "activitiesRecorded": "Activities recorded",
+      "overdueFollowUps": "{count, plural, one {# overdue follow-up} other {# overdue follow-ups}}",
+      "trialsCompleted": "Trials completed",
+      "trialsScheduled": "{count, plural, one {# scheduled in period} other {# scheduled in period}}",
+      "conversionsInPeriod": "Conversions in period",
+      "cohortConversionRate": "Cohort conversions",
+      "cohortDenominator": "{count, plural, one {# leads created in cohort} other {# leads created in cohort}}",
+      "pendingFollowUps": "Pending follow-ups",
+      "consultantProductivityTitle": "Consultant productivity",
+      "consultantProductivityNote": "Objective metrics only — conversion attribution uses owner snapshot at conversion time.",
+      "consultantProductivityEmpty": "No consultant activity in this period.",
+      "consultantColumn": "Consultant",
+      "leadsColumn": "Leads",
+      "activitiesColumn": "Activities",
+      "trialsColumn": "Trials",
+      "conversionsColumn": "Conversions",
+      "conversionRateColumn": "Conversion rate",
+      "approvedDeclarationsColumn": "Approved declarations",
+      "pendingDeclarationsColumn": "Pending declarations",
+      "sourceTitle": "Source performance",
+      "sourceRow": "{leads} leads · {conversions} conversions · {rate} cohort rate",
+      "exceptionsTitle": "Admissions exceptions",
+      "exceptionsEmpty": "No admissions exceptions for this period.",
+      "viewDetail": "View"
+    },
+    "myWork": {
+      "title": "My work",
+      "subtitle": "Personal pipeline, follow-ups, and performance for the selected period.",
+      "denied": "You do not have permission to access CRM operations.",
+      "loadError": "Unable to load your CRM workspace.",
+      "workQueueTitle": "Needs attention",
+      "workQueueEmpty": "No items need attention right now.",
+      "viewLead": "Open lead",
+      "performanceTitle": "My performance",
+      "leadsOwned": "Active leads owned",
+      "activitiesInPeriod": "Activities in period",
+      "trialsScheduled": "Trials scheduled",
+      "conversionsAttributed": "Conversions attributed",
+      "conversionRate": "Conversion rate (attributed)",
+      "declarationsTitle": "Revenue declarations",
+      "pendingDeclarations": "Pending declarations",
+      "approvedDeclarations": "Approved declarations",
+      "returnedDeclarations": "Returned declarations",
+      "queueType": {
+        "overdue_follow_up": "Overdue follow-up",
+        "upcoming_follow_up": "Upcoming follow-up",
+        "owned_active_lead": "Active lead"
+      }
     },
     "reports": {
       "title": "CRM reports",

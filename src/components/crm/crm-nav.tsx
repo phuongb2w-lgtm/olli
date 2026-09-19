@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 const baseItems = [
+  { key: "myWork", href: "/crm/my-work" },
   { key: "leads", href: "/crm/leads" },
   { key: "reports", href: "/crm/reports" },
 ] as const;
