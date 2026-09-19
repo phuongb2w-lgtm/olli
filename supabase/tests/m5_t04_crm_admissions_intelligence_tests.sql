@@ -155,6 +155,15 @@ BEGIN
   WHERE id = 'd6100000-0000-4000-8000-000000000003';
   PERFORM set_config('olli.lead_assignment_mutation', 'false', true);
 
+  INSERT INTO lead_assignment (
+    organization_id, lead_id, previous_assigned_user_id, new_assigned_user_id, changed_by
+  )
+  VALUES
+    (v_org, 'd6100000-0000-4000-8000-000000000001', NULL, v_cons_a, v_cons_a),
+    (v_org, 'd6100000-0000-4000-8000-000000000002', NULL, v_cons_a, v_cons_a),
+    (v_org, 'd6100000-0000-4000-8000-000000000003', NULL, v_cons_b, v_cons_b),
+    (v_org, 'd6100000-0000-4000-8000-000000000004', NULL, v_cons_a, v_cons_a);
+
   IF NOT EXISTS (
     SELECT 1 FROM lead_candidate
     WHERE lead_id = 'd6100000-0000-4000-8000-000000000003' AND organization_id = v_org
@@ -326,9 +335,9 @@ BEGIN
   PERFORM _m5_t04_record(
     9, 'conversion attributed to snapshot owner',
     EXISTS (
-      SELECT 1 FROM jsonb_array_elements(v_prod) elem
+      SELECT 1 FROM jsonb_array_elements(v_prod->'rows') elem
       WHERE (elem->>'consultant_user_id')::uuid = v_cons_b
-        AND (elem->>'conversions_attributed')::bigint >= 1
+        AND (elem->>'conversions_in_period')::bigint >= 1
     )
   );
 END $$;

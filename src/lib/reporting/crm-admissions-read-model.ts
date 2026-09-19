@@ -44,13 +44,21 @@ export type CrmConversionMetrics = {
 export type CrmConsultantProductivityRow = {
   consultant_user_id: string;
   display_name: string;
-  leads_owned_created: number;
+  current_leads_owned: number;
+  cohort_leads: number;
   activities_recorded: number;
   trials_scheduled: number;
-  conversions_attributed: number;
-  conversion_rate_by_attribution: number | null;
+  conversions_in_period: number;
+  cohort_converted_leads: number;
+  cohort_conversion_rate: number | null;
   approved_declarations_amount: number;
   pending_declarations_amount: number;
+};
+
+export type CrmConsultantProductivityPayload = {
+  cohort_attribution_rule: string;
+  cohort_conversion_time_rule: string;
+  rows: CrmConsultantProductivityRow[];
 };
 
 export type CrmSourceMetricRow = {
@@ -58,6 +66,7 @@ export type CrmSourceMetricRow = {
   source_id: string | null;
   leads_created: number;
   conversions_in_period: number;
+  cohort_converted_leads: number;
   cohort_conversion_rate: number | null;
 };
 
@@ -68,7 +77,7 @@ export type CrmAdmissionsOverview = {
   activity: CrmActivityMetrics;
   trials: CrmTrialMetrics;
   conversions: CrmConversionMetrics;
-  consultantProductivity: CrmConsultantProductivityRow[];
+  consultantProductivity: CrmConsultantProductivityPayload;
   sources: CrmSourceMetricRow[];
   pipelineSnapshot: { metric_type: string; as_of: string; by_status: Record<string, number> };
   declarations: Record<string, unknown>;
@@ -88,14 +97,26 @@ export type ConsultantPersonalDeclarations = {
 export type ConsultantCrmOverview = {
   period: { start_date: string; end_date: string; timezone: string };
   consultant_user_id: string;
-  leads_owned: number;
-  leads_created_in_period: number;
+  cohort_attribution_rule: string;
+  cohort_conversion_time_rule: string;
+  current_leads_owned: number;
+  cohort_leads: number;
+  leads_created_by_me: number;
   activities_in_period: number;
   trials_scheduled_in_period: number;
-  conversions_attributed_in_period: number;
-  conversion_rate_attributed: number | null;
+  conversions_in_period: number;
+  cohort_converted_leads: number;
+  cohort_conversion_rate: number | null;
   declarations: ConsultantPersonalDeclarations;
 };
+
+export function parseConsultantProductivityRows(
+  payload: CrmConsultantProductivityPayload | CrmConsultantProductivityRow[] | null | undefined,
+): CrmConsultantProductivityRow[] {
+  if (!payload) return [];
+  if (Array.isArray(payload)) return payload;
+  return payload.rows ?? [];
+}
 
 export type CrmAdmissionsException = {
   exception_code: string;

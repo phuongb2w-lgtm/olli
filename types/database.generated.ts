@@ -5626,6 +5626,16 @@ export type Database = {
         Args: { p_auth: string; p_email: string }
         Returns: undefined
       }
+      _m5_t04_1_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m5_t04_1_as_super: { Args: never; Returns: undefined }
+      _m5_t04_1_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m5_t04_1_seed_auth_user: {
+        Args: { p_auth: string; p_email: string }
+        Returns: undefined
+      }
       _m5_t04_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _m5_t04_as_super: { Args: never; Returns: undefined }
       _m5_t04_record: {
@@ -6065,6 +6075,10 @@ export type Database = {
           p_effective_from: string
           p_notes?: string
         }
+        Returns: string
+      }
+      crm_lead_cohort_consultant_user_id: {
+        Args: { p_lead_id: string; p_organization_id: string }
         Returns: string
       }
       current_app_user_id: { Args: never; Returns: string }

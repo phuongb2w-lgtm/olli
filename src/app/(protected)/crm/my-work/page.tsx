@@ -90,8 +90,16 @@ export default async function ConsultantMyWorkPage({ searchParams }: Props) {
         <h3 className="text-sm font-semibold text-slate-800">{t("performanceTitle")}</h3>
         <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 text-sm">
           <div>
-            <dt className="text-slate-600">{t("leadsOwned")}</dt>
-            <dd className="font-medium">{overview.leads_owned}</dd>
+            <dt className="text-slate-600">{t("currentLeadsOwned")}</dt>
+            <dd className="font-medium">{overview.current_leads_owned}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-600">{t("cohortLeads")}</dt>
+            <dd className="font-medium">{overview.cohort_leads}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-600">{t("leadsCreatedByMe")}</dt>
+            <dd className="font-medium">{overview.leads_created_by_me}</dd>
           </div>
           <div>
             <dt className="text-slate-600">{t("activitiesInPeriod")}</dt>
@@ -102,12 +110,12 @@ export default async function ConsultantMyWorkPage({ searchParams }: Props) {
             <dd className="font-medium">{overview.trials_scheduled_in_period}</dd>
           </div>
           <div>
-            <dt className="text-slate-600">{t("conversionsAttributed")}</dt>
-            <dd className="font-medium">{overview.conversions_attributed_in_period}</dd>
+            <dt className="text-slate-600">{t("conversionsInPeriod")}</dt>
+            <dd className="font-medium">{overview.conversions_in_period}</dd>
           </div>
           <div>
-            <dt className="text-slate-600">{t("conversionRate")}</dt>
-            <dd className="font-medium">{formatRate(overview.conversion_rate_attributed)}</dd>
+            <dt className="text-slate-600">{t("cohortConversionRate")}</dt>
+            <dd className="font-medium">{formatRate(overview.cohort_conversion_rate)}</dd>
           </div>
         </dl>
       </section>

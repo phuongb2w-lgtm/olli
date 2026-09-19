@@ -10,6 +10,7 @@ import { can } from "@/lib/permissions/can";
 import {
   fetchCrmAdmissionsExceptions,
   fetchCrmAdmissionsOverview,
+  parseConsultantProductivityRows,
 } from "@/lib/reporting/crm-admissions-read-model";
 import { parseReportingSearchParams } from "@/lib/reporting/parse-reporting-search-params";
 import { createClient } from "@/lib/supabase/server";
@@ -63,9 +64,10 @@ export default async function ExecutiveAdmissionsPage({ searchParams }: Props) {
   const activity = overview.activity;
   const trials = overview.trials;
   const conversions = overview.conversions;
-  const productivity = Array.isArray(overview.consultantProductivity)
-    ? overview.consultantProductivity
-    : [];
+  const productivity = parseConsultantProductivityRows(overview.consultantProductivity);
+  const productivityMeta = Array.isArray(overview.consultantProductivity)
+    ? null
+    : overview.consultantProductivity;
 
   return (
     <div className="space-y-6">
@@ -138,17 +140,21 @@ export default async function ExecutiveAdmissionsPage({ searchParams }: Props) {
       <section className="rounded-lg border border-slate-200 bg-white p-4">
         <h2 className="text-sm font-semibold text-slate-800">{t("consultantProductivityTitle")}</h2>
         <p className="mt-1 text-xs text-slate-600">{t("consultantProductivityNote")}</p>
+        {productivityMeta?.cohort_attribution_rule ? (
+          <p className="mt-1 text-xs text-slate-500">{productivityMeta.cohort_attribution_rule}</p>
+        ) : null}
         <div className="mt-3">
           <ConsultantProductivityTable
             rows={productivity}
             emptyLabel={t("consultantProductivityEmpty")}
             headers={{
               consultant: t("consultantColumn"),
-              leads: t("leadsColumn"),
+              currentOwned: t("currentLeadsOwnedColumn"),
+              cohortLeads: t("cohortLeadsColumn"),
               activities: t("activitiesColumn"),
               trials: t("trialsColumn"),
-              conversions: t("conversionsColumn"),
-              conversionRate: t("conversionRateColumn"),
+              conversionsInPeriod: t("conversionsInPeriodColumn"),
+              cohortConversionRate: t("cohortConversionRateColumn"),
               approvedDeclarations: t("approvedDeclarationsColumn"),
               pendingDeclarations: t("pendingDeclarationsColumn"),
             }}

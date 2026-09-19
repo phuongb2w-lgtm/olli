@@ -135,6 +135,9 @@ Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m5_t03_acad
 Write-Host "==> M5-T04 CRM admissions intelligence tests (30)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m5_t04_crm_admissions_intelligence_tests.sql")
 
+Write-Host "==> M5-T04.1 consultant conversion semantics tests (9)..."
+Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m5_t04_1_consultant_conversion_semantics_tests.sql")
+
 Write-Host "==> Generating TypeScript types..."
 New-Item -ItemType Directory -Force -Path (Join-Path $ProjectRoot "types") | Out-Null
 npx supabase gen types typescript --local | Set-Content -Path (Join-Path $ProjectRoot "types\database.generated.ts") -Encoding utf8
@@ -142,4 +145,4 @@ npx supabase gen types typescript --local | Set-Content -Path (Join-Path $Projec
 if ($LASTEXITCODE -ne 0) { throw "Verification failed" }
 
 Write-Host ""
-Write-Host "SUCCESS: Supabase verification complete (25/25 integrity + 30/30 security + 5/5 charge_balance + 6/6 locale + 12/12 cost_domain + 20/20 capital_depreciation + 35/35 enrollment_financial + 41/41 payment_allocation + 30/30 revenue_recognition + 24/24 personnel_costing + 35/35 class_cost_allocation + 35/35 class_financial_simulator + 5/5 m2_milestone_acceptance + 29/29 crm_foundation + 25/25 lead_lifecycle + 27/27 lead_assignment + 35/35 lead_trial + 40/40 lead_identity_resolution + 48/48 lead_conversion + 28/28 crm_attribution_reporting + 25/25 crm_operational_workspace + 5/5 m3_milestone_acceptance + 22/22 m4_teacher_unavailability + 26/26 m4_timetable_integrity + 28/28 m4_conflict_detection + 30/30 m4_operational_calendar + 44/44 m4_session_mutation + 35/35 m4_workload_analytics + 20/20 m4_daily_operations + 8/8 m4_milestone_acceptance + 25/25 m5_t01_foundation + 10/10 m5_t01_1_semantic_correction + 28/28 m5_t02_financial_intelligence + 36/36 m5_t03_academic_quality + 30/30 m5_t04_crm_admissions_intelligence)."
+Write-Host "SUCCESS: Supabase verification complete (25/25 integrity + 30/30 security + 5/5 charge_balance + 6/6 locale + 12/12 cost_domain + 20/20 capital_depreciation + 35/35 enrollment_financial + 41/41 payment_allocation + 30/30 revenue_recognition + 24/24 personnel_costing + 35/35 class_cost_allocation + 35/35 class_financial_simulator + 5/5 m2_milestone_acceptance + 29/29 crm_foundation + 25/25 lead_lifecycle + 27/27 lead_assignment + 35/35 lead_trial + 40/40 lead_identity_resolution + 48/48 lead_conversion + 28/28 crm_attribution_reporting + 25/25 crm_operational_workspace + 5/5 m3_milestone_acceptance + 22/22 m4_teacher_unavailability + 26/26 m4_timetable_integrity + 28/28 m4_conflict_detection + 30/30 m4_operational_calendar + 44/44 m4_session_mutation + 35/35 m4_workload_analytics + 20/20 m4_daily_operations + 8/8 m4_milestone_acceptance + 25/25 m5_t01_foundation + 10/10 m5_t01_1_semantic_correction + 28/28 m5_t02_financial_intelligence + 36/36 m5_t03_academic_quality + 30/30 m5_t04_crm_admissions_intelligence + 9/9 m5_t04_1_consultant_conversion_semantics)."
