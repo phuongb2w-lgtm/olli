@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
+import { SessionAcademicSubmitPanel } from "@/components/session-execution/session-academic-submit-panel";
 import { SessionOperationsPanel } from "@/components/session-execution/session-operations-panel";
 import { SessionRoster } from "@/components/session-execution/session-roster";
 import { SessionStatusActions } from "@/components/session-execution/session-status-actions";
@@ -159,6 +160,14 @@ export default async function SessionExecutionPage({ params, searchParams }: Pro
             notRecordedCount={progress.notRecorded}
           />
         </section>
+      ) : null}
+
+      {canRecordAttendance ? (
+        <SessionAcademicSubmitPanel
+          classId={classId}
+          sessionId={sessionId}
+          canSubmit={context.status === "in_progress" || context.status === "completed"}
+        />
       ) : null}
 
       {canReadOps ? (

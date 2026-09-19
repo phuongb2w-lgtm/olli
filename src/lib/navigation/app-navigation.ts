@@ -7,6 +7,7 @@ export type NavItemKey =
   | "students"
   | "classes"
   | "operations"
+  | "academicReview"
   | "mySchedule"
   | "finance"
   | "users"
@@ -33,6 +34,11 @@ export const APP_NAV_ITEMS: NavItemDefinition[] = [
     key: "operations",
     href: "/operations",
     anyOf: ["enrollment.update", "enrollment.create"],
+  },
+  {
+    key: "academicReview",
+    href: "/academic/review",
+    anyOf: ["attendance.review", "assessment_result.review", "observation.review"],
   },
   {
     key: "mySchedule",

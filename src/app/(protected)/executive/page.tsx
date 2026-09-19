@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { can } from "@/lib/permissions/can";
 import { createClient } from "@/lib/supabase/server";
@@ -26,7 +27,11 @@ export default async function ExecutiveOverviewPage() {
       <h1 className="text-xl font-semibold">{t("title")}</h1>
       <p className="text-sm text-slate-600">{t("foundationDescription")}</p>
       <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
-        <p>{t("accessConfirmed")}</p>
+        <Link href="/executive/quality" className="font-medium underline">
+          {t("qualityLink")}
+        </Link>
+        <p className="mt-2 text-slate-600">{t("qualityDescription")}</p>
+        <p className="mt-3">{t("accessConfirmed")}</p>
         {error ? (
           <p className="mt-2 text-red-600">{t("loadError")}</p>
         ) : (

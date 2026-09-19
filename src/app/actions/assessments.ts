@@ -241,12 +241,18 @@ export async function recordScoreAction(
     .maybeSingle();
 
   if (existing) {
+    const nextStatus =
+      existing.status === "finalized" || existing.status === "submitted"
+        ? existing.status
+        : existing.status === "corrected"
+          ? "corrected"
+          : "draft";
     const { error } = await supabase
       .from("assessment_result")
       .update({
         raw_score: scoreParsed.rawScore,
         max_score: assessment.maxScore,
-        status: "corrected",
+        status: nextStatus,
         updated_by: user.appUserId,
       })
       .eq("id", existing.id);

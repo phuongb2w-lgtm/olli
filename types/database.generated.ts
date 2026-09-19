@@ -151,7 +151,12 @@ export type Database = {
           organization_id: string
           raw_score: number
           recorded_by: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
+          submitted_at: string | null
+          submitted_by: string | null
           updated_at: string
           updated_by: string | null
         }
@@ -165,7 +170,12 @@ export type Database = {
           organization_id: string
           raw_score: number
           recorded_by?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -179,7 +189,12 @@ export type Database = {
           organization_id?: string
           raw_score?: number
           recorded_by?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -222,7 +237,13 @@ export type Database = {
           organization_id: string
           recorded_at: string
           recorded_by: string | null
+          review_notes: string | null
+          review_status: Database["public"]["Enums"]["academic_review_status"]
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
+          submitted_at: string | null
+          submitted_by: string | null
           teaching_session_id: string
           updated_at: string
           updated_by: string | null
@@ -234,7 +255,13 @@ export type Database = {
           organization_id: string
           recorded_at?: string
           recorded_by?: string | null
+          review_notes?: string | null
+          review_status?: Database["public"]["Enums"]["academic_review_status"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status: string
+          submitted_at?: string | null
+          submitted_by?: string | null
           teaching_session_id: string
           updated_at?: string
           updated_by?: string | null
@@ -246,7 +273,13 @@ export type Database = {
           organization_id?: string
           recorded_at?: string
           recorded_by?: string | null
+          review_notes?: string | null
+          review_status?: Database["public"]["Enums"]["academic_review_status"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
           teaching_session_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -4526,45 +4559,78 @@ export type Database = {
         Row: {
           class_id: string
           comment: string | null
+          comment_language: string | null
           created_at: string
           created_by: string | null
           enrollment_id: string
           id: string
           observed_at: string
           organization_id: string
+          review_notes: string | null
+          review_status: Database["public"]["Enums"]["academic_review_status"]
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
+          submitted_at: string | null
+          submitted_by: string | null
           teacher_id: string
           teaching_session_id: string | null
+          translated_at: string | null
+          translated_by: string | null
+          translated_comment: string | null
+          translated_language: string | null
           updated_at: string
           updated_by: string | null
         }
         Insert: {
           class_id: string
           comment?: string | null
+          comment_language?: string | null
           created_at?: string
           created_by?: string | null
           enrollment_id: string
           id?: string
           observed_at: string
           organization_id: string
+          review_notes?: string | null
+          review_status?: Database["public"]["Enums"]["academic_review_status"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
           teacher_id: string
           teaching_session_id?: string | null
+          translated_at?: string | null
+          translated_by?: string | null
+          translated_comment?: string | null
+          translated_language?: string | null
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
           class_id?: string
           comment?: string | null
+          comment_language?: string | null
           created_at?: string
           created_by?: string | null
           enrollment_id?: string
           id?: string
           observed_at?: string
           organization_id?: string
+          review_notes?: string | null
+          review_status?: Database["public"]["Enums"]["academic_review_status"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
           teacher_id?: string
           teaching_session_id?: string | null
+          translated_at?: string | null
+          translated_by?: string | null
+          translated_comment?: string | null
+          translated_language?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -5292,6 +5358,10 @@ export type Database = {
       }
     }
     Functions: {
+      _academic_session_operational_date: {
+        Args: { p_scheduled_start_at: string; p_timezone: string }
+        Returns: string
+      }
       _allocate_shared_source: {
         Args: {
           p_basis: string
@@ -5326,6 +5396,11 @@ export type Database = {
         }
         Returns: string
       }
+      _assert_academic_quality_overview_access: {
+        Args: never
+        Returns: undefined
+      }
+      _assert_academic_review_access: { Args: never; Returns: undefined }
       _assert_class_open_for_teaching_create: {
         Args: { p_class: Database["public"]["Tables"]["class"]["Row"] }
         Returns: undefined
@@ -5363,13 +5438,6 @@ export type Database = {
         Returns: undefined
       }
       _build_payment_details: { Args: { p_payment_id: string }; Returns: Json }
-      _cb_as_anon: { Args: never; Returns: undefined }
-      _cb_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _cb_as_super: { Args: never; Returns: undefined }
-      _cb_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
       _charge_collection_status: {
         Args: { p_charge_id: string }
         Returns: string
@@ -5469,70 +5537,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      _loc_as_anon: { Args: never; Returns: undefined }
-      _loc_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _loc_as_super: { Args: never; Returns: undefined }
-      _loc_record: {
+      _m5_t03_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m5_t03_as_super: { Args: never; Returns: undefined }
+      _m5_t03_record: {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
-      _m3_as_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _m3_as_as_super: { Args: never; Returns: undefined }
-      _m3_as_expect_fail: {
-        Args: { sql_text: string; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_as_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_crm_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _m3_crm_as_super: { Args: never; Returns: undefined }
-      _m3_crm_expect_fail: {
-        Args: { sql_text: string; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_crm_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_lc_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _m3_lc_as_super: { Args: never; Returns: undefined }
-      _m3_lc_expect_fail: {
-        Args: { sql_text: string; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_lc_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_ow_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _m3_ow_as_super: { Args: never; Returns: undefined }
-      _m3_ow_expect_fail: {
-        Args: { sql_text: string; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_ow_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_tr_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _m3_tr_as_super: { Args: never; Returns: undefined }
-      _m3_tr_expect_fail: {
-        Args: { sql_text: string; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m3_tr_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m5_t02_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _m5_t02_as_super: { Args: never; Returns: undefined }
-      _m5_t02_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
-      }
-      _m5_t02_seed_auth_user: {
+      _m5_t03_seed_auth_user: {
         Args: { p_auth: string; p_email: string }
         Returns: undefined
       }
@@ -5576,13 +5587,6 @@ export type Database = {
           p_term_end: string
         }
         Returns: string
-      }
-      _sec_as_anon: { Args: never; Returns: undefined }
-      _sec_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
-      _sec_as_super: { Args: never; Returns: undefined }
-      _sec_record: {
-        Args: { passed: boolean; test_name: string; test_no: number }
-        Returns: undefined
       }
       _session_has_attendance: {
         Args: { p_session_id: string }
@@ -6069,6 +6073,31 @@ export type Database = {
         }
         Returns: number
       }
+      get_academic_assessment_metrics: {
+        Args: { p_class_id?: string; p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
+      get_academic_attendance_metrics: {
+        Args: { p_class_id?: string; p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
+      get_academic_observation_metrics: {
+        Args: { p_class_id?: string; p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
+      get_academic_quality_overview: {
+        Args: {
+          p_compare_previous?: boolean
+          p_end_date: string
+          p_start_date: string
+        }
+        Returns: Json
+      }
+      get_academic_review_backlog: { Args: never; Returns: Json }
+      get_academic_teaching_delivery: {
+        Args: { p_class_id?: string; p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
       get_class_economics: {
         Args: { p_class_id: string; p_period_from: string; p_period_to: string }
         Returns: Json
@@ -6190,6 +6219,14 @@ export type Database = {
       is_eligible_trial_class: {
         Args: { p_class_id: string }
         Returns: boolean
+      }
+      list_academic_exceptions: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json[]
+      }
+      list_academic_review_queue: {
+        Args: { p_limit?: number; p_offset?: number; p_queue_type: string }
+        Returns: Json[]
       }
       list_daily_operations: {
         Args: {
@@ -6496,6 +6533,65 @@ export type Database = {
         Args: { p_allocation_id: string; p_notes?: string }
         Returns: Json
       }
+      review_assessment_result: {
+        Args: { p_action: string; p_result_id: string; p_review_notes?: string }
+        Returns: {
+          assessment_id: string
+          created_at: string
+          enrollment_id: string
+          finalized_at: string | null
+          id: string
+          max_score: number
+          organization_id: string
+          raw_score: number
+          recorded_by: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          submitted_by: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "assessment_result"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      review_attendance: {
+        Args: {
+          p_action: string
+          p_attendance_id: string
+          p_review_notes?: string
+        }
+        Returns: {
+          created_at: string
+          enrollment_id: string
+          id: string
+          organization_id: string
+          recorded_at: string
+          recorded_by: string | null
+          review_notes: string | null
+          review_status: Database["public"]["Enums"]["academic_review_status"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          submitted_by: string | null
+          teaching_session_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "attendance"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       review_consultant_revenue_declaration: {
         Args: {
           p_action: string
@@ -6522,6 +6618,45 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "consultant_revenue_declaration"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      review_teacher_observation: {
+        Args: {
+          p_action: string
+          p_observation_id: string
+          p_review_notes?: string
+        }
+        Returns: {
+          class_id: string
+          comment: string | null
+          comment_language: string | null
+          created_at: string
+          created_by: string | null
+          enrollment_id: string
+          id: string
+          observed_at: string
+          organization_id: string
+          review_notes: string | null
+          review_status: Database["public"]["Enums"]["academic_review_status"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          submitted_by: string | null
+          teacher_id: string
+          teaching_session_id: string | null
+          translated_at: string | null
+          translated_by: string | null
+          translated_comment: string | null
+          translated_language: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "teacher_observation"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -6590,6 +6725,73 @@ export type Database = {
           p_useful_life_months: number
         }
         Returns: number
+      }
+      submit_assessment_result: {
+        Args: { p_result_id: string }
+        Returns: {
+          assessment_id: string
+          created_at: string
+          enrollment_id: string
+          finalized_at: string | null
+          id: string
+          max_score: number
+          organization_id: string
+          raw_score: number
+          recorded_by: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          submitted_by: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "assessment_result"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      submit_session_attendance: {
+        Args: { p_session_id: string }
+        Returns: number
+      }
+      submit_teacher_observation: {
+        Args: { p_observation_id: string }
+        Returns: {
+          class_id: string
+          comment: string | null
+          comment_language: string | null
+          created_at: string
+          created_by: string | null
+          enrollment_id: string
+          id: string
+          observed_at: string
+          organization_id: string
+          review_notes: string | null
+          review_status: Database["public"]["Enums"]["academic_review_status"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          submitted_by: string | null
+          teacher_id: string
+          teaching_session_id: string | null
+          translated_at: string | null
+          translated_by: string | null
+          translated_comment: string | null
+          translated_language: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "teacher_observation"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       substitute_session_teacher: {
         Args: {
@@ -6662,6 +6864,45 @@ export type Database = {
           p_to_status: string
         }
         Returns: string
+      }
+      translate_teacher_observation: {
+        Args: {
+          p_observation_id: string
+          p_translated_comment: string
+          p_translated_language?: string
+        }
+        Returns: {
+          class_id: string
+          comment: string | null
+          comment_language: string | null
+          created_at: string
+          created_by: string | null
+          enrollment_id: string
+          id: string
+          observed_at: string
+          organization_id: string
+          review_notes: string | null
+          review_status: Database["public"]["Enums"]["academic_review_status"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          submitted_by: string | null
+          teacher_id: string
+          teaching_session_id: string | null
+          translated_at: string | null
+          translated_by: string | null
+          translated_comment: string | null
+          translated_language: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "teacher_observation"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       try_advance_lead_lifecycle_for_trial: {
         Args: {
@@ -6790,6 +7031,7 @@ export type Database = {
       }
     }
     Enums: {
+      academic_review_status: "draft" | "submitted" | "confirmed" | "returned"
       consultant_revenue_declaration_status:
         | "pending"
         | "approved"
@@ -7004,6 +7246,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      academic_review_status: ["draft", "submitted", "confirmed", "returned"],
       consultant_revenue_declaration_status: [
         "pending",
         "approved",

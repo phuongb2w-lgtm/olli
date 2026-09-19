@@ -217,6 +217,38 @@ async function main() {
     readerOverviewErr?.message ?? "",
   );
 
+  // 15–16: M5-T03 academic quality RPCs
+  const { data: academicOverview, error: academicOverviewErr } = await admin.rpc(
+    "get_academic_quality_overview",
+    {
+      p_start_date: "2026-01-01",
+      p_end_date: "2026-01-31",
+      p_compare_previous: false,
+    },
+  );
+  record(
+    15,
+    "academic quality overview callable for manager",
+    !academicOverviewErr && academicOverview?.teaching_delivery != null,
+    academicOverviewErr?.message ?? "",
+  );
+
+  const { error: readerAcademicErr } = await reader.rpc(
+    "get_academic_quality_overview",
+    {
+      p_start_date: "2026-01-01",
+      p_end_date: "2026-01-31",
+      p_compare_previous: false,
+    },
+  );
+  record(
+    16,
+    "reader denied academic quality overview",
+    readerAcademicErr?.code === "42501" ||
+      readerAcademicErr?.message?.includes("permission"),
+    readerAcademicErr?.message ?? "",
+  );
+
   const failed = results.filter((r) => !r.passed);
   console.log(`\nM5 foundation smoke: ${results.length - failed.length}/${results.length} passed`);
   if (failed.length > 0) process.exit(1);
