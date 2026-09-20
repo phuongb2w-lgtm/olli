@@ -44,6 +44,17 @@ RETURNS text LANGUAGE sql IMMUTABLE AS $$
   END;
 $$;
 
+-- Change metrics filter by org-local reporting period; session CURRENT_DATE is UTC-biased.
+CREATE OR REPLACE FUNCTION _m5_t05_org_local_today(
+  p_org uuid DEFAULT 'a0000000-0000-4000-8000-000000000001'
+)
+RETURNS date
+LANGUAGE sql
+STABLE
+AS $$
+  SELECT (now() AT TIME ZONE (SELECT o.timezone FROM organization o WHERE o.id = p_org))::date;
+$$;
+
 CREATE TEMP TABLE _m5_t05_last (
   class_id uuid, teacher_id uuid, teacher_b uuid, room_id uuid, room_b uuid,
   schedule_id uuid, session_id uuid
@@ -235,7 +246,9 @@ BEGIN
   UPDATE teaching_session SET status = 'completed' WHERE id = v_session;
   PERFORM _m5_t05_as_auth('a1111111-1111-4111-8111-111111111111');
   SELECT * INTO v_row FROM public.list_teacher_workload('2046-02-14', '2046-02-14', NULL, v_new);
-  SELECT public.get_teaching_ops_change_metrics(CURRENT_DATE, CURRENT_DATE) INTO v_changes;
+  SELECT public.get_teaching_ops_change_metrics(
+    _m5_t05_org_local_today(), _m5_t05_org_local_today()
+  ) INTO v_changes;
   PERFORM _m5_t05_record(9, 'current teacher from teaching_session.teacher_id',
     EXISTS (SELECT 1 FROM teaching_session WHERE id = v_session AND teacher_id = v_new));
   PERFORM _m5_t05_record(10, 'substitution event recorded separately',
@@ -287,7 +300,9 @@ BEGIN
   PERFORM public.reschedule_teaching_session(v_session,
     timestamptz '2046-02-18 09:00:00+07', timestamptz '2046-02-18 10:00:00+07', 'b');
   PERFORM public.cancel_teaching_session(v_session, 'cancel');
-  v_changes := public.get_teaching_ops_change_metrics(CURRENT_DATE, CURRENT_DATE);
+  v_changes := public.get_teaching_ops_change_metrics(
+    _m5_t05_org_local_today(), _m5_t05_org_local_today()
+  );
   PERFORM _m5_t05_record(16, 'reschedule event count deterministic',
     (v_changes->'reschedule'->>'event_count')::bigint >= 2);
   PERFORM _m5_t05_record(17, 'unique sessions rescheduled distinct from events',

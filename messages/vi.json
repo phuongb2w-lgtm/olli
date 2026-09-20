@@ -41,15 +41,27 @@
   "executive": {
     "title": "Tổng quan điều hành",
     "denied": "Báo cáo điều hành chỉ dành cho quản lý trung tâm.",
-    "foundationDescription": "Nền tảng báo cáo quản trị. Bảng điều khiển đa lĩnh vực sẽ có ở các tác vụ M5 sau.",
-    "accessConfirmed": "Đã xác nhận quyền truy cập báo cáo điều hành.",
-    "loadError": "Không thể xác minh quyền truy cập báo cáo điều hành.",
-    "qualityLink": "Báo cáo chất lượng học thuật",
-    "qualityDescription": "Buổi học đã dạy, điểm danh, bài kiểm tra và hàng đợi xác nhận học thuật.",
-    "admissionsLink": "Báo cáo CRM & tuyển sinh",
-    "admissionsDescription": "Lead mới, hoạt động phễu, học thử, chuyển đổi và năng suất tư vấn viên.",
-    "operationsLink": "Báo cáo vận hành giảng dạy",
-    "operationsDescription": "Buổi học đã dạy, đổi lịch, thay giáo viên, khối lượng giảng dạy và sử dụng phòng."
+    "overview": {
+      "title": "Tổng quan điều hành",
+      "denied": "Báo cáo điều hành chỉ dành cho quản lý trung tâm.",
+      "description": "Tóm tắt quản trị đa lĩnh vực về tài chính, tuyển sinh, chất lượng dịch vụ và vận hành giảng dạy trong kỳ đã chọn.",
+      "loadError": "Không thể tải tổng quan điều hành.",
+      "periodHint": "Kỳ báo cáo {start} đến {end} ({timezone})",
+      "comparisonHint": "So với {start} đến {end}",
+      "financeSection": "Tình hình tài chính",
+      "admissionsSection": "Tuyển sinh & CRM",
+      "qualitySection": "Chất lượng học tập & dịch vụ",
+      "operationsSection": "Vận hành giảng dạy",
+      "viewDetails": "Xem chi tiết",
+      "viewException": "Xem",
+      "attentionTitle": "Cần chú ý",
+      "attentionEmpty": "Không có ngoại lệ đa lĩnh vực trong kỳ này.",
+      "domainFinance": "Tài chính",
+      "domainAdmissions": "Tuyển sinh",
+      "domainQuality": "Chất lượng",
+      "domainOperations": "Vận hành",
+      "notApplicable": "Không áp dụng"
+    }
   },
   "teachingOps": {
     "intelligence": {

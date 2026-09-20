@@ -124,6 +124,39 @@ function mapChangeMetrics(raw: Record<string, unknown>): TeachingOpsChangeMetric
   };
 }
 
+export function mapTeachingOpsIntelligenceOverviewRow(
+  row: Record<string, unknown>,
+): TeachingOpsIntelligenceOverview {
+  const sessionBlock = row.sessionMetrics as Record<string, unknown>;
+  const changeBlock = row.changeMetrics as Record<string, unknown>;
+  const comparisonRaw = row.comparison_period as Record<string, unknown> | null;
+
+  return {
+    period: row.period as ReportingPeriodBounds,
+    comparisonPeriod: comparisonRaw
+      ? {
+          startDate: String(comparisonRaw.start_date),
+          endDate: String(comparisonRaw.end_date),
+        }
+      : null,
+    sessionMetrics: {
+      current: mapSessionMetrics((sessionBlock.current as Record<string, unknown>) ?? {}),
+      previous: sessionBlock.previous
+        ? mapSessionMetrics(sessionBlock.previous as Record<string, unknown>)
+        : null,
+    },
+    changeMetrics: {
+      current: mapChangeMetrics((changeBlock.current as Record<string, unknown>) ?? {}),
+      previous: changeBlock.previous
+        ? mapChangeMetrics(changeBlock.previous as Record<string, unknown>)
+        : null,
+    },
+    workloadReadModel: String(row.workload_read_model ?? ""),
+    roomUsageReadModel: String(row.room_usage_read_model ?? ""),
+    utilizationPercentageRule: String(row.utilization_percentage_rule ?? ""),
+  };
+}
+
 export async function fetchTeachingOpsIntelligenceOverview(
   supabase: SupabaseClient,
   period: LocalDateRange,
@@ -139,30 +172,8 @@ export async function fetchTeachingOpsIntelligenceOverview(
     return { data: null, error: error.message };
   }
 
-  const row = data as Record<string, unknown>;
-  const sessionBlock = row.sessionMetrics as Record<string, unknown>;
-  const changeBlock = row.changeMetrics as Record<string, unknown>;
-
   return {
-    data: {
-      period: row.period as ReportingPeriodBounds,
-      comparisonPeriod: (row.comparison_period as LocalDateRange | null) ?? null,
-      sessionMetrics: {
-        current: mapSessionMetrics((sessionBlock.current as Record<string, unknown>) ?? {}),
-        previous: sessionBlock.previous
-          ? mapSessionMetrics(sessionBlock.previous as Record<string, unknown>)
-          : null,
-      },
-      changeMetrics: {
-        current: mapChangeMetrics((changeBlock.current as Record<string, unknown>) ?? {}),
-        previous: changeBlock.previous
-          ? mapChangeMetrics(changeBlock.previous as Record<string, unknown>)
-          : null,
-      },
-      workloadReadModel: String(row.workload_read_model ?? ""),
-      roomUsageReadModel: String(row.room_usage_read_model ?? ""),
-      utilizationPercentageRule: String(row.utilization_percentage_rule ?? ""),
-    },
+    data: mapTeachingOpsIntelligenceOverviewRow(data as Record<string, unknown>),
     error: null,
   };
 }

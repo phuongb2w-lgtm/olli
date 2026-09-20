@@ -5410,6 +5410,7 @@ export type Database = {
         Returns: undefined
       }
       _assert_crm_executive_access: { Args: never; Returns: undefined }
+      _assert_executive_overview_access: { Args: never; Returns: undefined }
       _assert_finance_intelligence_access: { Args: never; Returns: undefined }
       _assert_no_schedule_conflicts: {
         Args: {
@@ -5666,11 +5667,17 @@ export type Database = {
         }
         Returns: string
       }
+      _m5_t05_org_local_today: { Args: { p_org?: string }; Returns: string }
       _m5_t05_record: {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
       _m5_t05_weekday: { Args: { p_date: string }; Returns: string }
+      _m5_t06_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m5_t06_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -6304,6 +6311,14 @@ export type Database = {
         Args: { p_enrollment_id: string }
         Returns: Json
       }
+      get_executive_overview: {
+        Args: {
+          p_compare_previous?: boolean
+          p_end_date: string
+          p_start_date: string
+        }
+        Returns: Json
+      }
       get_executive_reporting_access: { Args: never; Returns: Json }
       get_finance_cash_by_method: {
         Args: { p_end_date: string; p_start_date: string }
@@ -6467,6 +6482,14 @@ export type Database = {
           class_name: string
           class_status: string
         }[]
+      }
+      list_executive_attention_items: {
+        Args: {
+          p_end_date: string
+          p_limit_per_domain?: number
+          p_start_date: string
+        }
+        Returns: Json[]
       }
       list_finance_cash_payments: {
         Args: {

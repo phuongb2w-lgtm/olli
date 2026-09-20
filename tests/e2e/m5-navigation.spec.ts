@@ -35,11 +35,11 @@ test.describe("M5-T01 permission-aware navigation", () => {
     ).toBeVisible();
   });
 
-  test("4. admin executive page confirms access", async ({ page }) => {
+  test("4. admin executive page shows cross-domain overview", async ({ page }) => {
     await signIn(page, adminEmail);
     await page.goto("/executive");
     await expect(
-      page.getByText(/executive reporting access confirmed|đã xác nhận quyền truy cập/i),
+      page.getByText(/financial position|tình hình tài chính/i),
     ).toBeVisible();
   });
 });

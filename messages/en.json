@@ -41,15 +41,27 @@
   "executive": {
     "title": "Executive overview",
     "denied": "Executive reporting is available to center managers only.",
-    "foundationDescription": "Management intelligence foundation. Full cross-domain dashboards arrive in later M5 tasks.",
-    "accessConfirmed": "Executive reporting access confirmed.",
-    "loadError": "Unable to verify executive reporting access.",
-    "qualityLink": "Academic quality intelligence",
-    "qualityDescription": "Teaching delivery, attendance, assessments, and academic review backlog.",
-    "admissionsLink": "CRM & admissions intelligence",
-    "admissionsDescription": "Lead intake, pipeline activity, trials, conversions, and consultant productivity.",
-    "operationsLink": "Teaching operations intelligence",
-    "operationsDescription": "Session delivery, reschedules, substitutions, teacher workload, and room usage."
+    "overview": {
+      "title": "Executive overview",
+      "denied": "Executive reporting is available to center managers only.",
+      "description": "Cross-domain management summary for finance, admissions, service quality, and teaching operations in the selected period.",
+      "loadError": "Unable to load executive overview.",
+      "periodHint": "Reporting period {start} to {end} ({timezone})",
+      "comparisonHint": "Compared with {start} to {end}",
+      "financeSection": "Financial position",
+      "admissionsSection": "Admissions & CRM",
+      "qualitySection": "Learning & service quality",
+      "operationsSection": "Teaching operations",
+      "viewDetails": "View details",
+      "viewException": "View",
+      "attentionTitle": "Needs attention",
+      "attentionEmpty": "No cross-domain exceptions in this period.",
+      "domainFinance": "Finance",
+      "domainAdmissions": "Admissions",
+      "domainQuality": "Quality",
+      "domainOperations": "Operations",
+      "notApplicable": "Not applicable"
+    }
   },
   "teachingOps": {
     "intelligence": {

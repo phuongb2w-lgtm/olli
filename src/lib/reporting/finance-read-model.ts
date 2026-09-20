@@ -147,7 +147,9 @@ function num(value: unknown): number {
   return Number(value ?? 0);
 }
 
-function parseOverview(raw: Record<string, unknown>): FinanceIntelligenceOverview {
+export function parseFinanceIntelligenceOverviewRow(
+  raw: Record<string, unknown>,
+): FinanceIntelligenceOverview {
   const period = raw.period as Record<string, unknown>;
   const cash = raw.cash_collected as Record<string, unknown>;
   const revenue = raw.recognized_revenue as Record<string, unknown>;
@@ -265,7 +267,7 @@ export async function fetchFinanceIntelligenceOverview(
     return { overview: null, error: "empty_overview" };
   }
 
-  return { overview: parseOverview(row), error: null };
+  return { overview: parseFinanceIntelligenceOverviewRow(row), error: null };
 }
 
 export async function fetchFinanceExceptions(

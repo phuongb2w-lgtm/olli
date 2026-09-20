@@ -188,7 +188,9 @@ function parseReviewBacklog(raw: Record<string, unknown>): AcademicReviewBacklog
   };
 }
 
-function parseOverview(raw: Record<string, unknown>): AcademicQualityOverview {
+export function parseAcademicQualityOverviewRow(
+  raw: Record<string, unknown>,
+): AcademicQualityOverview {
   const attendanceBlock = raw.attendance as Record<string, unknown>;
   const comparisonRaw = raw.comparison_period as Record<string, unknown> | null;
 
@@ -240,7 +242,7 @@ export async function fetchAcademicQualityOverview(
   if (error) return { data: null, error: error.message };
   if (!data || typeof data !== "object") return { data: null, error: "invalid_response" };
 
-  return { data: parseOverview(data as Record<string, unknown>), error: null };
+  return { data: parseAcademicQualityOverviewRow(data as Record<string, unknown>), error: null };
 }
 
 export async function fetchAcademicExceptions(
