@@ -304,6 +304,22 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
         </div>
       </section>
 
+      <section className="rounded-lg border border-slate-200 bg-white p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-slate-800">{t("worklistTitle")}</h2>
+          <Link href="/executive/exceptions" className="text-xs font-medium underline">
+            {t("openWorklist")}
+          </Link>
+        </div>
+        <p className="mt-2 text-sm text-slate-700">
+          {t("worklistSummary", {
+            detected: overview.exceptionWorklist.currentDetectedCount,
+            open: overview.exceptionWorklist.openFollowUpCount,
+            acknowledged: overview.exceptionWorklist.acknowledgedFollowUpCount,
+          })}
+        </p>
+      </section>
+
       <ExecutiveAttentionPanel
         items={overview.attention}
         locale={locale}
@@ -311,6 +327,8 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
         emptyLabel={t("attentionEmpty")}
         viewLabel={t("viewException")}
         domainLabels={domainLabels}
+        worklistHref="/executive/exceptions"
+        worklistLabel={t("openWorklist")}
       />
     </div>
   );

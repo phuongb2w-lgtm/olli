@@ -59,6 +59,7 @@ export const PERMISSION_CODES = [
   "lead.manage_sources",
   "report.read",
   "report.executive.read",
+  "report.executive.follow_up.manage",
   "consultant_revenue.declare",
   "consultant_revenue.review",
 ] as const;

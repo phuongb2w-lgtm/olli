@@ -1700,6 +1700,149 @@ export type Database = {
           },
         ]
       }
+      executive_exception_follow_up: {
+        Row: {
+          created_at: string
+          created_by: string
+          domain: string
+          entity_id: string
+          entity_type: string
+          exception_code: string
+          exception_key: string
+          id: string
+          latest_note: string | null
+          organization_id: string
+          status: Database["public"]["Enums"]["executive_exception_follow_up_status"]
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          domain: string
+          entity_id: string
+          entity_type: string
+          exception_code: string
+          exception_key: string
+          id?: string
+          latest_note?: string | null
+          organization_id: string
+          status?: Database["public"]["Enums"]["executive_exception_follow_up_status"]
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          domain?: string
+          entity_id?: string
+          entity_type?: string
+          exception_code?: string
+          exception_key?: string
+          id?: string
+          latest_note?: string | null
+          organization_id?: string
+          status?: Database["public"]["Enums"]["executive_exception_follow_up_status"]
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "executive_exception_follow_up_org_created_by_fk"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "executive_exception_follow_up_org_updated_by_fk"
+            columns: ["organization_id", "updated_by"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "executive_exception_follow_up_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      executive_exception_follow_up_event: {
+        Row: {
+          actor_id: string
+          created_at: string
+          event_type: string
+          exception_key: string
+          follow_up_id: string
+          id: string
+          new_status:
+            | Database["public"]["Enums"]["executive_exception_follow_up_status"]
+            | null
+          note: string | null
+          organization_id: string
+          previous_status:
+            | Database["public"]["Enums"]["executive_exception_follow_up_status"]
+            | null
+        }
+        Insert: {
+          actor_id: string
+          created_at?: string
+          event_type: string
+          exception_key: string
+          follow_up_id: string
+          id?: string
+          new_status?:
+            | Database["public"]["Enums"]["executive_exception_follow_up_status"]
+            | null
+          note?: string | null
+          organization_id: string
+          previous_status?:
+            | Database["public"]["Enums"]["executive_exception_follow_up_status"]
+            | null
+        }
+        Update: {
+          actor_id?: string
+          created_at?: string
+          event_type?: string
+          exception_key?: string
+          follow_up_id?: string
+          id?: string
+          new_status?:
+            | Database["public"]["Enums"]["executive_exception_follow_up_status"]
+            | null
+          note?: string | null
+          organization_id?: string
+          previous_status?:
+            | Database["public"]["Enums"]["executive_exception_follow_up_status"]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "executive_exception_follow_up_event_follow_up_id_fkey"
+            columns: ["follow_up_id"]
+            isOneToOne: false
+            referencedRelation: "executive_exception_follow_up"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "executive_exception_follow_up_event_org_actor_fk"
+            columns: ["organization_id", "actor_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "executive_exception_follow_up_event_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expense: {
         Row: {
           amount: number
@@ -5410,6 +5553,14 @@ export type Database = {
         Returns: undefined
       }
       _assert_crm_executive_access: { Args: never; Returns: undefined }
+      _assert_executive_exception_follow_up_manage: {
+        Args: never
+        Returns: undefined
+      }
+      _assert_executive_exception_read_access: {
+        Args: never
+        Returns: undefined
+      }
       _assert_executive_overview_access: { Args: never; Returns: undefined }
       _assert_finance_intelligence_access: { Args: never; Returns: undefined }
       _assert_no_schedule_conflicts: {
@@ -5678,6 +5829,11 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m5_t07_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m5_t07_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -5855,6 +6011,15 @@ export type Database = {
           p_note?: string
         }
         Returns: Json
+      }
+      build_executive_exception_key: {
+        Args: {
+          p_domain: string
+          p_entity_id: string
+          p_entity_type: string
+          p_exception_code: string
+        }
+        Returns: string
       }
       build_lead_candidate_identity_snapshot: {
         Args: {
@@ -6311,6 +6476,10 @@ export type Database = {
         Args: { p_enrollment_id: string }
         Returns: Json
       }
+      get_executive_exception_worklist_summary: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
       get_executive_overview: {
         Args: {
           p_compare_previous?: boolean
@@ -6487,6 +6656,22 @@ export type Database = {
         Args: {
           p_end_date: string
           p_limit_per_domain?: number
+          p_start_date: string
+        }
+        Returns: Json[]
+      }
+      list_executive_exception_follow_up_history: {
+        Args: { p_exception_key: string }
+        Returns: Json[]
+      }
+      list_executive_exceptions: {
+        Args: {
+          p_domain?: string
+          p_end_date: string
+          p_exception_code?: string
+          p_follow_up_status?: Database["public"]["Enums"]["executive_exception_follow_up_status"]
+          p_include_historical?: boolean
+          p_search?: string
           p_start_date: string
         }
         Returns: Json[]
@@ -6914,6 +7099,38 @@ export type Database = {
         Args: { p_period_month: string }
         Returns: Json
       }
+      save_executive_exception_follow_up: {
+        Args: {
+          p_domain: string
+          p_entity_id: string
+          p_entity_type: string
+          p_exception_code: string
+          p_exception_key: string
+          p_note?: string
+          p_status?: Database["public"]["Enums"]["executive_exception_follow_up_status"]
+        }
+        Returns: {
+          created_at: string
+          created_by: string
+          domain: string
+          entity_id: string
+          entity_type: string
+          exception_code: string
+          exception_key: string
+          id: string
+          latest_note: string | null
+          organization_id: string
+          status: Database["public"]["Enums"]["executive_exception_follow_up_status"]
+          updated_at: string
+          updated_by: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "executive_exception_follow_up"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       schedule_lead_trial: {
         Args: {
           p_class_id: string
@@ -7286,6 +7503,11 @@ export type Database = {
         | "approved"
         | "rejected"
         | "returned"
+      executive_exception_follow_up_status:
+        | "open"
+        | "acknowledged"
+        | "resolved"
+        | "dismissed"
     }
     CompositeTypes: {
       operational_calendar_entry: {
@@ -7501,6 +7723,12 @@ export const Constants = {
         "approved",
         "rejected",
         "returned",
+      ],
+      executive_exception_follow_up_status: [
+        "open",
+        "acknowledged",
+        "resolved",
+        "dismissed",
       ],
     },
   },

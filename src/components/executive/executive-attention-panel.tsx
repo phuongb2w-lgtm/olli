@@ -10,6 +10,8 @@ type Props = {
   emptyLabel: string;
   viewLabel: string;
   domainLabels: Record<ExecutiveAttentionItem["domain"], string>;
+  worklistHref?: string;
+  worklistLabel?: string;
 };
 
 export function ExecutiveAttentionPanel({
@@ -19,6 +21,8 @@ export function ExecutiveAttentionPanel({
   emptyLabel,
   viewLabel,
   domainLabels,
+  worklistHref,
+  worklistLabel,
 }: Props) {
   if (items.length === 0) {
     return (
@@ -31,7 +35,14 @@ export function ExecutiveAttentionPanel({
 
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-4">
-      <h2 className="text-sm font-semibold text-slate-800">{title}</h2>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold text-slate-800">{title}</h2>
+        {worklistHref && worklistLabel ? (
+          <Link href={worklistHref} className="text-xs font-medium underline">
+            {worklistLabel}
+          </Link>
+        ) : null}
+      </div>
       <ul className="mt-3 space-y-2">
         {items.map((item) => (
           <li

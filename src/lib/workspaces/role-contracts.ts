@@ -47,6 +47,7 @@ export const ROLE_WORKSPACE_CONTRACTS: RoleWorkspaceContract[] = [
     ],
     permissions: [
       "report.executive.read",
+      "report.executive.follow_up.manage",
       "user.manage",
       "role.manage",
       "organization.update",
