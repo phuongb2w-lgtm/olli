@@ -6,6 +6,7 @@ import { ReportingPeriodFilterForm } from "@/components/finance/reporting-period
 import { formatFinanceMoney } from "@/lib/finance/format-finance-value";
 import { queryFinanceOverview } from "@/lib/finance/query-finance-overview";
 import { fetchFinanceExceptions } from "@/lib/reporting/finance-read-model";
+import { buildReportingHref } from "@/lib/reporting/build-reporting-href";
 import { parseReportingSearchParams } from "@/lib/reporting/parse-reporting-search-params";
 import { can } from "@/lib/permissions/can";
 import { resolveLocale } from "@/i18n/resolve-locale";
@@ -179,18 +180,18 @@ export default async function FinanceOverviewPage({ searchParams }: Props) {
       </div>
 
       <div className="flex flex-wrap gap-3 text-sm">
-        <Link href={`/finance/cash-revenue?start=${period.startDate}&end=${period.endDate}`} className="underline">
+        <Link href={buildReportingHref("/finance/cash-revenue", period, { comparePrevious })} className="underline">
           {t("drillDownCashRevenue")}
         </Link>
-        <Link href="/finance/receivables" className="underline">
+        <Link href={buildReportingHref("/finance/receivables", period, { comparePrevious: false })} className="underline">
           {t("drillDownReceivables")}
         </Link>
-        <Link href={`/finance/class-economics?start=${period.startDate}&end=${period.endDate}`} className="underline">
+        <Link href={buildReportingHref("/finance/class-economics", period, { comparePrevious })} className="underline">
           {t("drillDownClassEconomics")}
         </Link>
         {(await can("consultant_revenue.review")) ? (
           <Link
-            href={`/finance/consultant-revenue?start=${period.startDate}&end=${period.endDate}`}
+            href={buildReportingHref("/finance/consultant-revenue", period, { comparePrevious })}
             className="underline"
           >
             {t("drillDownConsultantRevenue")}

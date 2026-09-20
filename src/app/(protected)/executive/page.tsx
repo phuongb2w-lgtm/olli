@@ -7,6 +7,8 @@ import { resolveLocale } from "@/i18n/resolve-locale";
 import { getIdentityState } from "@/lib/auth/get-identity-state";
 import { can } from "@/lib/permissions/can";
 import { fetchExecutiveOverview } from "@/lib/reporting/executive-read-model";
+import { buildReportingHref } from "@/lib/reporting/build-reporting-href";
+import { formatReportingRate } from "@/lib/reporting/format-reporting-metric";
 import { parseReportingSearchParams } from "@/lib/reporting/parse-reporting-search-params";
 import { teachingOpsMetricDelta } from "@/lib/reporting/teaching-ops-read-model";
 import { createClient } from "@/lib/supabase/server";
@@ -16,11 +18,6 @@ export const dynamic = "force-dynamic";
 type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
-
-function formatRate(rate: number | null): string {
-  if (rate === null) return "—";
-  return `${(rate * 100).toFixed(1)}%`;
-}
 
 export default async function ExecutiveOverviewPage({ searchParams }: Props) {
   const t = await getTranslations("executive.overview");
@@ -83,6 +80,8 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
     operations: t("domainOperations"),
   };
 
+  const periodNav = { period, comparePrevious };
+
   return (
     <div className="space-y-6">
       <div className="space-y-1">
@@ -116,7 +115,7 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
       <section className="space-y-3 rounded-lg border border-emerald-200 bg-emerald-50/40 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-emerald-900">{t("financeSection")}</h2>
-          <Link href="/finance" className="text-xs font-medium underline">
+          <Link href={buildReportingHref("/finance", period, periodNav)} className="text-xs font-medium underline">
             {t("viewDetails")}
           </Link>
         </div>
@@ -155,7 +154,10 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
       <section className="space-y-3 rounded-lg border border-sky-200 bg-sky-50/40 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-sky-900">{t("admissionsSection")}</h2>
-          <Link href="/executive/admissions" className="text-xs font-medium underline">
+          <Link
+            href={buildReportingHref("/executive/admissions", period, periodNav)}
+            className="text-xs font-medium underline"
+          >
             {t("viewDetails")}
           </Link>
         </div>
@@ -165,6 +167,7 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
             value={intake.leads_created}
             change={null}
             locale={locale}
+            valueKind="count"
             variant="neutral"
           />
           <FinanceComparisonMetricCard
@@ -172,6 +175,7 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
             value={conversions.conversions_in_period}
             change={null}
             locale={locale}
+            valueKind="count"
             variant="revenue"
           />
           <FinanceComparisonMetricCard
@@ -179,14 +183,16 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
             value={conversions.cohort_conversions}
             change={null}
             locale={locale}
+            valueKind="count"
             variant="revenue"
-            hint={formatRate(conversions.cohort_conversion_rate)}
+            hint={formatReportingRate(conversions.cohort_conversion_rate, locale)}
           />
           <FinanceComparisonMetricCard
             label={tCrm("pendingFollowUps")}
             value={activity.pending_follow_ups}
             change={null}
             locale={locale}
+            valueKind="count"
             variant="obligation"
             sublabel={tCrm("overdueFollowUps", { count: activity.overdue_follow_ups })}
           />
@@ -196,7 +202,10 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
       <section className="space-y-3 rounded-lg border border-violet-200 bg-violet-50/40 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-violet-900">{t("qualitySection")}</h2>
-          <Link href="/executive/quality" className="text-xs font-medium underline">
+          <Link
+            href={buildReportingHref("/executive/quality", period, periodNav)}
+            className="text-xs font-medium underline"
+          >
             {t("viewDetails")}
           </Link>
         </div>
@@ -206,18 +215,18 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
             value={delivery.deliveredSessions}
             change={null}
             locale={locale}
+            valueKind="count"
             variant="neutral"
           />
           <FinanceComparisonMetricCard
             label={tQuality("attendanceRate")}
-            value={attendance.current.attendanceRate ?? 0}
+            value={attendance.current.attendanceRate}
             change={comparePrevious ? attendance.rateChange : null}
             locale={locale}
+            valueKind="rate"
             variant="revenue"
             hint={
-              attendance.current.attendanceRate === null
-                ? t("notApplicable")
-                : formatRate(attendance.current.attendanceRate)
+              attendance.current.attendanceRate === null ? t("notApplicable") : undefined
             }
           />
           <FinanceComparisonMetricCard
@@ -230,6 +239,7 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
             }
             change={null}
             locale={locale}
+            valueKind="count"
             variant="obligation"
           />
           <FinanceComparisonMetricCard
@@ -237,6 +247,7 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
             value={quality.assessment.finalizedResults}
             change={null}
             locale={locale}
+            valueKind="count"
             variant="neutral"
             sublabel={tQuality("totalResults", { count: quality.assessment.totalResults })}
           />
@@ -246,7 +257,10 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
       <section className="space-y-3 rounded-lg border border-amber-200 bg-amber-50/40 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-amber-900">{t("operationsSection")}</h2>
-          <Link href="/executive/operations" className="text-xs font-medium underline">
+          <Link
+            href={buildReportingHref("/executive/operations", period, periodNav)}
+            className="text-xs font-medium underline"
+          >
             {t("viewDetails")}
           </Link>
         </div>
@@ -263,6 +277,7 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
                 : null
             }
             locale={locale}
+            valueKind="count"
             variant="neutral"
           />
           <FinanceComparisonMetricCard
@@ -277,6 +292,7 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
                 : null
             }
             locale={locale}
+            valueKind="count"
             variant="neutral"
             sublabel={tOps("materializedSessions", { count: sessions.materialized_sessions })}
           />
@@ -292,6 +308,7 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
                 : null
             }
             locale={locale}
+            valueKind="count"
             variant="obligation"
           />
           <FinanceComparisonMetricCard
@@ -299,6 +316,7 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
             value={changes.reschedule.event_count}
             change={null}
             locale={locale}
+            valueKind="count"
             variant="neutral"
           />
         </div>
@@ -307,7 +325,10 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
       <section className="rounded-lg border border-slate-200 bg-white p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-slate-800">{t("worklistTitle")}</h2>
-          <Link href="/executive/exceptions" className="text-xs font-medium underline">
+          <Link
+            href={buildReportingHref("/executive/exceptions", period, periodNav)}
+            className="text-xs font-medium underline"
+          >
             {t("openWorklist")}
           </Link>
         </div>
@@ -327,7 +348,7 @@ export default async function ExecutiveOverviewPage({ searchParams }: Props) {
         emptyLabel={t("attentionEmpty")}
         viewLabel={t("viewException")}
         domainLabels={domainLabels}
-        worklistHref="/executive/exceptions"
+        worklistHref={buildReportingHref("/executive/exceptions", period, periodNav)}
         worklistLabel={t("openWorklist")}
       />
     </div>

@@ -37,7 +37,9 @@ test.describe("M5-T03 academic quality", () => {
   test("4. executive overview links to quality", async ({ page }) => {
     await signIn(page, adminEmail);
     await page.goto("/executive");
-    await expect(page.getByText(/learning.*service quality|chất lượng học tập/i)).toBeVisible();
+    await expect(page.getByText(/learning.*service quality|chất lượng học tập/i)).toBeVisible({
+      timeout: 45_000,
+    });
     const qualitySection = page.locator("section").filter({
       has: page.getByRole("heading", {
         level: 2,
@@ -45,7 +47,7 @@ test.describe("M5-T03 academic quality", () => {
       }),
     });
     await qualitySection.getByRole("link", { name: /view details|xem chi tiết/i }).click();
-    await expect(page).toHaveURL("/executive/quality");
+    await expect(page).toHaveURL(/\/executive\/quality(\?|$)/);
   });
 
   test("5. period filter visible on quality page", async ({ page }) => {

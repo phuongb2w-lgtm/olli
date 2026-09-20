@@ -15,7 +15,22 @@ export function parseReportingSearchParams(
     periodMonth: periodParam,
   });
 
-  const comparePrevious = compareParam !== "0";
+  const comparePrevious = parseReportingCompareParam(compareParam);
 
   return { period, comparePrevious };
+}
+
+/** Supports hidden compare=0 + checkbox compare=1 form submissions and explicit URL params. */
+export function parseReportingCompareParam(
+  compareParam: string | string[] | undefined,
+  defaultWhenAbsent = true,
+): boolean {
+  const values = Array.isArray(compareParam)
+    ? compareParam
+    : compareParam != null
+      ? [compareParam]
+      : [];
+  if (values.includes("1")) return true;
+  if (values.includes("0")) return false;
+  return defaultWhenAbsent;
 }

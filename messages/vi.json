@@ -161,6 +161,7 @@
       "title": "Giảng dạy của tôi",
       "subtitle": "Buổi học được giao và giờ giảng trong kỳ đã chọn.",
       "denied": "Chỉ số cá nhân có khi tài khoản được liên kết với hồ sơ giáo viên.",
+      "loadError": "Không thể tải chỉ số giảng dạy của bạn trong kỳ này.",
       "upcomingSessions": "Buổi sắp tới",
       "scheduledSessions": "Buổi đã lên lịch",
       "scheduledHours": "đã lên lịch",

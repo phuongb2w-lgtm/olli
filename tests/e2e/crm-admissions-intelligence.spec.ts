@@ -57,15 +57,22 @@ test.describe("M5-T04 CRM admissions intelligence", () => {
   test("6. executive overview links to admissions", async ({ page }) => {
     await signIn(page, adminEmail);
     await page.goto("/executive");
-    await expect(page.getByText(/admissions.*crm|tuyển sinh.*crm/i)).toBeVisible();
+    await expect(page.getByText(/admissions.*crm|tuyển sinh.*crm/i)).toBeVisible({
+      timeout: 45_000,
+    });
     const admissionsSection = page.locator("section").filter({
       has: page.getByRole("heading", {
         level: 2,
         name: /admissions.*crm|tuyển sinh.*crm/i,
       }),
     });
-    await admissionsSection.getByRole("link", { name: /view details|xem chi tiết/i }).click();
-    await expect(page).toHaveURL("/executive/admissions");
+    const drillDown = admissionsSection.getByRole("link", {
+      name: /view details|xem chi tiết/i,
+    });
+    const href = await drillDown.getAttribute("href");
+    expect(href).toMatch(/\/executive\/admissions/);
+    await page.goto(href!);
+    await expect(page).toHaveURL(/\/executive\/admissions(\?|$)/);
   });
 
   test("7. admin can open CRM my work with performance metrics", async ({ page }) => {

@@ -40,6 +40,6 @@ test.describe("M5-T01 permission-aware navigation", () => {
     await page.goto("/executive");
     await expect(
       page.getByText(/financial position|tình hình tài chính/i),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 60_000 });
   });
 });

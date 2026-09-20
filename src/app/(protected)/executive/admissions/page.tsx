@@ -12,6 +12,8 @@ import {
   fetchCrmAdmissionsOverview,
   parseConsultantProductivityRows,
 } from "@/lib/reporting/crm-admissions-read-model";
+import { buildReportingHref } from "@/lib/reporting/build-reporting-href";
+import { formatReportingRate } from "@/lib/reporting/format-reporting-metric";
 import { parseReportingSearchParams } from "@/lib/reporting/parse-reporting-search-params";
 import { createClient } from "@/lib/supabase/server";
 
@@ -20,11 +22,6 @@ export const dynamic = "force-dynamic";
 type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
-
-function formatRate(rate: number | null): string {
-  if (rate === null) return "—";
-  return `${(rate * 100).toFixed(1)}%`;
-}
 
 export default async function ExecutiveAdmissionsPage({ searchParams }: Props) {
   const t = await getTranslations("crm.intelligence");
@@ -73,7 +70,10 @@ export default async function ExecutiveAdmissionsPage({ searchParams }: Props) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <Link href="/executive" className="text-sm underline">
+        <Link
+          href={buildReportingHref("/executive", period, { comparePrevious })}
+          className="text-sm underline"
+        >
           {t("backToExecutive")}
         </Link>
       </div>
@@ -87,12 +87,22 @@ export default async function ExecutiveAdmissionsPage({ searchParams }: Props) {
         comparePrevious={comparePrevious}
       />
 
+      {overview.comparisonPeriod ? (
+        <p className="text-xs text-slate-600">
+          {t("comparisonHint", {
+            start: overview.comparisonPeriod.startDate,
+            end: overview.comparisonPeriod.endDate,
+          })}
+        </p>
+      ) : null}
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <FinanceComparisonMetricCard
           label={t("leadsCreated")}
           value={intake.leads_created}
           change={null}
           locale={locale}
+          valueKind="count"
           variant="neutral"
           sublabel={t("unassignedLeads", { count: intake.unassigned_count })}
         />
@@ -101,6 +111,7 @@ export default async function ExecutiveAdmissionsPage({ searchParams }: Props) {
           value={activity.activities_recorded}
           change={null}
           locale={locale}
+          valueKind="count"
           variant="neutral"
           sublabel={t("overdueFollowUps", { count: activity.overdue_follow_ups })}
         />
@@ -109,6 +120,7 @@ export default async function ExecutiveAdmissionsPage({ searchParams }: Props) {
           value={trials.trials_completed}
           change={null}
           locale={locale}
+          valueKind="count"
           variant="neutral"
           sublabel={t("trialsScheduled", { count: trials.trials_scheduled })}
         />
@@ -117,6 +129,7 @@ export default async function ExecutiveAdmissionsPage({ searchParams }: Props) {
           value={conversions.conversions_in_period}
           change={null}
           locale={locale}
+          valueKind="count"
           variant="revenue"
         />
         <FinanceComparisonMetricCard
@@ -124,8 +137,9 @@ export default async function ExecutiveAdmissionsPage({ searchParams }: Props) {
           value={conversions.cohort_conversions}
           change={null}
           locale={locale}
+          valueKind="count"
           variant="revenue"
-          hint={formatRate(conversions.cohort_conversion_rate)}
+          hint={formatReportingRate(conversions.cohort_conversion_rate, locale)}
           sublabel={t("cohortDenominator", { count: conversions.cohort_leads_created })}
         />
         <FinanceComparisonMetricCard
@@ -133,6 +147,7 @@ export default async function ExecutiveAdmissionsPage({ searchParams }: Props) {
           value={activity.pending_follow_ups}
           change={null}
           locale={locale}
+          valueKind="count"
           variant="obligation"
         />
       </div>
@@ -173,7 +188,7 @@ export default async function ExecutiveAdmissionsPage({ searchParams }: Props) {
                   {t("sourceRow", {
                     leads: source.leads_created,
                     conversions: source.conversions_in_period,
-                    rate: formatRate(source.cohort_conversion_rate),
+                    rate: formatReportingRate(source.cohort_conversion_rate, locale),
                   })}
                 </span>
               </li>

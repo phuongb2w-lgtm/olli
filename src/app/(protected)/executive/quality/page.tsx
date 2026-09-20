@@ -10,6 +10,7 @@ import {
   fetchAcademicExceptions,
   fetchAcademicQualityOverview,
 } from "@/lib/reporting/academic-read-model";
+import { buildReportingHref } from "@/lib/reporting/build-reporting-href";
 import { parseReportingSearchParams } from "@/lib/reporting/parse-reporting-search-params";
 import { createClient } from "@/lib/supabase/server";
 
@@ -18,11 +19,6 @@ export const dynamic = "force-dynamic";
 type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
-
-function formatRate(rate: number | null): string {
-  if (rate === null) return "—";
-  return `${(rate * 100).toFixed(1)}%`;
-}
 
 export default async function ExecutiveQualityPage({ searchParams }: Props) {
   const t = await getTranslations("academic.intelligence");
@@ -68,7 +64,10 @@ export default async function ExecutiveQualityPage({ searchParams }: Props) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <Link href="/executive" className="text-sm underline">
+        <Link
+          href={buildReportingHref("/executive", period, { comparePrevious })}
+          className="text-sm underline"
+        >
           {t("backToExecutive")}
         </Link>
       </div>
@@ -95,22 +94,24 @@ export default async function ExecutiveQualityPage({ searchParams }: Props) {
           value={delivery.deliveredSessions}
           change={null}
           locale={locale}
+          valueKind="count"
           variant="neutral"
           sublabel={t("materializedSessions", { count: delivery.materializedSessions })}
         />
         <FinanceComparisonMetricCard
           label={t("attendanceRate")}
-          value={attendance.current.attendanceRate ?? 0}
+          value={attendance.current.attendanceRate}
           change={comparePrevious ? attendance.rateChange : null}
           locale={locale}
+          valueKind="rate"
           variant="revenue"
-          hint={formatRate(attendance.current.attendanceRate)}
         />
         <FinanceComparisonMetricCard
           label={t("assessmentCoverage")}
           value={assessment.finalizedResults}
           change={null}
           locale={locale}
+          valueKind="count"
           variant="neutral"
           sublabel={t("totalResults", { count: assessment.totalResults })}
         />
@@ -119,6 +120,7 @@ export default async function ExecutiveQualityPage({ searchParams }: Props) {
           value={observation.confirmedObservations}
           change={null}
           locale={locale}
+          valueKind="count"
           variant="neutral"
           sublabel={t("totalObservations", { count: observation.observationCount })}
         />
@@ -132,6 +134,7 @@ export default async function ExecutiveQualityPage({ searchParams }: Props) {
           }
           change={null}
           locale={locale}
+          valueKind="count"
           variant="obligation"
         />
         <FinanceComparisonMetricCard
@@ -139,6 +142,7 @@ export default async function ExecutiveQualityPage({ searchParams }: Props) {
           value={delivery.cancelledSessions}
           change={null}
           locale={locale}
+          valueKind="count"
           variant="cost"
         />
       </div>

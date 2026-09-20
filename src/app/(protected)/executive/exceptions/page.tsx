@@ -9,6 +9,7 @@ import {
   fetchExecutiveExceptions,
   type ExecutiveExceptionListFilters,
 } from "@/lib/reporting/executive-read-model";
+import { buildReportingHref } from "@/lib/reporting/build-reporting-href";
 import { parseReportingSearchParams } from "@/lib/reporting/parse-reporting-search-params";
 import { createClient } from "@/lib/supabase/server";
 
@@ -28,7 +29,7 @@ export default async function ExecutiveExceptionsPage({ searchParams }: Props) {
   const identity = await getIdentityState();
   const locale = await resolveLocale(identity.kind === "active" ? identity.appUser : null);
   const rawParams = await searchParams;
-  const { period } = parseReportingSearchParams(rawParams);
+  const { period, comparePrevious } = parseReportingSearchParams(rawParams);
 
   if (!(await can("report.executive.read"))) {
     return (
@@ -80,7 +81,10 @@ export default async function ExecutiveExceptionsPage({ searchParams }: Props) {
     <div className="space-y-6">
       <div className="space-y-1">
         <p className="text-sm">
-          <Link href="/executive" className="underline">
+          <Link
+            href={buildReportingHref("/executive", period, { comparePrevious })}
+            className="underline"
+          >
             {t("backToExecutive")}
           </Link>
         </p>

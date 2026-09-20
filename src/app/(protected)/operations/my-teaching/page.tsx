@@ -21,12 +21,20 @@ export default async function MyTeachingPage({ searchParams }: Props) {
   const { data, error } = await fetchMyTeachingOpsOverview(supabase, period);
 
   if (error || !data) {
+    const isPermissionDenied =
+      error != null && /permission_denied|42501/i.test(error);
     return (
       <div className="space-y-4">
         <h1 className="text-xl font-semibold">{t("title")}</h1>
         <OperationsSubnav />
-        <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-600">
-          <p>{t("denied")}</p>
+        <section
+          className={`rounded-lg border p-4 text-sm ${
+            isPermissionDenied
+              ? "border-slate-200 bg-white text-slate-600"
+              : "border-red-200 bg-red-50 text-red-800"
+          }`}
+        >
+          <p>{isPermissionDenied ? t("denied") : t("loadError")}</p>
         </section>
       </div>
     );

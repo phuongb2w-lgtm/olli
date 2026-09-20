@@ -161,6 +161,7 @@
       "title": "My teaching",
       "subtitle": "Your assigned sessions and teaching hours in the selected period.",
       "denied": "Personal teaching metrics are available when your user account is linked to a teacher profile.",
+      "loadError": "Unable to load your teaching metrics for this period.",
       "upcomingSessions": "Upcoming sessions",
       "scheduledSessions": "Scheduled sessions",
       "scheduledHours": "scheduled",

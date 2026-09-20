@@ -40,16 +40,19 @@ export function ReportingPeriodFilterForm({
         />
       </label>
       {showComparisonToggle ? (
-        <label className="flex items-center gap-2 text-sm text-slate-700">
-          <input
-            type="checkbox"
-            name="compare"
-            value="1"
-            defaultChecked={comparePrevious}
-            className="rounded border-slate-300"
-          />
-          {t("comparePrevious")}
-        </label>
+        <>
+          <input type="hidden" name="compare" value="0" />
+          <label className="flex items-center gap-2 text-sm text-slate-700">
+            <input
+              type="checkbox"
+              name="compare"
+              value="1"
+              defaultChecked={comparePrevious}
+              className="rounded border-slate-300"
+            />
+            {t("comparePrevious")}
+          </label>
+        </>
       ) : null}
       <button
         type="submit"

@@ -84,7 +84,9 @@ test.describe("M4-T07 operations analytics", () => {
     await expect(page).toHaveURL(/\/operations$/);
     await page.getByRole("link", { name: /calendar|lịch vận hành/i }).click();
     await expect(page).toHaveURL(/\/operations\/calendar/);
-    await page.getByRole("link", { name: /workload|khối lượng/i }).click();
-    await expect(page).toHaveURL(/\/operations\/workload/);
+    await Promise.all([
+      page.waitForURL(/\/operations\/workload/, { timeout: 15_000 }),
+      page.locator('a[href="/operations/workload"]').click(),
+    ]);
   });
 });
