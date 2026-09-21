@@ -91,8 +91,10 @@ BEGIN
     false
   );
 
-  INSERT INTO app_user (organization_id, email, display_name, auth_user_id, status)
-  VALUES (v_org, 'pay-admin@test.local', 'Pay Admin', v_auth, 'active');
+  PERFORM public.set_primary_owner_for_organization(
+    v_org,
+    public.test_fixture_insert_app_user(v_org, 'pay-admin@test.local', 'Pay Admin', v_auth)
+  );
 
   RETURN QUERY SELECT v_org, v_course, v_class, v_student, v_guardian, v_enrollment, v_auth;
 END;
@@ -172,14 +174,10 @@ $$;
 
 CREATE OR REPLACE FUNCTION _m2_pay_grant_admin(p_org uuid, p_auth uuid)
 RETURNS void LANGUAGE plpgsql AS $$
-DECLARE v_user uuid; v_role uuid;
+DECLARE v_user uuid;
 BEGIN
-  SELECT id INTO v_user FROM app_user WHERE organization_id = p_org LIMIT 1;
-  INSERT INTO role (organization_id, code) VALUES (p_org, 'pay_admin') RETURNING id INTO v_role;
-  INSERT INTO role_permission (role_id, permission_id)
-  SELECT v_role, p.id FROM permission p;
-  INSERT INTO user_role (organization_id, user_id, role_id, effective_from, status)
-  VALUES (p_org, v_user, v_role, CURRENT_DATE, 'active');
+  SELECT id INTO v_user FROM app_user WHERE organization_id = p_org AND email = 'pay-admin@test.local' LIMIT 1;
+  PERFORM public.test_fixture_grant_all_permissions_role(p_org, v_user, 'pay_admin');
 END;
 $$;
 
@@ -205,9 +203,7 @@ BEGIN
     false,
     false
   );
-  INSERT INTO app_user (organization_id, email, display_name, auth_user_id, status)
-  VALUES (p_org, 'reader@test.local', 'Reader', v_auth, 'active')
-  RETURNING id INTO v_user;
+  v_user := public.test_fixture_insert_app_user(p_org, 'reader@test.local', 'Reader', v_auth);
   auth_id := v_auth;
 END;
 $$;

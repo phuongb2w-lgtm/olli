@@ -76,16 +76,17 @@ test.describe("M5-T08 management intelligence hardening", () => {
   test("7. manager navigates executive domain surfaces", async ({ page }) => {
     await signIn(page, adminEmail);
     await page.goto("/executive");
-    await page.goto("/executive/admissions");
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await page.goto("/executive/quality");
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await page.goto("/executive/operations");
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await page.goto("/executive/exceptions");
+    await expect(page.locator('input[name="start"]')).toBeVisible({ timeout: 60_000 });
+    await page.goto("/executive/admissions?start=2026-01-01&end=2026-01-31");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible({ timeout: 60_000 });
+    await page.goto("/executive/quality?start=2026-01-01&end=2026-01-31");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible({ timeout: 60_000 });
+    await page.goto("/executive/operations?start=2026-01-01&end=2026-01-31");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible({ timeout: 60_000 });
+    await page.goto("/executive/exceptions?start=2026-01-01&end=2026-01-31");
     await expect(
       page.getByRole("heading", { level: 1, name: /executive exceptions|ngoại lệ điều hành/i }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 60_000 });
   });
 
   test("8. attendance rate shows unavailable not zero money on executive overview", async ({

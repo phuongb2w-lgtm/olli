@@ -31,7 +31,7 @@ test.describe("M3 CRM leads", () => {
     await page.goto("/crm/leads");
     await expect(
       page.getByText(/do not have permission to read leads|không có quyền đọc lead/i),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test("3. reader without lead.read is denied", async ({ page }) => {

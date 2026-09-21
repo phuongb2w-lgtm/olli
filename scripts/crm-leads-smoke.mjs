@@ -323,8 +323,8 @@ async function main() {
     .insert({
       organization_id: ORG_A,
       lead_id: identityLeadId,
-      given_name: "Văn Phương",
-      family_name: "Trần",
+      given_name: "Student",
+      family_name: "A",
       is_primary_candidate: true,
     })
     .select("id")

@@ -46,13 +46,11 @@ export const ROLE_WORKSPACE_CONTRACTS: RoleWorkspaceContract[] = [
       "settings",
     ],
     permissions: [
-      "report.executive.read",
-      "report.executive.follow_up.manage",
-      "user.manage",
-      "role.manage",
       "organization.update",
+      "center_account.manage",
     ],
-    notes: "Full system access via permission composition; only role with executive_overview.",
+    notes:
+      "Broad operational permissions come from the center_manager DB template. Executive and center_account.manage are identity-derived via is_primary_owner(), not role_permission rows.",
   },
   {
     role: "accountant",

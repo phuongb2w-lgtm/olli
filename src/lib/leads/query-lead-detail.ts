@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { fetchAppUserIdentityLabels } from "@/lib/identity/fetch-app-user-identity-labels";
 import { formatPersonName } from "@/lib/leads/format-person-name";
 import type {
   LeadActivityType,
@@ -166,8 +167,8 @@ export async function queryLeadDetail(
       ? supabase.from("lead_campaign").select("name").eq("id", lead.lead_campaign_id).maybeSingle()
       : Promise.resolve({ data: null }),
     lead.assigned_user_id
-      ? supabase.from("app_user").select("display_name").eq("id", lead.assigned_user_id).maybeSingle()
-      : Promise.resolve({ data: null }),
+      ? fetchAppUserIdentityLabels(supabase, [lead.assigned_user_id])
+      : Promise.resolve(new Map()),
     lead.lost_reason_id
       ? supabase.from("lead_lost_reason").select("display_name").eq("id", lead.lost_reason_id).maybeSingle()
       : Promise.resolve({ data: null }),
@@ -251,11 +252,11 @@ export async function queryLeadDetail(
     .filter(Boolean) as string[];
   for (const id of assigneeIds) actorIds.add(id);
 
-  const { data: actors } = actorIds.size
-    ? await supabase.from("app_user").select("id, display_name").in("id", [...actorIds])
-    : { data: [] as { id: string; display_name: string }[] };
+  const actorLabels = actorIds.size
+    ? await fetchAppUserIdentityLabels(supabase, [...actorIds])
+    : new Map();
 
-  const actorMap = new Map((actors ?? []).map((a) => [a.id, a.display_name]));
+  const actorMap = new Map([...actorLabels.entries()].map(([id, a]) => [id, a.displayName]));
 
   const lostReasonIds = (statusHistory.data ?? [])
     .map((h) => h.lost_reason_id)
@@ -395,7 +396,9 @@ export async function queryLeadDetail(
       leadSourceId: lead.lead_source_id,
       campaignName: campaign.data?.name ?? null,
       leadCampaignId: lead.lead_campaign_id,
-      assignedUserName: assignedUser.data?.display_name ?? null,
+      assignedUserName: lead.assigned_user_id
+        ? assignedUser.get(lead.assigned_user_id)?.displayName ?? null
+        : null,
       assignedUserId: lead.assigned_user_id,
       assignmentHistory: assignmentHistoryDetails,
       lostReasonLabel: lostReason.data?.display_name ?? null,

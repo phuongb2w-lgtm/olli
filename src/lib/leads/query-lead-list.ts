@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { fetchAppUserIdentityLabels } from "@/lib/identity/fetch-app-user-identity-labels";
 import { formatPersonName } from "@/lib/leads/format-person-name";
 import {
   clampPage,
@@ -307,13 +308,11 @@ async function enrichLeadListItems(
   const sourceIds = [...new Set(leads.map((l) => l.lead_source_id).filter(Boolean))] as string[];
   const userIds = [...new Set(leads.map((l) => l.assigned_user_id).filter(Boolean))] as string[];
 
-  const [sources, users, candidates, contacts, followUps, activities, trials] = await Promise.all([
+  const [sources, userLabels, candidates, contacts, followUps, activities, trials] = await Promise.all([
     sourceIds.length
       ? supabase.from("lead_source").select("id, code, display_name").in("id", sourceIds)
       : Promise.resolve({ data: [] }),
-    userIds.length
-      ? supabase.from("app_user").select("id, display_name").in("id", userIds)
-      : Promise.resolve({ data: [] }),
+    userIds.length ? fetchAppUserIdentityLabels(supabase, userIds) : Promise.resolve(new Map()),
     supabase
       .from("lead_candidate")
       .select("lead_id, given_name, family_name, is_primary_candidate")
@@ -344,7 +343,9 @@ async function enrichLeadListItems(
   ]);
 
   const sourceMap = new Map((sources.data ?? []).map((s) => [s.id, s.display_name]));
-  const userMap = new Map((users.data ?? []).map((u) => [u.id, u.display_name]));
+  const userMap = new Map(
+    [...userLabels.entries()].map(([id, label]) => [id, label.displayName]),
+  );
 
   const primaryCandidate = new Map<string, string>();
   const primaryContact = new Map<string, string>();

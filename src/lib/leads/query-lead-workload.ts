@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { fetchAppUserIdentityLabels } from "@/lib/identity/fetch-app-user-identity-labels";
 import { LEAD_INACTIVE_STATUSES } from "@/lib/leads/constants";
 import type { Database } from "@/types/database";
 
@@ -35,11 +36,11 @@ export async function queryLeadWorkloadSummary(
     counts.delete(null);
 
     const userIds = [...counts.keys()].filter(Boolean) as string[];
-    const { data: users } = userIds.length
-      ? await supabase.from("app_user").select("id, display_name").in("id", userIds)
-      : { data: [] as { id: string; display_name: string }[] };
+    const userLabels = userIds.length
+      ? await fetchAppUserIdentityLabels(supabase, userIds)
+      : new Map<string, { userId: string; displayName: string; membershipStatus: string }>();
 
-    const nameMap = new Map((users ?? []).map((u) => [u.id, u.display_name]));
+    const nameMap = new Map([...userLabels.entries()].map(([id, u]) => [id, u.displayName]));
 
     const byAssignee = userIds
       .map((userId) => ({

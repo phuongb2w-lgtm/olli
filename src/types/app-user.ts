@@ -1,4 +1,4 @@
-export type AppUserStatus = "active" | "inactive";
+export type AppUserStatus = "active" | "inactive" | "locked";
 
 export type AppUserContext = {
   appUserId: string;

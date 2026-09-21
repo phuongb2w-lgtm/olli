@@ -37,7 +37,7 @@ test.describe("M1-T08 session execution", () => {
     ).toBeVisible();
   });
 
-  test("staff can view session execution but not mark attendance", async ({ page }) => {
+  test("teacher staff can view session execution and mark attendance", async ({ page }) => {
     await signIn(page, staffEmail);
     await openSeededClassTeaching(page);
     const openSession = page.getByRole("link", { name: /open session|mở buổi học/i }).first();
@@ -46,7 +46,7 @@ test.describe("M1-T08 session execution", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: /session execution|thực hiện buổi học/i }),
     ).toBeVisible();
-    await expect(page.getByRole("button", { name: /present|có mặt/i })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /present|có mặt/i }).first()).toBeVisible();
   });
 
   test("session execution shows not recorded label", async ({ page }) => {

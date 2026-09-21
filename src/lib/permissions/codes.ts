@@ -8,6 +8,8 @@ export const PERMISSION_CODES = [
   "permission.read",
   "user.read",
   "user.manage",
+  "center_account.manage",
+  "identity.read",
   "role.read",
   "role.manage",
   "student.create",

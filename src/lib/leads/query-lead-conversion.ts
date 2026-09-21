@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { fetchAppUserIdentityLabels } from "@/lib/identity/fetch-app-user-identity-labels";
 import type { Database } from "@/types/database";
 
 type DbClient = SupabaseClient<Database>;
@@ -83,7 +84,7 @@ export async function queryLeadConversion(
       .from("lead_conversion_enrollment")
       .select("lead_candidate_id, enrollment_id, class_id")
       .eq("lead_conversion_id", conversion.id),
-    supabase.from("app_user").select("display_name").eq("id", conversion.converted_by).maybeSingle(),
+    fetchAppUserIdentityLabels(supabase, [conversion.converted_by]),
   ]);
 
   const studentIds = (candidates.data ?? []).map((c) => c.student_id);
@@ -114,7 +115,7 @@ export async function queryLeadConversion(
     conversion: {
       id: conversion.id,
       convertedAt: conversion.converted_at,
-      convertedByName: actor.data?.display_name ?? null,
+      convertedByName: actor.get(conversion.converted_by)?.displayName ?? null,
       candidates: (candidates.data ?? []).map((c) => ({
         leadCandidateId: c.lead_candidate_id,
         studentId: c.student_id,

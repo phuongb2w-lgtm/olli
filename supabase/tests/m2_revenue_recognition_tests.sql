@@ -50,8 +50,10 @@ BEGIN
   INSERT INTO organization (id, name) VALUES (v_org, 'M2 Rev Org');
   INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, is_sso_user, is_anonymous)
   VALUES (v_auth, (SELECT id FROM auth.instances LIMIT 1), 'authenticated', 'authenticated', 'rev-' || replace(v_auth::text, '-', '') || '@test.local', '', now(), now(), now(), false, false);
-  INSERT INTO app_user (organization_id, email, display_name, auth_user_id, status)
-  VALUES (v_org, 'rev-admin@test.local', 'Rev Admin', v_auth, 'active');
+  PERFORM public.set_primary_owner_for_organization(
+    v_org,
+    public.test_fixture_insert_app_user(v_org, 'rev-admin@test.local', 'Rev Admin', v_auth)
+  );
   INSERT INTO course (organization_id, code, name) VALUES (v_org, 'R1', 'Rev Course');
   INSERT INTO class (organization_id, course_id, name, status)
   SELECT v_org, c.id, 'Rev Class', 'active' FROM course c WHERE c.organization_id = v_org LIMIT 1 RETURNING id INTO v_class;
@@ -64,12 +66,10 @@ BEGIN
 END; $$;
 
 CREATE OR REPLACE FUNCTION _m2_rev_grant_admin(p_org uuid) RETURNS void LANGUAGE plpgsql AS $$
-DECLARE v_user uuid; v_role uuid;
+DECLARE v_user uuid;
 BEGIN
-  SELECT id INTO v_user FROM app_user WHERE organization_id = p_org LIMIT 1;
-  INSERT INTO role (organization_id, code) VALUES (p_org, 'rev_admin') RETURNING id INTO v_role;
-  INSERT INTO role_permission (role_id, permission_id) SELECT v_role, p.id FROM permission p;
-  INSERT INTO user_role (organization_id, user_id, role_id, effective_from, status) VALUES (p_org, v_user, v_role, CURRENT_DATE, 'active');
+  SELECT id INTO v_user FROM app_user WHERE organization_id = p_org AND email = 'rev-admin@test.local' LIMIT 1;
+  PERFORM public.test_fixture_grant_all_permissions_role(p_org, v_user, 'rev_admin');
 END; $$;
 
 CREATE OR REPLACE FUNCTION _m2_rev_terms(

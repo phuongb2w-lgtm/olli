@@ -98,7 +98,7 @@ DO $$
 DECLARE v_count integer; v_role uuid; v_perm uuid;
 BEGIN
   PERFORM _cb_as_super();
-  SELECT id INTO v_role FROM role WHERE organization_id = 'a0000000-0000-4000-8000-000000000001' AND code = 'staff';
+  SELECT id INTO v_role FROM role WHERE organization_id = 'a0000000-0000-4000-8000-000000000001' AND code = 'fixture_readonly';
   SELECT id INTO v_perm FROM permission WHERE code = 'charge.read';
   DELETE FROM role_permission WHERE role_id = v_role AND permission_id = v_perm;
   PERFORM _cb_as_auth('a2222222-2222-4222-8222-222222222222');

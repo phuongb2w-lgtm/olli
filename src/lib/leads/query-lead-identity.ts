@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { fetchAppUserIdentityLabels } from "@/lib/identity/fetch-app-user-identity-labels";
 import { formatPersonName } from "@/lib/leads/format-person-name";
 import type { Database } from "@/types/database";
 
@@ -208,10 +209,10 @@ export async function queryLeadIdentity(
     const actorIds = new Set(
       (eventRows ?? []).map((e) => e.changed_by).filter(Boolean) as string[],
     );
-    const { data: actors } = actorIds.size
-      ? await supabase.from("app_user").select("id, display_name").in("id", [...actorIds])
-      : { data: [] as { id: string; display_name: string }[] };
-    const actorMap = new Map((actors ?? []).map((a) => [a.id, a.display_name]));
+    const actorLabels = actorIds.size
+      ? await fetchAppUserIdentityLabels(supabase, [...actorIds])
+      : new Map();
+    const actorMap = new Map([...actorLabels.entries()].map(([id, a]) => [id, a.displayName]));
 
     events = (eventRows ?? []).map((e) => ({
       id: e.id,

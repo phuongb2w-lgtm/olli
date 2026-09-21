@@ -17,6 +17,7 @@ export type Database = {
           display_name: string
           email: string
           id: string
+          membership_status: string
           organization_id: string
           preferred_locale: string
           status: string
@@ -30,6 +31,7 @@ export type Database = {
           display_name: string
           email: string
           id?: string
+          membership_status?: string
           organization_id: string
           preferred_locale?: string
           status?: string
@@ -43,6 +45,7 @@ export type Database = {
           display_name?: string
           email?: string
           id?: string
+          membership_status?: string
           organization_id?: string
           preferred_locale?: string
           status?: string
@@ -3730,6 +3733,48 @@ export type Database = {
         }
         Relationships: []
       }
+      organization_entitlement: {
+        Row: {
+          created_at: string
+          organization_id: string
+          primary_app_user_id: string | null
+          primary_owner_limit: number
+          staff_limit: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          organization_id: string
+          primary_app_user_id?: string | null
+          primary_owner_limit?: number
+          staff_limit?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          organization_id?: string
+          primary_app_user_id?: string | null
+          primary_owner_limit?: number
+          staff_limit?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_entitlement_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_entitlement_primary_user_fk"
+            columns: ["organization_id", "primary_app_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       payment: {
         Row: {
           amount: number
@@ -4282,25 +4327,31 @@ export type Database = {
       }
       role: {
         Row: {
+          canonical_code: string | null
           code: string
           created_at: string
           id: string
+          is_canonical_template: boolean
           organization_id: string
           status: string
           updated_at: string
         }
         Insert: {
+          canonical_code?: string | null
           code: string
           created_at?: string
           id?: string
+          is_canonical_template?: boolean
           organization_id: string
           status?: string
           updated_at?: string
         }
         Update: {
+          canonical_code?: string | null
           code?: string
           created_at?: string
           id?: string
+          is_canonical_template?: boolean
           organization_id?: string
           status?: string
           updated_at?: string
@@ -5846,6 +5897,15 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m6_apply_canonical_role_permissions: {
+        Args: { p_canonical_code: string; p_organization_id: string }
+        Returns: undefined
+      }
+      _m6_t02_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m6_t02_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -6015,6 +6075,10 @@ export type Database = {
           p_terms_id: string
         }
         Returns: string
+      }
+      assign_canonical_staff_role: {
+        Args: { p_canonical_code: string; p_target_user_id: string }
+        Returns: Json
       }
       assign_lead: {
         Args: {
@@ -6188,6 +6252,10 @@ export type Database = {
         Args: { p_class_id?: string; p_date_from: string; p_date_to: string }
         Returns: number
       }
+      count_member_staff_seats: {
+        Args: { p_organization_id: string }
+        Returns: number
+      }
       create_capital_asset: {
         Args: {
           p_category_code?: string
@@ -6296,6 +6364,15 @@ export type Database = {
         }
         Returns: string
       }
+      create_staff_membership_record: {
+        Args: {
+          p_display_name: string
+          p_email: string
+          p_organization_id: string
+          p_preferred_locale?: string
+        }
+        Returns: string
+      }
       crm_lead_cohort_consultant_user_id: {
         Args: { p_lead_id: string; p_organization_id: string }
         Returns: string
@@ -6345,6 +6422,14 @@ export type Database = {
       ensure_default_allocation_rules: {
         Args: { p_organization_id: string }
         Returns: undefined
+      }
+      fetch_app_user_identity_labels: {
+        Args: { p_user_ids: string[] }
+        Returns: {
+          display_name: string
+          membership_status: string
+          user_id: string
+        }[]
       }
       finalize_class_financial_scenario: {
         Args: { p_scenario_id: string }
@@ -6569,6 +6654,10 @@ export type Database = {
         Args: { p_lesson_count: number; p_terms_id: string }
         Returns: string
       }
+      initialize_organization_access_foundation: {
+        Args: { p_organization_id: string }
+        Returns: undefined
+      }
       installment_schedule_amount: {
         Args: {
           p_installment_count: number
@@ -6618,6 +6707,13 @@ export type Database = {
         Args: { p_class_id: string }
         Returns: boolean
       }
+      is_owner_only_permission: { Args: { p_code: string }; Returns: boolean }
+      is_primary_owner: { Args: never; Returns: boolean }
+      is_same_organization_app_user: {
+        Args: { p_app_user_id: string }
+        Returns: boolean
+      }
+      is_trusted_schema_mutation_role: { Args: never; Returns: boolean }
       list_academic_exceptions: {
         Args: { p_end_date: string; p_start_date: string }
         Returns: Json[]
@@ -7196,6 +7292,10 @@ export type Database = {
         Args: { p_locale: string }
         Returns: undefined
       }
+      set_primary_owner_for_organization: {
+        Args: { p_app_user_id: string; p_organization_id: string }
+        Returns: undefined
+      }
       straight_line_depreciation_amount: {
         Args: {
           p_original_cost: number
@@ -7323,6 +7423,25 @@ export type Database = {
       }
       teaching_session_operational_date: {
         Args: { p_scheduled_start_at: string; p_timezone: string }
+        Returns: string
+      }
+      test_fixture_grant_all_permissions_role: {
+        Args: {
+          p_admin_app_user_id: string
+          p_organization_id: string
+          p_role_code: string
+        }
+        Returns: undefined
+      }
+      test_fixture_insert_app_user: {
+        Args: {
+          p_auth_user_id?: string
+          p_display_name: string
+          p_email: string
+          p_membership_status?: string
+          p_organization_id: string
+          p_status?: string
+        }
         Returns: string
       }
       transfer_enrollment: {

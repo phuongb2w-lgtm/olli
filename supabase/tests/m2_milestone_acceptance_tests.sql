@@ -29,13 +29,11 @@ BEGIN
 END; $$;
 
 CREATE OR REPLACE FUNCTION _m2_acc_grant_admin(p_org uuid) RETURNS void LANGUAGE plpgsql AS $$
-DECLARE v_user uuid; v_role uuid;
+DECLARE v_user uuid;
 BEGIN
   PERFORM public.ensure_default_allocation_rules(p_org);
-  SELECT id INTO v_user FROM app_user WHERE organization_id = p_org LIMIT 1;
-  INSERT INTO role (organization_id, code) VALUES (p_org, 'acc_admin') RETURNING id INTO v_role;
-  INSERT INTO role_permission (role_id, permission_id) SELECT v_role, p.id FROM permission p;
-  INSERT INTO user_role (organization_id, user_id, role_id, effective_from, status) VALUES (p_org, v_user, v_role, CURRENT_DATE, 'active');
+  SELECT id INTO v_user FROM app_user WHERE organization_id = p_org AND email = 'acc-admin@test.local' LIMIT 1;
+  PERFORM public.test_fixture_grant_all_permissions_role(p_org, v_user, 'acc_admin');
 END; $$;
 
 CREATE OR REPLACE FUNCTION _m2_acc_bootstrap()
@@ -45,7 +43,7 @@ RETURNS TABLE (
 ) LANGUAGE plpgsql AS $$
 DECLARE
   v_org uuid; v_class uuid; v_student uuid; v_guardian uuid; v_enrollment uuid;
-  v_teacher uuid; v_staff uuid; v_auth uuid; v_staff_auth uuid; v_course uuid;
+  v_teacher uuid; v_staff uuid; v_admin uuid; v_auth uuid; v_staff_auth uuid; v_course uuid;
 BEGIN
   PERFORM _m2_acc_as_super();
   v_org := gen_random_uuid();
@@ -56,10 +54,9 @@ BEGIN
   VALUES
     (v_auth, (SELECT id FROM auth.instances LIMIT 1), 'authenticated', 'authenticated', 'acc-' || replace(v_auth::text, '-', '') || '@test.local', '', now(), now(), now(), false, false),
     (v_staff_auth, (SELECT id FROM auth.instances LIMIT 1), 'authenticated', 'authenticated', 'acc-staff-' || replace(v_staff_auth::text, '-', '') || '@test.local', '', now(), now(), now(), false, false);
-  INSERT INTO app_user (organization_id, email, display_name, auth_user_id, status)
-  VALUES (v_org, 'acc-admin@test.local', 'Acc Admin', v_auth, 'active');
-  INSERT INTO app_user (organization_id, email, display_name, auth_user_id, status)
-  VALUES (v_org, 'acc-staff@test.local', 'Acc Staff', v_staff_auth, 'active') RETURNING id INTO v_staff;
+  v_admin := public.test_fixture_insert_app_user(v_org, 'acc-admin@test.local', 'Acc Admin', v_auth);
+  v_staff := public.test_fixture_insert_app_user(v_org, 'acc-staff@test.local', 'Acc Staff', v_staff_auth);
+  PERFORM public.set_primary_owner_for_organization(v_org, v_admin);
   INSERT INTO course (organization_id, code, name) VALUES (v_org, 'ACC1', 'Acceptance Course') RETURNING id INTO v_course;
   INSERT INTO class (organization_id, course_id, name, status)
   VALUES (v_org, v_course, 'Acceptance Class', 'active') RETURNING id INTO v_class;

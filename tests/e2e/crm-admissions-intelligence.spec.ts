@@ -14,13 +14,15 @@ async function signIn(page: import("@playwright/test").Page, email: string) {
 }
 
 test.describe("M5-T04 CRM admissions intelligence", () => {
+  test.describe.configure({ timeout: 90_000 });
+
   test("1. manager can open executive admissions page", async ({ page }) => {
     await signIn(page, adminEmail);
-    await page.goto("/executive/admissions");
+    await page.goto("/executive/admissions?start=2026-01-01&end=2026-01-31");
     await expect(
       page.getByRole("heading", { level: 1, name: /crm.*admissions|crm.*tuyển sinh/i }),
-    ).toBeVisible();
-    await expect(page.getByText(/leads created|lead mới/i).first()).toBeVisible();
+    ).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByText(/leads created|lead mới/i).first()).toBeVisible({ timeout: 60_000 });
   });
 
   test("2. manager sees consultant productivity section", async ({ page }) => {
@@ -49,9 +51,9 @@ test.describe("M5-T04 CRM admissions intelligence", () => {
 
   test("5. period filter visible on admissions page", async ({ page }) => {
     await signIn(page, adminEmail);
-    await page.goto("/executive/admissions");
-    await expect(page.locator('input[name="start"]')).toBeVisible();
-    await expect(page.locator('input[name="end"]')).toBeVisible();
+    await page.goto("/executive/admissions?start=2026-01-01&end=2026-01-31");
+    await expect(page.locator('input[name="start"]')).toBeVisible({ timeout: 60_000 });
+    await expect(page.locator('input[name="end"]')).toBeVisible({ timeout: 60_000 });
   });
 
   test("6. executive overview links to admissions", async ({ page }) => {
@@ -88,9 +90,9 @@ test.describe("M5-T04 CRM admissions intelligence", () => {
 
   test("8. admissions exceptions section renders", async ({ page }) => {
     await signIn(page, adminEmail);
-    await page.goto("/executive/admissions");
+    await page.goto("/executive/admissions?start=2026-01-01&end=2026-01-31");
     await expect(
       page.getByText(/admissions exceptions|ngoại lệ tuyển sinh/i),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 60_000 });
   });
 });

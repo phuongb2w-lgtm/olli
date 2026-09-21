@@ -9,7 +9,7 @@ M6 turns existing authentication, organization, role, and permission foundations
 | Task | Document | Status |
 |------|----------|--------|
 | M6-T01 | [Center administration contract](./01-center-administration-contract.md) | **Complete** (pending owner acceptance of closeout) |
-| M6-T02 | Owner, entitlement, canonical roles & permission foundation | Not started |
+| M6-T02 | [Access foundation implementation](./02-t02-access-foundation-implementation.md) | **Complete** (pending owner acceptance) |
 | M6-T03 | Trusted staff provisioning & account lifecycle | Not started |
 | M6-T04 | Owner `/users` administration workspace | Not started |
 | M6-T05 | Suspension, removal, role changes & historical integrity | Not started |
@@ -17,7 +17,7 @@ M6 turns existing authentication, organization, role, and permission foundations
 | M6-T07 | UX, i18n, integration & regression hardening | Not started |
 | M6-T08 | Final acceptance & milestone closeout | Not started |
 
-**M6 — OPEN** (T01 contract documented). Do not begin M6-T02 until explicitly authorized.
+**M6 — OPEN** (T02 foundation implemented). Do not begin M6-T03 until explicitly authorized.
 
 ## Task sequence
 

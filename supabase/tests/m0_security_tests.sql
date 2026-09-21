@@ -72,18 +72,14 @@ DO $$
 DECLARE v_exists boolean; v_count integer;
 BEGIN
   PERFORM _sec_as_super();
-  PERFORM set_config('olli.bypass_app_user_guard', 'true', true);
   UPDATE app_user SET auth_user_id = NULL WHERE email = 'org-a-admin@olli.local';
-  PERFORM set_config('olli.bypass_app_user_guard', 'false', true);
   SELECT EXISTS(SELECT 1 FROM app_user WHERE email = 'org-a-admin@olli.local') INTO v_exists;
   PERFORM _sec_as_auth('a1111111-1111-4111-8111-111111111111');
   SELECT count(*) INTO v_count FROM student WHERE organization_id = 'a0000000-0000-4000-8000-000000000001';
   PERFORM _sec_record(3, 'removed auth mapping blocks access keeps app_user', v_exists AND v_count = 0);
   -- restore mapping for later tests
   PERFORM _sec_as_super();
-  PERFORM set_config('olli.bypass_app_user_guard', 'true', true);
   UPDATE app_user SET auth_user_id = 'a1111111-1111-4111-8111-111111111111' WHERE email = 'org-a-admin@olli.local';
-  PERFORM set_config('olli.bypass_app_user_guard', 'false', true);
 END $$;
 
 -- 4-6 anonymous denied
@@ -236,11 +232,11 @@ BEGIN
   END;
 END $$;
 
--- 19 staff cannot create observation
+-- 19 user without observation.record cannot create observation
 DO $$
 DECLARE v_enr uuid; v_class uuid; v_teacher uuid;
 BEGIN
-  PERFORM _sec_as_auth('a2222222-2222-4222-8222-222222222222');
+  PERFORM _sec_as_auth('a4444444-4444-4444-8444-444444444444');
   SELECT t.id INTO v_teacher FROM teacher t WHERE t.organization_id = 'a0000000-0000-4000-8000-000000000001' LIMIT 1;
   SELECT e.id, e.class_id INTO v_enr, v_class FROM enrollment e WHERE e.organization_id = 'a0000000-0000-4000-8000-000000000001' LIMIT 1;
   BEGIN
@@ -257,7 +253,7 @@ DO $$
 DECLARE v_role uuid;
 BEGIN
   PERFORM _sec_as_auth('a2222222-2222-4222-8222-222222222222');
-  SELECT id INTO v_role FROM role WHERE organization_id = 'a0000000-0000-4000-8000-000000000001' AND code = 'admin' LIMIT 1;
+  SELECT id INTO v_role FROM role WHERE organization_id = 'a0000000-0000-4000-8000-000000000001' AND canonical_code = 'center_manager' LIMIT 1;
   BEGIN
     INSERT INTO user_role (organization_id, user_id, role_id, effective_from, status)
     VALUES ('a0000000-0000-4000-8000-000000000001', 'a2000000-0000-4000-8000-000000000001', v_role, CURRENT_DATE, 'active');
@@ -272,7 +268,7 @@ DO $$
 DECLARE v_role uuid; v_perm uuid;
 BEGIN
   PERFORM _sec_as_auth('a2222222-2222-4222-8222-222222222222');
-  SELECT id INTO v_role FROM role WHERE organization_id = 'a0000000-0000-4000-8000-000000000001' AND code = 'staff' LIMIT 1;
+  SELECT id INTO v_role FROM role WHERE organization_id = 'a0000000-0000-4000-8000-000000000001' AND canonical_code = 'teacher' LIMIT 1;
   SELECT id INTO v_perm FROM permission WHERE code = 'student.create' LIMIT 1;
   BEGIN
     INSERT INTO role_permission (role_id, permission_id) VALUES (v_role, v_perm);
@@ -289,9 +285,14 @@ BEGIN
   PERFORM _sec_as_super();
   SELECT id INTO v_role FROM role WHERE organization_id = 'b0000000-0000-4000-8000-000000000001' LIMIT 1;
   PERFORM _sec_as_auth('a1111111-1111-4111-8111-111111111111');
-  UPDATE role SET code = 'hacked' WHERE id = v_role;
-  GET DIAGNOSTICS v_rows = ROW_COUNT;
-  PERFORM _sec_record(22, 'cross-org role manage denied', v_rows = 0);
+  BEGIN
+    UPDATE role SET code = 'hacked' WHERE id = v_role;
+    GET DIAGNOSTICS v_rows = ROW_COUNT;
+    PERFORM _sec_record(22, 'cross-org role manage denied', v_rows = 0);
+  EXCEPTION
+    WHEN insufficient_privilege THEN
+      PERFORM _sec_record(22, 'cross-org role manage denied', true);
+  END;
 END $$;
 
 -- 23 staff cannot mutate permission codes

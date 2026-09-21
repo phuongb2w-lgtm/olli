@@ -41,7 +41,7 @@ RETURNS TABLE (
   org_id uuid, class_id uuid, teacher_id uuid, staff_user_id uuid, admin_auth_id uuid
 ) LANGUAGE plpgsql AS $$
 DECLARE
-  v_org uuid; v_class uuid; v_teacher uuid; v_staff uuid; v_auth uuid; v_staff_auth uuid;
+  v_org uuid; v_class uuid; v_teacher uuid; v_staff uuid; v_admin uuid; v_auth uuid; v_staff_auth uuid;
 BEGIN
   PERFORM _m2_pc_as_super();
   v_org := gen_random_uuid();
@@ -52,10 +52,9 @@ BEGIN
   VALUES
     (v_auth, (SELECT id FROM auth.instances LIMIT 1), 'authenticated', 'authenticated', 'pc-admin-' || replace(v_auth::text, '-', '') || '@test.local', '', now(), now(), now(), false, false),
     (v_staff_auth, (SELECT id FROM auth.instances LIMIT 1), 'authenticated', 'authenticated', 'pc-staff-' || replace(v_staff_auth::text, '-', '') || '@test.local', '', now(), now(), now(), false, false);
-  INSERT INTO app_user (organization_id, email, display_name, auth_user_id, status)
-  VALUES (v_org, 'pc-admin@test.local', 'PC Admin', v_auth, 'active');
-  INSERT INTO app_user (organization_id, email, display_name, auth_user_id, status)
-  VALUES (v_org, 'pc-staff@test.local', 'PC Staff', v_staff_auth, 'active') RETURNING id INTO v_staff;
+  v_admin := public.test_fixture_insert_app_user(v_org, 'pc-admin@test.local', 'PC Admin', v_auth);
+  v_staff := public.test_fixture_insert_app_user(v_org, 'pc-staff@test.local', 'PC Staff', v_staff_auth);
+  PERFORM public.set_primary_owner_for_organization(v_org, v_admin);
   INSERT INTO course (organization_id, code, name) VALUES (v_org, 'PC1', 'PC Course');
   INSERT INTO class (organization_id, course_id, name, status)
   SELECT v_org, c.id, 'PC Class', 'active' FROM course c WHERE c.organization_id = v_org LIMIT 1 RETURNING id INTO v_class;
@@ -65,12 +64,10 @@ BEGIN
 END; $$;
 
 CREATE OR REPLACE FUNCTION _m2_pc_grant_admin(p_org uuid) RETURNS void LANGUAGE plpgsql AS $$
-DECLARE v_user uuid; v_role uuid;
+DECLARE v_user uuid;
 BEGIN
   SELECT id INTO v_user FROM app_user WHERE organization_id = p_org AND email = 'pc-admin@test.local' LIMIT 1;
-  INSERT INTO role (organization_id, code) VALUES (p_org, 'pc_admin') RETURNING id INTO v_role;
-  INSERT INTO role_permission (role_id, permission_id) SELECT v_role, p.id FROM permission p;
-  INSERT INTO user_role (organization_id, user_id, role_id, effective_from, status) VALUES (p_org, v_user, v_role, CURRENT_DATE, 'active');
+  PERFORM public.test_fixture_grant_all_permissions_role(p_org, v_user, 'pc_admin');
 END; $$;
 
 CREATE OR REPLACE FUNCTION _m2_pc_session(
@@ -124,8 +121,7 @@ DO $$
 DECLARE b record; counselor uuid; domain text;
 BEGIN
   SELECT * INTO b FROM _m2_pc_bootstrap();
-  INSERT INTO app_user (organization_id, email, display_name, status)
-  VALUES (b.org_id, 'counselor@test.local', 'Counselor', 'active') RETURNING id INTO counselor;
+  counselor := public.test_fixture_insert_app_user(b.org_id, 'counselor@test.local', 'Counselor');
   PERFORM _m2_pc_grant_admin(b.org_id);
   PERFORM _m2_pc_as_auth(b.admin_auth_id);
   PERFORM public.create_staff_compensation_rule(counselor, 'marketing_sales', 'monthly_fixed', 8000000, '2026-01-01');

@@ -30,6 +30,7 @@ DECLARE
   v_role_a_staff uuid;
   v_role_a_reader uuid;
   v_role_a_no_student uuid;
+  v_role_a_fixture_readonly uuid;
   v_student_tran uuid := 'a5100000-0000-4000-8000-000000000001';
   v_student_nguyen uuid := 'a5100000-0000-4000-8000-000000000002';
   v_guardian_lan uuid := 'a5200000-0000-4000-8000-000000000001';
@@ -62,36 +63,37 @@ BEGIN
     (v_app_a_reader, v_org_a, 'org-a-reader@olli.local', 'Org A Reader', v_auth_a_reader, 'active'),
     (v_app_a_no_student, v_org_a, 'org-a-no-student@olli.local', 'Org A No Student', v_auth_a_no_student, 'active');
 
-  INSERT INTO role (organization_id, code) VALUES (v_org_a, 'admin') RETURNING id INTO v_role_a_admin;
-  INSERT INTO role (organization_id, code) VALUES (v_org_a, 'staff') RETURNING id INTO v_role_a_staff;
-  INSERT INTO role (organization_id, code) VALUES (v_org_a, 'student_reader') RETURNING id INTO v_role_a_reader;
-  INSERT INTO role (organization_id, code) VALUES (v_org_a, 'no_student') RETURNING id INTO v_role_a_no_student;
-  INSERT INTO role (organization_id, code) VALUES (v_org_b, 'admin') RETURNING id INTO v_role_b_admin;
-  INSERT INTO role (organization_id, code) VALUES (v_org_b, 'staff') RETURNING id INTO v_role_b_staff;
+  -- Canonical roles are created by organization_initialize_access_foundation trigger.
+  PERFORM public.set_primary_owner_for_organization(v_org_a, v_app_a_admin);
+  PERFORM public.set_primary_owner_for_organization(v_org_b, v_app_b_admin);
+
+  SELECT id INTO v_role_a_admin FROM role
+    WHERE organization_id = v_org_a AND canonical_code = 'center_manager' LIMIT 1;
+  SELECT id INTO v_role_b_admin FROM role
+    WHERE organization_id = v_org_b AND canonical_code = 'center_manager' LIMIT 1;
+  SELECT id INTO v_role_a_staff FROM role
+    WHERE organization_id = v_org_a AND canonical_code = 'teacher' LIMIT 1;
+  SELECT id INTO v_role_b_staff FROM role
+    WHERE organization_id = v_org_b AND canonical_code = 'teacher' LIMIT 1;
+
+  INSERT INTO role (organization_id, code, is_canonical_template, status) VALUES
+    (v_org_a, 'student_reader', false, 'active') RETURNING id INTO v_role_a_reader;
+  INSERT INTO role (organization_id, code, is_canonical_template, status) VALUES
+    (v_org_a, 'no_student', false, 'active') RETURNING id INTO v_role_a_no_student;
+  INSERT INTO role (organization_id, code, is_canonical_template, status) VALUES
+    (v_org_a, 'fixture_readonly', false, 'active') RETURNING id INTO v_role_a_fixture_readonly;
 
   INSERT INTO role_permission (role_id, permission_id)
-  SELECT v_role_a_admin, p.id FROM permission p;
-  INSERT INTO role_permission (role_id, permission_id)
-  SELECT v_role_b_admin, p.id FROM permission p;
-
-  INSERT INTO role_permission (role_id, permission_id)
-  SELECT v_role_a_staff, p.id FROM permission p
+  SELECT v_role_a_fixture_readonly, p.id FROM permission p
   WHERE p.code IN (
     'student.read', 'enrollment.read', 'charge.read', 'expense.read', 'asset.read', 'observation.read',
-    'permission.read', 'role.read', 'organization.read', 'user.read', 'assessment.read',
-    'attendance.read', 'payment.read', 'guardian.read', 'teacher.read'
-  );
-  INSERT INTO role_permission (role_id, permission_id)
-  SELECT v_role_b_staff, p.id FROM permission p
-  WHERE p.code IN (
-    'student.read', 'enrollment.read', 'charge.read', 'expense.read', 'asset.read', 'observation.read',
-    'permission.read', 'role.read', 'organization.read', 'user.read', 'assessment.read',
+    'permission.read', 'role.read', 'organization.read', 'identity.read', 'assessment.read',
     'attendance.read', 'payment.read', 'guardian.read', 'teacher.read'
   );
 
   INSERT INTO role_permission (role_id, permission_id)
   SELECT v_role_a_reader, p.id FROM permission p
-  WHERE p.code IN ('student.read', 'organization.read');
+  WHERE p.code IN ('student.read', 'organization.read', 'identity.read');
 
   INSERT INTO role_permission (role_id, permission_id)
   SELECT v_role_a_no_student, p.id FROM permission p
@@ -100,6 +102,7 @@ BEGIN
   INSERT INTO user_role (organization_id, user_id, role_id, effective_from, status) VALUES
     (v_org_a, v_app_a_admin, v_role_a_admin, CURRENT_DATE, 'active'),
     (v_org_a, v_app_a_staff, v_role_a_staff, CURRENT_DATE, 'active'),
+    (v_org_a, v_app_a_staff, v_role_a_fixture_readonly, CURRENT_DATE, 'active'),
     (v_org_a, v_app_a_reader, v_role_a_reader, CURRENT_DATE, 'active'),
     (v_org_a, v_app_a_no_student, v_role_a_no_student, CURRENT_DATE, 'active'),
     (v_org_b, v_app_b_admin, v_role_b_admin, CURRENT_DATE, 'active'),

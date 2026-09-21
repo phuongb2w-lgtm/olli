@@ -37,13 +37,11 @@ BEGIN
 END; $$;
 
 CREATE OR REPLACE FUNCTION _m2_ca_grant_admin(p_org uuid) RETURNS void LANGUAGE plpgsql AS $$
-DECLARE v_user uuid; v_role uuid;
+DECLARE v_user uuid;
 BEGIN
   PERFORM public.ensure_default_allocation_rules(p_org);
-  SELECT id INTO v_user FROM app_user WHERE organization_id = p_org LIMIT 1;
-  INSERT INTO role (organization_id, code) VALUES (p_org, 'ca_admin') RETURNING id INTO v_role;
-  INSERT INTO role_permission (role_id, permission_id) SELECT v_role, p.id FROM permission p;
-  INSERT INTO user_role (organization_id, user_id, role_id, effective_from, status) VALUES (p_org, v_user, v_role, CURRENT_DATE, 'active');
+  SELECT id INTO v_user FROM app_user WHERE organization_id = p_org AND email = 'ca-admin@test.local' LIMIT 1;
+  PERFORM public.test_fixture_grant_all_permissions_role(p_org, v_user, 'ca_admin');
 END; $$;
 
 CREATE OR REPLACE FUNCTION _m2_ca_bootstrap()
@@ -52,7 +50,7 @@ RETURNS TABLE (
   admin_auth_id uuid, enrollment1_id uuid, enrollment2_id uuid, enrollment3_id uuid
 ) LANGUAGE plpgsql AS $$
 DECLARE
-  v_org uuid; v_c1 uuid; v_c2 uuid; v_teacher uuid; v_staff uuid; v_auth uuid; v_staff_auth uuid;
+  v_org uuid; v_c1 uuid; v_c2 uuid; v_teacher uuid; v_staff uuid; v_admin uuid; v_auth uuid; v_staff_auth uuid;
   v_s1 uuid; v_s2 uuid; v_s3 uuid;
 BEGIN
   PERFORM _m2_ca_as_super();
@@ -64,10 +62,9 @@ BEGIN
   VALUES
     (v_auth, (SELECT id FROM auth.instances LIMIT 1), 'authenticated', 'authenticated', 'ca-admin-' || replace(v_auth::text, '-', '') || '@test.local', '', now(), now(), now(), false, false),
     (v_staff_auth, (SELECT id FROM auth.instances LIMIT 1), 'authenticated', 'authenticated', 'ca-staff-' || replace(v_staff_auth::text, '-', '') || '@test.local', '', now(), now(), now(), false, false);
-  INSERT INTO app_user (organization_id, email, display_name, auth_user_id, status)
-  VALUES (v_org, 'ca-admin@test.local', 'CA Admin', v_auth, 'active');
-  INSERT INTO app_user (organization_id, email, display_name, auth_user_id, status)
-  VALUES (v_org, 'ca-staff@test.local', 'CA Staff', v_staff_auth, 'active') RETURNING id INTO v_staff;
+  v_admin := public.test_fixture_insert_app_user(v_org, 'ca-admin@test.local', 'CA Admin', v_auth);
+  v_staff := public.test_fixture_insert_app_user(v_org, 'ca-staff@test.local', 'CA Staff', v_staff_auth);
+  PERFORM public.set_primary_owner_for_organization(v_org, v_admin);
   INSERT INTO course (organization_id, code, name) VALUES (v_org, 'CA1', 'CA Course');
   INSERT INTO class (organization_id, course_id, name, status)
   SELECT v_org, c.id, 'CA Class 1', 'active' FROM course c WHERE c.organization_id = v_org LIMIT 1 RETURNING id INTO v_c1;
@@ -216,8 +213,7 @@ BEGIN
   v_period := date_trunc('month', CURRENT_DATE)::date;
   PERFORM _m2_ca_grant_admin(b.org_id);
   PERFORM _m2_ca_as_auth(b.admin_auth_id);
-  INSERT INTO app_user (organization_id, email, display_name, status)
-  VALUES (b.org_id, 'counselor@test.local', 'Counselor', 'active') RETURNING id INTO counselor;
+  counselor := public.test_fixture_insert_app_user(b.org_id, 'counselor@test.local', 'Counselor');
   PERFORM public.create_staff_compensation_rule(counselor, 'marketing_sales', 'monthly_fixed', 1000000, '2026-01-01');
   PERFORM public.generate_personnel_costs(v_period);
   INSERT INTO enrollment_financial_terms (organization_id, enrollment_id, agreed_tuition_amount, discount_amount, net_tuition_amount, agreement_date, recognition_basis_code, status)
@@ -279,8 +275,7 @@ DO $$
 DECLARE b record; counselor uuid; domain text; rid uuid;
 BEGIN
   SELECT * INTO b FROM _m2_ca_bootstrap();
-  INSERT INTO app_user (organization_id, email, display_name, status)
-  VALUES (b.org_id, 'mkt@test.local', 'Mkt', 'active') RETURNING id INTO counselor;
+  counselor := public.test_fixture_insert_app_user(b.org_id, 'mkt@test.local', 'Mkt');
   PERFORM _m2_ca_grant_admin(b.org_id);
   PERFORM _m2_ca_as_auth(b.admin_auth_id);
   rid := (SELECT id FROM cost_allocation_rule WHERE organization_id = b.org_id AND source_scope_code = 'marketing_sales' LIMIT 1);
@@ -431,8 +426,7 @@ BEGIN
     '2026-02-28'
   );
   PERFORM public.create_cost_allocation_rule('marketing_sales', 'recognized_revenue', '2026-03-01');
-  INSERT INTO app_user (organization_id, email, display_name, status)
-  VALUES (b.org_id, 'mkt2@test.local', 'Mkt2', 'active');
+  PERFORM public.test_fixture_insert_app_user(b.org_id, 'mkt2@test.local', 'Mkt2');
   PERFORM public.create_staff_compensation_rule(
     (SELECT id FROM app_user WHERE email = 'mkt2@test.local' AND organization_id = b.org_id),
     'marketing_sales', 'monthly_fixed', 500000, '2026-01-01'
@@ -661,7 +655,7 @@ BEGIN
     '2026-02-28'
   );
   PERFORM public.create_cost_allocation_rule('marketing_sales', 'recognized_revenue', '2026-03-01');
-  INSERT INTO app_user (organization_id, email, display_name, status) VALUES (b.org_id, 'm3@test.local', 'M3', 'active');
+  PERFORM public.test_fixture_insert_app_user(b.org_id, 'm3@test.local', 'M3');
   PERFORM public.create_staff_compensation_rule(
     (SELECT id FROM app_user WHERE email = 'm3@test.local'), 'marketing_sales', 'monthly_fixed', 700000, '2026-01-01'
   );
