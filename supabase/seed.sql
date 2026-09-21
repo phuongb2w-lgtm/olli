@@ -11,6 +11,7 @@ DO $$
 DECLARE
   v_org_a uuid := 'a0000000-0000-4000-8000-000000000001';
   v_org_b uuid := 'b0000000-0000-4000-8000-000000000001';
+  v_org_c uuid := 'c0000000-0000-4000-8000-000000000001';
   v_auth_a_admin uuid := 'a1111111-1111-4111-8111-111111111111';
   v_auth_a_staff uuid := 'a2222222-2222-4222-8222-222222222222';
   v_auth_b_admin uuid := 'b1111111-1111-4111-8111-111111111111';
@@ -26,6 +27,8 @@ DECLARE
   v_app_m6_acct uuid := 'a6661001-0000-4000-8000-000000000001';
   v_app_m6_cons uuid := 'a6661002-0000-4000-8000-000000000002';
   v_app_m6_acad uuid := 'a6661003-0000-4000-8000-000000000003';
+  v_auth_c_owner uuid := 'c0000001-0000-4000-8000-000000000001';
+  v_app_c_owner uuid := 'c1000000-0000-4000-8000-000000000001';
   v_role_m6_acct uuid;
   v_role_m6_cons uuid;
   v_role_m6_acad uuid;
@@ -47,6 +50,7 @@ DECLARE
   v_guardian_quang uuid := 'a5200000-0000-4000-8000-000000000002';
   v_role_b_admin uuid;
   v_role_b_staff uuid;
+  v_role_c_admin uuid;
   v_lead_a1 uuid := 'a6100000-0000-4000-8000-000000000001';
   v_lead_a2 uuid := 'a6100000-0000-4000-8000-000000000002';
   v_lead_b1 uuid := 'b6100000-0000-4000-8000-000000000001';
@@ -62,7 +66,8 @@ BEGIN
 
   INSERT INTO organization (id, name) VALUES
     (v_org_a, 'Olli Test Org A'),
-    (v_org_b, 'Olli Test Org B');
+    (v_org_b, 'Olli Test Org B'),
+    (v_org_c, 'Olli Test Org C (M6 E2E fixtures)');
 
   INSERT INTO app_user (id, organization_id, email, display_name, auth_user_id, status) VALUES
     (v_app_a_admin, v_org_a, 'org-a-admin@olli.local', 'Org A Admin', v_auth_a_admin, 'active'),
@@ -72,26 +77,30 @@ BEGIN
     (v_app_disabled, v_org_a, 'disabled@olli.local', 'Disabled User', v_auth_disabled, 'inactive'),
     (v_app_a_reader, v_org_a, 'org-a-reader@olli.local', 'Org A Reader', v_auth_a_reader, 'active'),
     (v_app_a_no_student, v_org_a, 'org-a-no-student@olli.local', 'Org A No Student', v_auth_a_no_student, 'active'),
-    (v_app_m6_acct, v_org_b, 'm6-t04-accountant@olli.local', 'M6 Fixture Accountant', v_auth_m6_acct, 'active'),
-    (v_app_m6_cons, v_org_b, 'm6-t04-consultant@olli.local', 'M6 Fixture Consultant', v_auth_m6_cons, 'active'),
-    (v_app_m6_acad, v_org_b, 'm6-t04-academic-ops@olli.local', 'M6 Fixture Academic Ops', v_auth_m6_acad, 'active');
+    (v_app_c_owner, v_org_c, 'm6-t04-org-c-owner@olli.local', 'M6 Fixture Org C Owner', v_auth_c_owner, 'active'),
+    (v_app_m6_acct, v_org_c, 'm6-t04-accountant@olli.local', 'M6 Fixture Accountant', v_auth_m6_acct, 'active'),
+    (v_app_m6_cons, v_org_c, 'm6-t04-consultant@olli.local', 'M6 Fixture Consultant', v_auth_m6_cons, 'active'),
+    (v_app_m6_acad, v_org_c, 'm6-t04-academic-ops@olli.local', 'M6 Fixture Academic Ops', v_auth_m6_acad, 'active');
 
   -- Canonical roles are created by organization_initialize_access_foundation trigger.
   PERFORM public.set_primary_owner_for_organization(v_org_a, v_app_a_admin);
   PERFORM public.set_primary_owner_for_organization(v_org_b, v_app_b_admin);
+  PERFORM public.set_primary_owner_for_organization(v_org_c, v_app_c_owner);
 
   SELECT id INTO v_role_a_admin FROM role
     WHERE organization_id = v_org_a AND canonical_code = 'center_manager' LIMIT 1;
   SELECT id INTO v_role_b_admin FROM role
     WHERE organization_id = v_org_b AND canonical_code = 'center_manager' LIMIT 1;
+  SELECT id INTO v_role_c_admin FROM role
+    WHERE organization_id = v_org_c AND canonical_code = 'center_manager' LIMIT 1;
   SELECT id INTO v_role_a_staff FROM role
     WHERE organization_id = v_org_a AND canonical_code = 'teacher' LIMIT 1;
   SELECT id INTO v_role_m6_acct FROM role
-    WHERE organization_id = v_org_b AND canonical_code = 'accountant' LIMIT 1;
+    WHERE organization_id = v_org_c AND canonical_code = 'accountant' LIMIT 1;
   SELECT id INTO v_role_m6_cons FROM role
-    WHERE organization_id = v_org_b AND canonical_code = 'consultant' LIMIT 1;
+    WHERE organization_id = v_org_c AND canonical_code = 'consultant' LIMIT 1;
   SELECT id INTO v_role_m6_acad FROM role
-    WHERE organization_id = v_org_b AND canonical_code = 'academic_operations' LIMIT 1;
+    WHERE organization_id = v_org_c AND canonical_code = 'academic_operations' LIMIT 1;
   SELECT id INTO v_role_b_staff FROM role
     WHERE organization_id = v_org_b AND canonical_code = 'teacher' LIMIT 1;
 
@@ -126,9 +135,10 @@ BEGIN
     (v_org_a, v_app_a_no_student, v_role_a_no_student, CURRENT_DATE, 'active'),
     (v_org_b, v_app_b_admin, v_role_b_admin, CURRENT_DATE, 'active'),
     (v_org_b, v_app_b_staff, v_role_b_staff, CURRENT_DATE, 'active'),
-    (v_org_b, v_app_m6_acct, v_role_m6_acct, CURRENT_DATE, 'active'),
-    (v_org_b, v_app_m6_cons, v_role_m6_cons, CURRENT_DATE, 'active'),
-    (v_org_b, v_app_m6_acad, v_role_m6_acad, CURRENT_DATE, 'active');
+    (v_org_c, v_app_c_owner, v_role_c_admin, CURRENT_DATE, 'active'),
+    (v_org_c, v_app_m6_acct, v_role_m6_acct, CURRENT_DATE, 'active'),
+    (v_org_c, v_app_m6_cons, v_role_m6_cons, CURRENT_DATE, 'active'),
+    (v_org_c, v_app_m6_acad, v_role_m6_acad, CURRENT_DATE, 'active');
 
   INSERT INTO student (id, organization_id, given_name, family_name, student_code, status) VALUES
     (v_student_tran, v_org_a, 'Văn Phương', 'Trần', 'HV001', 'active'),
