@@ -72,9 +72,9 @@ BEGIN
     (v_app_disabled, v_org_a, 'disabled@olli.local', 'Disabled User', v_auth_disabled, 'inactive'),
     (v_app_a_reader, v_org_a, 'org-a-reader@olli.local', 'Org A Reader', v_auth_a_reader, 'active'),
     (v_app_a_no_student, v_org_a, 'org-a-no-student@olli.local', 'Org A No Student', v_auth_a_no_student, 'active'),
-    (v_app_m6_acct, v_org_a, 'm6-t04-accountant@olli.local', 'M6 Fixture Accountant', v_auth_m6_acct, 'active'),
-    (v_app_m6_cons, v_org_a, 'm6-t04-consultant@olli.local', 'M6 Fixture Consultant', v_auth_m6_cons, 'active'),
-    (v_app_m6_acad, v_org_a, 'm6-t04-academic-ops@olli.local', 'M6 Fixture Academic Ops', v_auth_m6_acad, 'active');
+    (v_app_m6_acct, v_org_b, 'm6-t04-accountant@olli.local', 'M6 Fixture Accountant', v_auth_m6_acct, 'active'),
+    (v_app_m6_cons, v_org_b, 'm6-t04-consultant@olli.local', 'M6 Fixture Consultant', v_auth_m6_cons, 'active'),
+    (v_app_m6_acad, v_org_b, 'm6-t04-academic-ops@olli.local', 'M6 Fixture Academic Ops', v_auth_m6_acad, 'active');
 
   -- Canonical roles are created by organization_initialize_access_foundation trigger.
   PERFORM public.set_primary_owner_for_organization(v_org_a, v_app_a_admin);
@@ -87,11 +87,11 @@ BEGIN
   SELECT id INTO v_role_a_staff FROM role
     WHERE organization_id = v_org_a AND canonical_code = 'teacher' LIMIT 1;
   SELECT id INTO v_role_m6_acct FROM role
-    WHERE organization_id = v_org_a AND canonical_code = 'accountant' LIMIT 1;
+    WHERE organization_id = v_org_b AND canonical_code = 'accountant' LIMIT 1;
   SELECT id INTO v_role_m6_cons FROM role
-    WHERE organization_id = v_org_a AND canonical_code = 'consultant' LIMIT 1;
+    WHERE organization_id = v_org_b AND canonical_code = 'consultant' LIMIT 1;
   SELECT id INTO v_role_m6_acad FROM role
-    WHERE organization_id = v_org_a AND canonical_code = 'academic_operations' LIMIT 1;
+    WHERE organization_id = v_org_b AND canonical_code = 'academic_operations' LIMIT 1;
   SELECT id INTO v_role_b_staff FROM role
     WHERE organization_id = v_org_b AND canonical_code = 'teacher' LIMIT 1;
 
@@ -126,9 +126,9 @@ BEGIN
     (v_org_a, v_app_a_no_student, v_role_a_no_student, CURRENT_DATE, 'active'),
     (v_org_b, v_app_b_admin, v_role_b_admin, CURRENT_DATE, 'active'),
     (v_org_b, v_app_b_staff, v_role_b_staff, CURRENT_DATE, 'active'),
-    (v_org_a, v_app_m6_acct, v_role_m6_acct, CURRENT_DATE, 'active'),
-    (v_org_a, v_app_m6_cons, v_role_m6_cons, CURRENT_DATE, 'active'),
-    (v_org_a, v_app_m6_acad, v_role_m6_acad, CURRENT_DATE, 'active');
+    (v_org_b, v_app_m6_acct, v_role_m6_acct, CURRENT_DATE, 'active'),
+    (v_org_b, v_app_m6_cons, v_role_m6_cons, CURRENT_DATE, 'active'),
+    (v_org_b, v_app_m6_acad, v_role_m6_acad, CURRENT_DATE, 'active');
 
   INSERT INTO student (id, organization_id, given_name, family_name, student_code, status) VALUES
     (v_student_tran, v_org_a, 'Văn Phương', 'Trần', 'HV001', 'active'),
@@ -264,10 +264,5 @@ BEGIN
   JOIN class_schedule cs ON cs.class_id = cl.id AND cs.organization_id = cl.organization_id
   WHERE cl.organization_id = v_org_a AND cl.name = 'Class A1'
   LIMIT 1;
-
-  -- Dev headroom for M6 E2E fixtures (inactive + role-denial users still occupy member seats)
-  UPDATE organization_entitlement
-  SET staff_limit = 12
-  WHERE organization_id = v_org_a;
 
 END $$;
