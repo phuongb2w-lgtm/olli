@@ -1,16 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { signIn } from "./sign-in";
 
 const adminEmail = "org-a-admin@olli.local";
 const readerEmail = "org-a-reader@olli.local";
-const password = "testpass123";
-
-async function signIn(page: import("@playwright/test").Page, email: string) {
-  await page.goto("/login");
-  await page.locator('input[name="email"]').fill(email);
-  await page.locator('input[name="password"]').fill(password);
-  await page.getByRole("button", { name: /sign in|đăng nhập/i }).click();
-  await expect(page).toHaveURL("/");
-}
 
 test.describe("M3 CRM reports", () => {
   test.beforeEach(async ({ page }) => {

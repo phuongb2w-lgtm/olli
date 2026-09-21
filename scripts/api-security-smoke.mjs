@@ -147,6 +147,30 @@ async function main() {
     record(5, "staff without student.create cannot insert Student", created === 0);
   }
 
+  // API-7: authenticated Data API cannot invoke SQL test fixture helpers
+  {
+    const client = createClient(SUPABASE_URL, PUBLISHABLE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: { headers: { Authorization: `Bearer ${orgAAdminToken}` } },
+    });
+    const { data, error } = await client.rpc("test_fixture_insert_app_user", {
+      p_organization_id: ORG_A,
+      p_email: "fixture-api-abuse@olli.local",
+      p_display_name: "API Abuse",
+    });
+    const blocked =
+      data == null &&
+      error != null &&
+      (error.code === "42501" ||
+        /permission denied|test_fixture_only|not found|PGRST/i.test(error.message ?? ""));
+    record(
+      7,
+      "authenticated Data API cannot call test_fixture_insert_app_user",
+      blocked,
+      error?.message ?? "",
+    );
+  }
+
   // API-6: admin with permission can mutate allowed test data (organization name round-trip)
   {
     const before = await restGet(
@@ -194,7 +218,7 @@ async function main() {
   const total = unique.size;
 
   console.log(`\nAPI security smoke: ${finalPassed}/${total} passed`);
-  if (finalPassed !== 6) process.exit(1);
+  if (finalPassed !== total) process.exit(1);
 }
 
 main().catch((error) => {

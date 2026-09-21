@@ -1,12 +1,5 @@
 import { expect, test } from "@playwright/test";
-
-async function signIn(page: import("@playwright/test").Page, email: string, password = "testpass123") {
-  await page.goto("/login");
-  await page.locator('input[name="email"]').fill(email);
-  await page.locator('input[name="password"]').fill(password);
-  await page.getByRole("button", { name: /sign in|đăng nhập/i }).click();
-  await expect(page).toHaveURL("/");
-}
+import { signIn } from "./sign-in";
 
 test.describe("M4-T06 session operations", () => {
   test("admin can open session ops from operations and see controls", async ({ page }) => {

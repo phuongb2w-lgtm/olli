@@ -337,6 +337,56 @@ BEGIN
   PERFORM _m6_t02_record(23, 'identity labels available with identity.read', v_name IS NOT NULL);
 END $$;
 
+-- 24: authenticated SQL role cannot execute test_fixture_insert_app_user (no EXECUTE grant)
+DO $$
+DECLARE v_blocked boolean := false;
+BEGIN
+  PERFORM _m6_t02_as_auth('a1111111-1111-4111-8111-111111111111');
+  BEGIN
+    PERFORM public.test_fixture_insert_app_user(
+      'a0000000-0000-4000-8000-000000000001',
+      'fixture-abuse@test.local',
+      'Abuse'
+    );
+  EXCEPTION
+    WHEN insufficient_privilege THEN
+      v_blocked := true;
+    WHEN OTHERS THEN
+      IF SQLERRM LIKE '%permission denied%' OR SQLERRM LIKE '%test_fixture_only%' THEN
+        v_blocked := true;
+      ELSE
+        RAISE;
+      END IF;
+  END;
+  PERFORM _m6_t02_record(24, 'authenticated cannot execute test_fixture_insert_app_user', v_blocked);
+END $$;
+
+-- 25: authenticated SQL role cannot execute test_fixture_grant_all_permissions_role
+DO $$
+DECLARE v_blocked boolean := false;
+  v_staff uuid;
+BEGIN
+  PERFORM _m6_t02_as_auth('a1111111-1111-4111-8111-111111111111');
+  SELECT id INTO v_staff FROM app_user WHERE email = 'staff@test.local' LIMIT 1;
+  BEGIN
+    PERFORM public.test_fixture_grant_all_permissions_role(
+      'a0000000-0000-4000-8000-000000000001',
+      v_staff,
+      'abuse_all_perms'
+    );
+  EXCEPTION
+    WHEN insufficient_privilege THEN
+      v_blocked := true;
+    WHEN OTHERS THEN
+      IF SQLERRM LIKE '%permission denied%' OR SQLERRM LIKE '%test_fixture_only%' THEN
+        v_blocked := true;
+      ELSE
+        RAISE;
+      END IF;
+  END;
+  PERFORM _m6_t02_record(25, 'authenticated cannot execute test_fixture_grant_all_permissions_role', v_blocked);
+END $$;
+
 -- Summary
 DO $$
 DECLARE v_fail integer;

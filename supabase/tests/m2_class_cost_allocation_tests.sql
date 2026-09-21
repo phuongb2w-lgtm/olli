@@ -212,8 +212,9 @@ BEGIN
   SELECT * INTO b FROM _m2_ca_bootstrap();
   v_period := date_trunc('month', CURRENT_DATE)::date;
   PERFORM _m2_ca_grant_admin(b.org_id);
-  PERFORM _m2_ca_as_auth(b.admin_auth_id);
+  PERFORM _m2_ca_as_super();
   counselor := public.test_fixture_insert_app_user(b.org_id, 'counselor@test.local', 'Counselor');
+  PERFORM _m2_ca_as_auth(b.admin_auth_id);
   PERFORM public.create_staff_compensation_rule(counselor, 'marketing_sales', 'monthly_fixed', 1000000, '2026-01-01');
   PERFORM public.generate_personnel_costs(v_period);
   INSERT INTO enrollment_financial_terms (organization_id, enrollment_id, agreed_tuition_amount, discount_amount, net_tuition_amount, agreement_date, recognition_basis_code, status)
@@ -426,7 +427,9 @@ BEGIN
     '2026-02-28'
   );
   PERFORM public.create_cost_allocation_rule('marketing_sales', 'recognized_revenue', '2026-03-01');
+  PERFORM _m2_ca_as_super();
   PERFORM public.test_fixture_insert_app_user(b.org_id, 'mkt2@test.local', 'Mkt2');
+  PERFORM _m2_ca_as_auth(b.admin_auth_id);
   PERFORM public.create_staff_compensation_rule(
     (SELECT id FROM app_user WHERE email = 'mkt2@test.local' AND organization_id = b.org_id),
     'marketing_sales', 'monthly_fixed', 500000, '2026-01-01'
@@ -655,7 +658,9 @@ BEGIN
     '2026-02-28'
   );
   PERFORM public.create_cost_allocation_rule('marketing_sales', 'recognized_revenue', '2026-03-01');
+  PERFORM _m2_ca_as_super();
   PERFORM public.test_fixture_insert_app_user(b.org_id, 'm3@test.local', 'M3');
+  PERFORM _m2_ca_as_auth(b.admin_auth_id);
   PERFORM public.create_staff_compensation_rule(
     (SELECT id FROM app_user WHERE email = 'm3@test.local'), 'marketing_sales', 'monthly_fixed', 700000, '2026-01-01'
   );

@@ -1451,13 +1451,16 @@ async function main() {
       (await hasPermission(staff, "observation.read")),
   );
 
+  const reader = await signIn("org-a-reader@olli.local");
   record(
     54,
     "create/update permission controls attendance as defined by registry",
     (await hasPermission(admin, "attendance.record")) &&
       (await hasPermission(admin, "observation.record")) &&
-      !(await hasPermission(staff, "attendance.record")) &&
-      !(await hasPermission(staff, "observation.record")),
+      (await hasPermission(staff, "attendance.record")) &&
+      (await hasPermission(staff, "observation.record")) &&
+      !(await hasPermission(reader, "attendance.record")) &&
+      !(await hasPermission(reader, "observation.record")),
   );
 
   const { data: orgBSessions } = await admin

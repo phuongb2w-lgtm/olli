@@ -35,29 +35,59 @@ function loadEnv() {
   return env;
 }
 
-async function ensureUser(admin, user) {
-  const { data: existing, error: getError } = await admin.auth.admin.getUserById(user.id);
+function isTransientAuthError(message) {
+  return /database error|connection|timeout|503|502|unavailable|starting/i.test(message ?? "");
+}
 
-  if (!getError && existing?.user) {
-    const { error: updateError } = await admin.auth.admin.updateUserById(user.id, {
+async function sleep(ms) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForAuthAdmin(admin, maxAttempts = 30) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const { error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1 });
+    if (!error) return;
+    if (attempt === maxAttempts) {
+      throw new Error(`Auth admin API not ready: ${error.message}`);
+    }
+    await sleep(2000);
+  }
+}
+
+async function ensureUser(admin, user) {
+  for (let attempt = 1; attempt <= 8; attempt++) {
+    const { data: existing, error: getError } = await admin.auth.admin.getUserById(user.id);
+
+    if (!getError && existing?.user) {
+      const { error: updateError } = await admin.auth.admin.updateUserById(user.id, {
+        email: user.email,
+        password,
+        email_confirm: true,
+      });
+      if (updateError) {
+        if (isTransientAuthError(updateError.message) && attempt < 8) {
+          await sleep(2000 * attempt);
+          continue;
+        }
+        throw new Error(`Failed to update auth user ${user.email}: ${updateError.message}`);
+      }
+      return;
+    }
+
+    const { error: createError } = await admin.auth.admin.createUser({
+      id: user.id,
       email: user.email,
       password,
       email_confirm: true,
     });
-    if (updateError) {
-      throw new Error(`Failed to update auth user ${user.email}: ${updateError.message}`);
+
+    if (!createError) return;
+
+    if (isTransientAuthError(createError.message) && attempt < 8) {
+      await sleep(2000 * attempt);
+      continue;
     }
-    return;
-  }
 
-  const { error: createError } = await admin.auth.admin.createUser({
-    id: user.id,
-    email: user.email,
-    password,
-    email_confirm: true,
-  });
-
-  if (createError) {
     throw new Error(`Failed to create auth user ${user.email}: ${createError.message}`);
   }
 }
@@ -67,6 +97,8 @@ async function main() {
   const admin = createClient(env.API_URL, env.SECRET_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+
+  await waitForAuthAdmin(admin);
 
   for (const user of users) {
     await ensureUser(admin, user);

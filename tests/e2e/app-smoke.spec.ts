@@ -1,15 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { signIn } from "./sign-in";
 
 const adminEmail = "org-a-admin@olli.local";
-const adminPassword = "testpass123";
 const unmappedEmail = "unmapped@olli.local";
-
-async function signIn(page: import("@playwright/test").Page, email: string) {
-  await page.goto("/login");
-  await page.locator('input[name="email"]').fill(email);
-  await page.locator('input[name="password"]').fill(adminPassword);
-  await page.getByRole("button", { name: /sign in|đăng nhập/i }).click();
-}
 
 test.describe("M0-T05 application smoke", () => {
   test("1. unauthenticated protected route redirects to login", async ({ page }) => {

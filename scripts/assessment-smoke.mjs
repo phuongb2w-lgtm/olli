@@ -1379,7 +1379,9 @@ async function main() {
     (await hasPermission(adminUser, "assessment.create")) &&
       (await hasPermission(adminUser, "assessment_result.record")) &&
       !(await hasPermission(staff, "assessment.create")) &&
-      !(await hasPermission(staff, "assessment_result.record")),
+      (await hasPermission(staff, "assessment_result.record")) &&
+      !(await hasPermission(reader, "assessment.create")) &&
+      !(await hasPermission(reader, "assessment_result.record")),
   );
 
   const { data: orgBAssessments } = await adminUser

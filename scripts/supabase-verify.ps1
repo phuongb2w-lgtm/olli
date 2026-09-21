@@ -15,6 +15,9 @@ npx supabase db reset
 Write-Host "==> Ensure Supabase stack is up after reset..."
 npx supabase start --ignore-health-check
 
+Write-Host "==> Wait for Auth/GoTrue after reset..."
+Start-Sleep -Seconds 20
+
 function Invoke-SupabaseSqlFile {
   param([string]$Path)
   $content = Get-Content -Raw -Path $Path -Encoding utf8
@@ -28,6 +31,9 @@ if ($LASTEXITCODE -ne 0) { throw "seed-auth-users.mjs failed" }
 
 Write-Host "==> Apply dev seed fixtures..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\seed.sql")
+
+Write-Host "==> Wait for database after seed..."
+Start-Sleep -Seconds 10
 
 Write-Host "==> Supabase db lint..."
 npx supabase db lint
@@ -156,7 +162,7 @@ Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m5_t08_hard
 Write-Host "==> M5-T09 milestone acceptance tests (16)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m5_milestone_acceptance_tests.sql")
 
-Write-Host "==> M6-T02 access foundation tests (23)..."
+Write-Host "==> M6-T02 access foundation tests (25)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m6_t02_access_foundation_tests.sql")
 
 Write-Host "==> Generating TypeScript types..."
