@@ -18,6 +18,8 @@ M5 builds a management-intelligence layer over canonical M1–M4 operational dat
 
 **M5 closed (T09).** See [06-m5-acceptance-closeout.md](./06-m5-acceptance-closeout.md).
 
+**Successor milestone:** [M6 — Center Administration](../m6/README.md) (**OPEN**, T01 contract).
+
 ## Canonical operating roles
 
 1. **Center Manager** — full access; only role with complete executive reporting
