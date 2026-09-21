@@ -9,14 +9,30 @@ Set-Location $ProjectRoot
 Write-Host "==> Supabase start..."
 npx supabase start --ignore-health-check
 
-Write-Host "==> Supabase db reset (migrations only; seed disabled in config)..."
-npx supabase db reset
+function Invoke-SupabaseDbReset {
+  param([int]$MaxAttempts = 3)
+  for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+    Write-Host "==> Supabase db reset (attempt $attempt/$MaxAttempts; seed disabled in config)..."
+    npx supabase db reset
+    if ($LASTEXITCODE -eq 0) { return }
+    if ($attempt -lt $MaxAttempts) {
+      Write-Host "==> db reset failed; restarting stack before retry..."
+      npx supabase stop 2>$null
+      Start-Sleep -Seconds 15
+      npx supabase start --ignore-health-check
+      Start-Sleep -Seconds 10
+    }
+  }
+  throw "supabase db reset failed after $MaxAttempts attempts"
+}
+
+Invoke-SupabaseDbReset
 
 Write-Host "==> Ensure Supabase stack is up after reset..."
 npx supabase start --ignore-health-check
 
 Write-Host "==> Wait for Auth/GoTrue after reset..."
-Start-Sleep -Seconds 20
+Start-Sleep -Seconds 30
 
 function Invoke-SupabaseSqlFile {
   param([string]$Path)
@@ -26,8 +42,20 @@ function Invoke-SupabaseSqlFile {
 }
 
 Write-Host "==> Create Auth users via GoTrue admin API..."
-node (Join-Path $ProjectRoot "scripts\seed-auth-users.mjs")
-if ($LASTEXITCODE -ne 0) { throw "seed-auth-users.mjs failed" }
+$seedOk = $false
+for ($seedAttempt = 1; $seedAttempt -le 4; $seedAttempt++) {
+  node (Join-Path $ProjectRoot "scripts\seed-auth-users.mjs")
+  if ($LASTEXITCODE -eq 0) {
+    $seedOk = $true
+    break
+  }
+  if ($seedAttempt -lt 4) {
+    Write-Host "==> seed-auth-users failed; waiting before retry ($seedAttempt/4)..."
+    Start-Sleep -Seconds (15 * $seedAttempt)
+    npx supabase start --ignore-health-check | Out-Null
+  }
+}
+if (-not $seedOk) { throw "seed-auth-users.mjs failed after 4 attempts" }
 
 Write-Host "==> Apply dev seed fixtures..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\seed.sql")
@@ -165,6 +193,9 @@ Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m5_mileston
 Write-Host "==> M6-T02 access foundation tests (25)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m6_t02_access_foundation_tests.sql")
 
+Write-Host "==> M6-T03 staff provisioning tests (10)..."
+Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m6_t03_staff_provisioning_tests.sql")
+
 Write-Host "==> Generating TypeScript types..."
 New-Item -ItemType Directory -Force -Path (Join-Path $ProjectRoot "types") | Out-Null
 npx supabase gen types typescript --local | Set-Content -Path (Join-Path $ProjectRoot "types\database.generated.ts") -Encoding utf8
@@ -172,4 +203,4 @@ npx supabase gen types typescript --local | Set-Content -Path (Join-Path $Projec
 if ($LASTEXITCODE -ne 0) { throw "Verification failed" }
 
 Write-Host ""
-Write-Host "SUCCESS: Supabase verification complete (25/25 integrity + 30/30 security + 5/5 charge_balance + 6/6 locale + 12/12 cost_domain + 20/20 capital_depreciation + 35/35 enrollment_financial + 41/41 payment_allocation + 30/30 revenue_recognition + 24/24 personnel_costing + 35/35 class_cost_allocation + 35/35 class_financial_simulator + 5/5 m2_milestone_acceptance + 29/29 crm_foundation + 25/25 lead_lifecycle + 27/27 lead_assignment + 35/35 lead_trial + 40/40 lead_identity_resolution + 48/48 lead_conversion + 28/28 crm_attribution_reporting + 25/25 crm_operational_workspace + 5/5 m3_milestone_acceptance + 22/22 m4_teacher_unavailability + 26/26 m4_timetable_integrity + 28/28 m4_conflict_detection + 30/30 m4_operational_calendar + 44/44 m4_session_mutation + 35/35 m4_workload_analytics + 20/20 m4_daily_operations + 8/8 m4_milestone_acceptance + 25/25 m5_t01_foundation + 10/10 m5_t01_1_semantic_correction + 28/28 m5_t02_financial_intelligence + 36/36 m5_t03_academic_quality + 30/30 m5_t04_crm_admissions_intelligence + 9/9 m5_t04_1_consultant_conversion_semantics + 37/37 m5_t05_teaching_operations_intelligence + 32/32 m5_t06_executive_overview + 40/40 m5_t07_executive_exception_follow_up + 17/17 m5_t08_hardening + 16/16 m5_milestone_acceptance)."
+Write-Host "SUCCESS: Supabase verification complete (25/25 integrity + 30/30 security + 5/5 charge_balance + 6/6 locale + 12/12 cost_domain + 20/20 capital_depreciation + 35/35 enrollment_financial + 41/41 payment_allocation + 30/30 revenue_recognition + 24/24 personnel_costing + 35/35 class_cost_allocation + 35/35 class_financial_simulator + 5/5 m2_milestone_acceptance + 29/29 crm_foundation + 25/25 lead_lifecycle + 27/27 lead_assignment + 35/35 lead_trial + 40/40 lead_identity_resolution + 48/48 lead_conversion + 28/28 crm_attribution_reporting + 25/25 crm_operational_workspace + 5/5 m3_milestone_acceptance + 22/22 m4_teacher_unavailability + 26/26 m4_timetable_integrity + 28/28 m4_conflict_detection + 30/30 m4_operational_calendar + 44/44 m4_session_mutation + 35/35 m4_workload_analytics + 20/20 m4_daily_operations + 8/8 m4_milestone_acceptance + 25/25 m5_t01_foundation + 10/10 m5_t01_1_semantic_correction + 28/28 m5_t02_financial_intelligence + 36/36 m5_t03_academic_quality + 30/30 m5_t04_crm_admissions_intelligence + 9/9 m5_t04_1_consultant_conversion_semantics + 37/37 m5_t05_teaching_operations_intelligence + 32/32 m5_t06_executive_overview + 40/40 m5_t07_executive_exception_follow_up + 17/17 m5_t08_hardening + 16/16 m5_milestone_acceptance + 25/25 m6_t02_access_foundation + 10/10 m6_t03_staff_provisioning)."

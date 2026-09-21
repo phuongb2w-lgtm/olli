@@ -4540,6 +4540,87 @@ export type Database = {
           },
         ]
       }
+      staff_provisioning_request: {
+        Row: {
+          app_user_id: string | null
+          auth_created_by_this_request: boolean
+          auth_user_id: string | null
+          canonical_role: string
+          created_at: string
+          display_name: string
+          id: string
+          idempotency_key: string
+          lease_expires_at: string | null
+          normalized_email: string
+          organization_id: string
+          payload_fingerprint: string
+          preferred_locale: string
+          processing_started_at: string | null
+          processing_token: string | null
+          requesting_owner_app_user_id: string
+          result_code: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          app_user_id?: string | null
+          auth_created_by_this_request?: boolean
+          auth_user_id?: string | null
+          canonical_role: string
+          created_at?: string
+          display_name: string
+          id?: string
+          idempotency_key: string
+          lease_expires_at?: string | null
+          normalized_email: string
+          organization_id: string
+          payload_fingerprint: string
+          preferred_locale?: string
+          processing_started_at?: string | null
+          processing_token?: string | null
+          requesting_owner_app_user_id: string
+          result_code?: string | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          app_user_id?: string | null
+          auth_created_by_this_request?: boolean
+          auth_user_id?: string | null
+          canonical_role?: string
+          created_at?: string
+          display_name?: string
+          id?: string
+          idempotency_key?: string
+          lease_expires_at?: string | null
+          normalized_email?: string
+          organization_id?: string
+          payload_fingerprint?: string
+          preferred_locale?: string
+          processing_started_at?: string | null
+          processing_token?: string | null
+          requesting_owner_app_user_id?: string
+          result_code?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_provisioning_request_org_owner_fk"
+            columns: ["organization_id", "requesting_owner_app_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "staff_provisioning_request_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student: {
         Row: {
           created_at: string
@@ -5901,8 +5982,50 @@ export type Database = {
         Args: { p_canonical_code: string; p_organization_id: string }
         Returns: undefined
       }
+      _m6_assign_canonical_staff_role_internal: {
+        Args: {
+          p_canonical_code: string
+          p_organization_id: string
+          p_target_user_id: string
+        }
+        Returns: string
+      }
+      _m6_provisioning_assert_owner_for_org: {
+        Args: { p_organization_id: string; p_owner_app_user_id: string }
+        Returns: undefined
+      }
+      _m6_provisioning_check_duplicate_member: {
+        Args: {
+          p_exclude_app_user_id?: string
+          p_normalized_email: string
+          p_organization_id: string
+        }
+        Returns: undefined
+      }
+      _m6_provisioning_lease_interval: { Args: never; Returns: string }
+      _m6_provisioning_payload_fingerprint: {
+        Args: {
+          p_canonical_role: string
+          p_display_name: string
+          p_normalized_email: string
+          p_preferred_locale: string
+        }
+        Returns: string
+      }
+      _m6_provisioning_request_to_json: {
+        Args: {
+          p_row: Database["public"]["Tables"]["staff_provisioning_request"]["Row"]
+        }
+        Returns: Json
+      }
+      _m6_provisioning_staff_roles: { Args: never; Returns: string[] }
       _m6_t02_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _m6_t02_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m6_t03_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m6_t03_record: {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
@@ -6088,6 +6211,16 @@ export type Database = {
         }
         Returns: Json
       }
+      begin_staff_provisioning: {
+        Args: {
+          p_canonical_role: string
+          p_display_name: string
+          p_email: string
+          p_idempotency_key: string
+          p_preferred_locale?: string
+        }
+        Returns: Json
+      }
       build_executive_exception_key: {
         Args: {
           p_domain: string
@@ -6169,6 +6302,10 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      claim_provisioning_auth_execution: {
+        Args: { p_processing_token?: string; p_request_id: string }
+        Returns: Json
       }
       class_active_enrollment_count: {
         Args: { p_class_id: string; p_period_month: string }
@@ -6433,6 +6570,10 @@ export type Database = {
       }
       finalize_class_financial_scenario: {
         Args: { p_scenario_id: string }
+        Returns: Json
+      }
+      finalize_staff_provisioning: {
+        Args: { p_request_id: string }
         Returns: Json
       }
       find_guardian_matches_for_lead_contact: {
@@ -6929,6 +7070,14 @@ export type Database = {
         Args: { p_note?: string; p_trial_id: string }
         Returns: Json
       }
+      mark_provisioning_compensated: {
+        Args: { p_request_id: string }
+        Returns: Json
+      }
+      mark_provisioning_reconciliation_required: {
+        Args: { p_request_id: string; p_result_code?: string }
+        Returns: Json
+      }
       normalize_accounting_period: { Args: { p_date: string }; Returns: string }
       normalize_email_key: { Args: { p_email: string }; Returns: string }
       normalize_phone_digits: { Args: { p_phone: string }; Returns: string }
@@ -6972,6 +7121,14 @@ export type Database = {
           p_payer_name_snapshot?: string
           p_reference_number?: string
           p_student_id?: string
+        }
+        Returns: Json
+      }
+      record_provisioning_auth_created: {
+        Args: {
+          p_auth_user_id: string
+          p_processing_token: string
+          p_request_id: string
         }
         Returns: Json
       }

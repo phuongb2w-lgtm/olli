@@ -82,6 +82,26 @@ for (const rel of clientPaths) {
 }
 pass("Client-facing source does not reference service credentials");
 
+const adminModule = join(root, "src/lib/supabase/admin.ts");
+if (existsSync(adminModule)) {
+  const adminSrc = readFileSync(adminModule, "utf8");
+  if (!adminSrc.includes('import "server-only"')) {
+    fail("Admin Supabase module must import server-only");
+  } else {
+    pass("Admin Supabase module is server-only guarded");
+  }
+}
+
+const clientModule = join(root, "src/lib/supabase/client.ts");
+if (existsSync(clientModule)) {
+  const clientSrc = readFileSync(clientModule, "utf8");
+  if (clientSrc.includes("admin") || clientSrc.includes("SUPABASE_SECRET_KEY")) {
+    fail("Browser Supabase client must not reference admin/secret modules");
+  } else {
+    pass("Browser Supabase client does not import admin credentials");
+  }
+}
+
 // Build output check (if .next exists)
 const nextDir = join(root, ".next");
 if (existsSync(nextDir)) {

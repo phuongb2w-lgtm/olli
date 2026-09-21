@@ -43,7 +43,7 @@ async function sleep(ms) {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function waitForAuthAdmin(admin, maxAttempts = 30) {
+async function waitForAuthAdmin(admin, maxAttempts = 60) {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const { error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1 });
     if (!error) return;

@@ -19,6 +19,7 @@
     "db:verify": "npm run db:verify:supabase",
     "db:seed:auth": "node scripts/seed-auth-users.mjs",
     "test:api": "node scripts/api-security-smoke.mjs",
+    "test:staff-provisioning": "node scripts/staff-provisioning-smoke.mjs",
     "test:students": "node scripts/student-list-smoke.mjs && node scripts/student-mutations-smoke.mjs",
     "test:guardians": "node scripts/guardian-relationships-smoke.mjs",
     "test:academic": "node scripts/course-class-smoke.mjs",
@@ -44,7 +45,7 @@
     "test:types:stale": "node scripts/check-generated-types.mjs",
     "db:inventory": "node scripts/generate-security-inventory.mjs",
     "test:foundation": "npm run db:verify && npm run test:api && npm run test:app",
-    "verify": "npm run db:verify && npm run test:i18n && npm run test:env && npm run lint && npm run typecheck && npm run build && npm run test:api && npm run test:students && npm run test:guardians && npm run test:academic && npm run test:enrollments && npm run test:teaching && npm run test:operations && npm run test:session-operations && npm run test:operations-analytics && npm run test:operations-daily && npm run test:session-execution && npm run test:assessments && npm run test:reporting && npm run test:m1-acceptance && npm run test:m3-acceptance && npm run test:crm && npm run test:m5-foundation && npm run test:m5-hardening && npm run test:app"
+    "verify": "npm run db:verify && npm run test:i18n && npm run test:env && npm run lint && npm run typecheck && npm run build && npm run test:api && npm run test:staff-provisioning && npm run test:students && npm run test:guardians && npm run test:academic && npm run test:enrollments && npm run test:teaching && npm run test:operations && npm run test:session-operations && npm run test:operations-analytics && npm run test:operations-daily && npm run test:session-execution && npm run test:assessments && npm run test:reporting && npm run test:m1-acceptance && npm run test:m3-acceptance && npm run test:crm && npm run test:m5-foundation && npm run test:m5-hardening && npm run test:app"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
@@ -52,9 +53,11 @@
     "next": "16.3.4",
     "next-intl": "^4.14.5",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^22.18.0",
     "@types/react": "^19.2.0",
@@ -63,9 +66,8 @@
     "eslint-config-next": "16.3.4",
     "supabase": "^2.117.0",
     "tailwindcss": "^4.1.13",
-    "@playwright/test": "^1.55.0",
-    "wait-on": "^8.0.5",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "wait-on": "^8.0.5"
   },
   "engines": {
     "node": ">=20.9.0"

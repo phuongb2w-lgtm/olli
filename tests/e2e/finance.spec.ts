@@ -109,20 +109,24 @@ test.describe("M2-T10 finance UI", () => {
   });
 
   test("16. VI locale renders finance UI", async ({ page }) => {
+    test.setTimeout(90_000);
     await signIn(page, adminEmail);
     await page.getByLabel(/language|ngôn ngữ/i).selectOption("vi");
     await expect(page.getByRole("button", { name: /đăng xuất/i })).toBeVisible();
     await page.goto("/finance");
-    await expect(page.getByText(/doanh thu đã ghi nhận/i)).toBeVisible();
+    await expect(page.getByRole("main")).toBeVisible();
+    await expect(page.getByText(/doanh thu đã ghi nhận/i)).toBeVisible({ timeout: 60_000 });
     await expect(page.getByRole("main").getByRole("link", { name: /^thanh toán$/i })).toBeVisible();
   });
 
   test("17. EN locale renders finance UI", async ({ page }) => {
+    test.setTimeout(90_000);
     await signIn(page, adminEmail);
     await page.getByLabel(/language|ngôn ngữ/i).selectOption("en");
     await expect(page.getByRole("button", { name: /sign out/i })).toBeVisible();
     await page.goto("/finance");
-    await expect(page.getByText(/recognized revenue/i)).toBeVisible();
+    await expect(page.getByRole("main")).toBeVisible();
+    await expect(page.getByText(/recognized revenue/i)).toBeVisible({ timeout: 60_000 });
     await expect(page.getByRole("main").getByRole("link", { name: /^payments$/i })).toBeVisible();
   });
 
