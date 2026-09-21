@@ -215,7 +215,7 @@ async function main() {
     !readerGuardianSearch.items.some((s) => s.id === STUDENT_TRAN),
   );
 
-  const adminWithGuardian = await queryStudentList(admin, { q: "", page: 1, pageSize: 25 }, true);
+  const adminWithGuardian = await queryStudentList(admin, { q: "HV001", page: 1, pageSize: 25 }, true);
   const { data: primaryLinks } = await admin
     .from("student_guardian")
     .select("student_id, guardian_id")

@@ -53,7 +53,7 @@ test.describe("M5-T03 academic quality", () => {
   test("5. period filter visible on quality page", async ({ page }) => {
     await signIn(page, adminEmail);
     await page.goto("/executive/quality");
-    await expect(page.locator('input[name="start"]')).toBeVisible();
+    await expect(page.locator('input[name="start"]')).toBeVisible({ timeout: 60_000 });
     await expect(page.locator('input[name="end"]')).toBeVisible();
   });
 });

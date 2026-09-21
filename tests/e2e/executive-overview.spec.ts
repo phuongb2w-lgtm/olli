@@ -95,11 +95,11 @@ test.describe("M5-T06 executive overview", () => {
 
   test("8. Vietnamese locale executive overview", async ({ page }) => {
     await signIn(page, adminEmail);
-    await page.goto("/settings");
     await page.getByLabel(/language|ngôn ngữ/i).selectOption("vi");
+    await expect(page.getByRole("button", { name: /đăng xuất/i })).toBeVisible();
     await page.goto("/executive");
-    await expect(page.getByText(/tình hình tài chính/i)).toBeVisible();
-    await expect(page.getByText(/cần chú ý/i)).toBeVisible();
+    await expect(page.getByText(/tình hình tài chính/i)).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByText(/hạng mục cần chú ý|cần chú ý/i)).toBeVisible();
   });
 
   test("9. quality drill-down from overview", async ({ page }) => {

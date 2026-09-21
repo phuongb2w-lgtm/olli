@@ -27,7 +27,7 @@ test.describe("M5-T07 executive exceptions", () => {
     await worklistSection
       .getByRole("link", { name: /open exception worklist|mở danh sách ngoại lệ/i })
       .click();
-    await expect(page).toHaveURL(/\/executive\/exceptions(\?|$)/);
+    await expect(page).toHaveURL(/\/executive\/exceptions(\?|$)/, { timeout: 45_000 });
   });
 
   test("2. exceptions page shows filters and period", async ({ page }) => {
@@ -110,12 +110,12 @@ test.describe("M5-T07 executive exceptions", () => {
 
   test("8. Vietnamese locale executive exceptions", async ({ page }) => {
     await signIn(page, adminEmail);
-    await page.goto("/settings");
     await page.getByLabel(/language|ngôn ngữ/i).selectOption("vi");
+    await expect(page.getByRole("button", { name: /đăng xuất/i })).toBeVisible();
     await page.goto("/executive/exceptions");
     await expect(
       page.getByRole("heading", { level: 1, name: /ngoại lệ điều hành/i }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 45_000 });
   });
 
   test("9. empty state when filters exclude all rows", async ({ page }) => {

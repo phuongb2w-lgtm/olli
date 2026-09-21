@@ -54,7 +54,9 @@ test.describe("M3 CRM leads", () => {
     await page.goto(`/crm/leads/${leadFixtureId}`);
     await expect(page.getByRole("heading", { name: /Lead detail|Chi tiết lead/i })).toBeVisible();
     await expect(page.getByText("Walk-in").first()).toBeVisible();
-    await expect(page.getByRole("heading", { name: /Candidates|Học viên tiềm năng/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 2, name: /Candidates|Học viên tiềm năng/i }),
+    ).toBeVisible();
   });
 
   test("6. admin can log activity from detail", async ({ page }) => {
@@ -114,11 +116,11 @@ test.describe("M3 CRM leads", () => {
   test("9. admin can schedule and complete a trial", async ({ page }) => {
     await signIn(page, adminEmail);
     await page.goto(`/crm/leads/${trialLeadFixtureId}`);
-    await expect(page.getByRole("heading", { name: /Trials|Học thử/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: /Trials|Học thử/i })).toBeVisible();
 
     const trialSection = page
       .locator("section")
-      .filter({ has: page.getByRole("heading", { name: /Trials|Học thử/i }) });
+      .filter({ has: page.getByRole("heading", { level: 2, name: /Trials|Học thử/i }) });
 
     await page.locator("#trialCandidateId").selectOption({ index: 1 });
     const classSelect = page.locator("#trialClassId");

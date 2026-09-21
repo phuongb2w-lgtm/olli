@@ -5765,6 +5765,13 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m5_ma_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m5_ma_as_super: { Args: never; Returns: undefined }
+      _m5_ma_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m5_ma_weekday: { Args: { p_date: string }; Returns: string }
       _m5_t02_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _m5_t02_as_super: { Args: never; Returns: undefined }
       _m5_t02_record: {

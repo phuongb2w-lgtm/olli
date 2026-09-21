@@ -16,6 +16,8 @@ M5 builds a management-intelligence layer over canonical M1–M4 operational dat
 | M5-T08 | Role-based reporting UX, permissions, i18n & performance |
 | M5-T09 | Final cross-domain acceptance & closeout |
 
+**M5 closed (T09).** See [06-m5-acceptance-closeout.md](./06-m5-acceptance-closeout.md).
+
 ## Canonical operating roles
 
 1. **Center Manager** — full access; only role with complete executive reporting
