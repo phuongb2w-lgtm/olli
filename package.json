@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "node --max-old-space-size=8192 ./node_modules/eslint/bin/eslint.js .",
     "typecheck": "tsc --noEmit",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
