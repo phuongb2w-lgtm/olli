@@ -2,7 +2,7 @@
 
 **Task:** M5-T09  
 **Baseline (T08 accepted):** `b6a063f` — `chore(m5): harden management intelligence`  
-**Closeout commit:** _recorded after `chore(m5): close management intelligence milestone` (see git log on `main`)_  
+**Closeout commit:** `7849edb` — `chore(m5): close management intelligence milestone`  
 **Result:** **PASS — M5 CLOSED**
 
 ---
