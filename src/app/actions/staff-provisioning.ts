@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { getCurrentAppUser } from "@/lib/auth/get-identity-state";
 import { STAFF_CANONICAL_ROLES, type StaffCanonicalRole } from "@/lib/staff-provisioning/constants";
 import {
@@ -31,11 +32,17 @@ export async function provisionStaffAccount(input: {
   }
 
   const supabase = await createClient();
-  return orchestrateStaffProvisioning(supabase, {
+  const result = await orchestrateStaffProvisioning(supabase, {
     email: input.email,
     displayName: input.displayName,
     canonicalRole: input.canonicalRole,
     idempotencyKey: input.idempotencyKey,
     preferredLocale: input.preferredLocale,
   });
+
+  if (result.ok) {
+    revalidatePath("/users");
+  }
+
+  return result;
 }

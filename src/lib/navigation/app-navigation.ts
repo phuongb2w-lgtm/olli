@@ -59,7 +59,7 @@ export const APP_NAV_ITEMS: NavItemDefinition[] = [
       "consultant_revenue.review",
     ],
   },
-  { key: "users", href: "/users", anyOf: ["user.read", "user.manage"] },
+  { key: "users", href: "/users", anyOf: ["center_account.manage"] },
   {
     key: "settings",
     href: "/settings",

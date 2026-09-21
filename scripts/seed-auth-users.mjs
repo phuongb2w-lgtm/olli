@@ -21,6 +21,9 @@ const users = [
   { id: "a3333333-3333-4333-8333-333333333333", email: "disabled@olli.local" },
   { id: "a4444444-4444-4444-8444-444444444444", email: "org-a-reader@olli.local" },
   { id: "a5555555-5555-4555-8555-555555555555", email: "org-a-no-student@olli.local" },
+  { id: "a6660001-0000-4000-8000-000000000001", email: "m6-t04-accountant@olli.local" },
+  { id: "a6660002-0000-4000-8000-000000000002", email: "m6-t04-consultant@olli.local" },
+  { id: "a6660003-0000-4000-8000-000000000003", email: "m6-t04-academic-ops@olli.local" },
 ];
 
 const password = "testpass123";

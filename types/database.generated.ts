@@ -6568,6 +6568,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      fetch_center_account_administration: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       finalize_class_financial_scenario: {
         Args: { p_scenario_id: string }
         Returns: Json

@@ -11,13 +11,13 @@ M6 turns existing authentication, organization, role, and permission foundations
 | M6-T01 | [Center administration contract](./01-center-administration-contract.md) | **Complete** (pending owner acceptance of closeout) |
 | M6-T02 | [Access foundation implementation](./02-t02-access-foundation-implementation.md) | **Complete** (pending owner acceptance) |
 | M6-T03 | [Trusted staff provisioning](./03-t03-trusted-staff-provisioning.md) | **Complete** (pending owner acceptance) |
-| M6-T04 | Owner `/users` administration workspace | Not started |
+| M6-T04 | [Owner `/users` administration workspace](./04-t04-users-administration-workspace.md) | **Complete** (pending owner acceptance) |
 | M6-T05 | Suspension, removal, role changes & historical integrity | Not started |
 | M6-T06 | Security, RLS & organization-isolation hardening | Not started |
 | M6-T07 | UX, i18n, integration & regression hardening | Not started |
 | M6-T08 | Final acceptance & milestone closeout | Not started |
 
-**M6 — OPEN** (T03 provisioning implemented). Do not begin M6-T04 until explicitly authorized.
+**M6 — OPEN** (T04 `/users` workspace implemented). Do not begin M6-T05 until explicitly authorized.
 
 ## Task sequence
 
