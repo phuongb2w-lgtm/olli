@@ -78,6 +78,8 @@ DECLARE v_data jsonb; v_count integer;
 BEGIN
   PERFORM _m6_t04_as_auth('a1111111-1111-4111-8111-111111111111');
   SELECT public.fetch_center_account_administration() INTO v_data;
+  RESET ROLE;
+  SET LOCAL ROLE postgres;
   SELECT public.count_member_staff_seats('a0000000-0000-4000-8000-000000000001') INTO v_count;
   PERFORM _m6_t04_record(
     4,
