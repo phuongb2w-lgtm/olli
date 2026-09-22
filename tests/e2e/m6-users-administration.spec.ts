@@ -22,7 +22,7 @@ test.describe("M6-T04 users administration", () => {
     await expect(page.getByText(/primary owner|chủ sở hữu chính/i)).toBeVisible();
     await expect(page.getByText(/org-a-admin@olli\.local/i)).toBeVisible();
     await expect(page.getByText(/\d+\s*\/\s*\d+\s*(staff accounts|tài khoản nhân sự)/i)).toBeVisible();
-    await expect(page.getByText(/org-a-staff@olli\.local/i)).toBeVisible();
+    await expect(page.getByRole("cell", { name: "org-a-staff@olli.local" })).toBeVisible();
   });
 
   for (const email of deniedUsers) {
@@ -115,7 +115,7 @@ test.describe("M6-T04 users administration", () => {
   });
 
   test("8. seat full disables new submission", async ({ page }) => {
-    await signIn(page, ownerEmail);
+    await signIn(page, "org-b-admin@olli.local");
     await page.goto("/users");
     await expect(page.getByText(/\d+\s*\/\s*\d+/i)).toBeVisible({ timeout: 45_000 });
 
@@ -133,7 +133,9 @@ test.describe("M6-T04 users administration", () => {
     }
 
     await expect(
-      page.getByText(/seat limit reached|giới hạn ghế|all staff seats are in use|đã dùng hết ghế/i),
+      page
+        .getByText(/seat limit reached|giới hạn ghế|all staff seats are in use|đã dùng hết ghế/i)
+        .first(),
     ).toBeVisible({ timeout: 45_000 });
     await expect(
       page.getByRole("button", { name: /create staff|tạo tài khoản nhân sự/i }),

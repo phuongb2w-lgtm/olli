@@ -192,7 +192,7 @@ END $$;
 DO $$
 DECLARE v_limit integer;
 BEGIN
-  SELECT staff_limit INTO v_limit FROM organization_entitlement WHERE organization_id = 'a0000000-0000-4000-8000-000000000001';
+  SELECT staff_limit INTO v_limit FROM organization_entitlement WHERE organization_id = 'b0000000-0000-4000-8000-000000000001';
   PERFORM _m6_t02_record(14, 'default staff_limit is 5', v_limit = 5);
 END $$;
 

@@ -87,6 +87,9 @@ BEGIN
   PERFORM public.set_primary_owner_for_organization(v_org_b, v_app_b_admin);
   PERFORM public.set_primary_owner_for_organization(v_org_c, v_app_c_owner);
 
+  -- Org A accumulates M5 SQL role fixtures during verify; keep headroom for M6-T04 provisioning E2E.
+  UPDATE organization_entitlement SET staff_limit = 24 WHERE organization_id = v_org_a;
+
   SELECT id INTO v_role_a_admin FROM role
     WHERE organization_id = v_org_a AND canonical_code = 'center_manager' LIMIT 1;
   SELECT id INTO v_role_b_admin FROM role
