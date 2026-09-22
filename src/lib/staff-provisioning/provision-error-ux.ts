@@ -47,6 +47,11 @@ const ERROR_UX: Record<StaffProvisioningErrorCode, ProvisionErrorUx> = {
     retryable: false,
     classification: "terminal",
   },
+  removed_member_exists: {
+    messageKey: "removedMemberExists",
+    retryable: false,
+    classification: "terminal",
+  },
   identity_conflict: {
     messageKey: "identityConflict",
     retryable: false,

@@ -12,7 +12,7 @@ export async function getIdentityState(): Promise<IdentityState> {
   const { data: appUserRow, error: appUserError } = await supabase
     .from("app_user")
     .select(
-      "id, organization_id, display_name, preferred_locale, status, organization:organization_id(name, default_locale)",
+      "id, organization_id, display_name, preferred_locale, status, membership_status, organization:organization_id(name, default_locale, status)",
     )
     .eq("auth_user_id", claimsData.claims.sub)
     .maybeSingle();
@@ -25,11 +25,18 @@ export async function getIdentityState(): Promise<IdentityState> {
     return { kind: "unmapped" };
   }
 
-  if (appUserRow.status !== "active") {
+  const organizationRaw = appUserRow.organization;
+  const organization = Array.isArray(organizationRaw) ? organizationRaw[0] : organizationRaw;
+  const organizationStatus = organization?.status;
+  const usableIdentity =
+    appUserRow.status === "active" &&
+    appUserRow.membership_status === "member" &&
+    organizationStatus === "active";
+
+  if (!usableIdentity) {
     return { kind: "inactive" };
   }
 
-  const organization = appUserRow.organization;
   if (!organization || !appUserRow.organization_id) {
     return { kind: "no_organization" };
   }

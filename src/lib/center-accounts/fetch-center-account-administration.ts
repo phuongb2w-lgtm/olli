@@ -28,6 +28,7 @@ type RpcPayload = {
   staff_seats_used: number;
   primary_owner: RpcPerson;
   staff: RpcStaff[];
+  removed_staff?: RpcStaff[];
 };
 
 function mapPerson(row: RpcPerson): CenterAccountPerson {
@@ -72,6 +73,11 @@ export async function fetchCenterAccountAdministration(
       staffSeatsUsed: payload.staff_seats_used,
       primaryOwner: mapPerson(payload.primary_owner),
       staff: (payload.staff ?? []).map((row) => ({
+        ...mapPerson(row),
+        canonicalRole: mapStaffRole(row.canonical_role),
+        createdAt: row.created_at,
+      })),
+      removedStaff: (payload.removed_staff ?? []).map((row) => ({
         ...mapPerson(row),
         canonicalRole: mapStaffRole(row.canonical_role),
         createdAt: row.created_at,

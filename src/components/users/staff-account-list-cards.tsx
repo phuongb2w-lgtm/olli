@@ -1,12 +1,15 @@
 import { getTranslations } from "next-intl/server";
 import { AccountAccessBadge } from "@/components/users/account-access-badge";
+import { StaffLifecycleActions } from "@/components/users/staff-lifecycle-actions";
 import type { CenterAccountStaffMember } from "@/lib/center-accounts/types";
 
 type Props = {
   staff: CenterAccountStaffMember[];
+  staffSeatsUsed: number;
+  staffLimit: number;
 };
 
-export async function StaffAccountListCards({ staff }: Props) {
+export async function StaffAccountListCards({ staff, staffSeatsUsed, staffLimit }: Props) {
   const t = await getTranslations("users");
   const tRoles = await getTranslations("roles");
 
@@ -23,6 +26,7 @@ export async function StaffAccountListCards({ staff }: Props) {
       {staff.map((member) => (
         <li
           key={member.appUserId}
+          data-testid={`staff-card-${member.email}`}
           className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
         >
           <div className="flex items-start justify-between gap-3">
@@ -43,6 +47,15 @@ export async function StaffAccountListCards({ staff }: Props) {
               </dd>
             </div>
           </dl>
+          <div className="mt-3">
+            <StaffLifecycleActions
+              member={member}
+              staffSeatsUsed={staffSeatsUsed}
+              staffLimit={staffLimit}
+              variant="current"
+              includeTestIds={false}
+            />
+          </div>
         </li>
       ))}
     </ul>

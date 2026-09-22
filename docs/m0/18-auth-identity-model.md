@@ -34,7 +34,7 @@ Migration: `20260914140200_auth_identity.sql`
 
 1. **Stable references** — sessions, charges, audit columns reference `app_user.id`, not Auth lifecycle.
 2. **Auth lifecycle isolation** — removing a Supabase Auth account must not delete business history.
-3. **Application access gate** — when `auth_user_id` is NULL or `app_user.status != 'active'`, RLS helpers return no organization context.
+3. **Application access gate** — when `auth_user_id` is NULL, `app_user.status != 'active'`, `membership_status != 'member'`, or the organization is not `active`, RLS helpers return no organization context (M6-T05).
 
 ---
 

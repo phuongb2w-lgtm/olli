@@ -19,4 +19,5 @@ export type CenterAccountAdministration = {
   staffSeatsUsed: number;
   primaryOwner: CenterAccountPerson;
   staff: CenterAccountStaffMember[];
+  removedStaff: CenterAccountStaffMember[];
 };

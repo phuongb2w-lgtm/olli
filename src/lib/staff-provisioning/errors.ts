@@ -7,6 +7,7 @@ export type StaffProvisioningErrorCode =
   | "invalid_input"
   | "staff_seat_limit_exceeded"
   | "member_already_exists"
+  | "removed_member_exists"
   | "identity_conflict"
   | "idempotency_conflict"
   | "auth_provisioning_failed"
@@ -24,6 +25,7 @@ export function mapProvisioningError(message: string): StaffProvisioningErrorCod
     "invalid_email",
     "invalid_input",
     "staff_seat_limit_exceeded",
+    "removed_member_exists",
     "member_already_exists",
     "identity_conflict",
     "idempotency_conflict",

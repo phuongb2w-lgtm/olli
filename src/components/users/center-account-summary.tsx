@@ -15,7 +15,7 @@ export async function CenterAccountSummary({ data }: Props) {
     <section className="space-y-4 rounded-lg border border-slate-200 bg-white p-4">
       <h2 className="text-sm font-semibold text-slate-900">{t("summaryTitle")}</h2>
 
-      <div className="rounded-lg border border-slate-100 bg-slate-50 p-4">
+      <div className="rounded-lg border border-slate-100 bg-slate-50 p-4" data-testid="primary-owner-card">
         <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
           {t("primaryOwnerLabel")}
         </p>

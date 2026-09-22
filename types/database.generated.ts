@@ -4540,6 +4540,70 @@ export type Database = {
           },
         ]
       }
+      staff_lifecycle_event: {
+        Row: {
+          actor_app_user_id: string
+          canonical_role: string | null
+          created_at: string
+          event_type: string
+          from_membership: string
+          from_status: string
+          id: string
+          organization_id: string
+          target_app_user_id: string
+          to_membership: string
+          to_status: string
+        }
+        Insert: {
+          actor_app_user_id: string
+          canonical_role?: string | null
+          created_at?: string
+          event_type: string
+          from_membership: string
+          from_status: string
+          id?: string
+          organization_id: string
+          target_app_user_id: string
+          to_membership: string
+          to_status: string
+        }
+        Update: {
+          actor_app_user_id?: string
+          canonical_role?: string | null
+          created_at?: string
+          event_type?: string
+          from_membership?: string
+          from_status?: string
+          id?: string
+          organization_id?: string
+          target_app_user_id?: string
+          to_membership?: string
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_lifecycle_event_actor_fk"
+            columns: ["organization_id", "actor_app_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "staff_lifecycle_event_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_lifecycle_event_target_fk"
+            columns: ["organization_id", "target_app_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       staff_provisioning_request: {
         Row: {
           app_user_id: string | null
@@ -5978,6 +6042,24 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m6_active_canonical_staff_role_code: {
+        Args: { p_org_id: string; p_user_id: string }
+        Returns: string
+      }
+      _m6_append_staff_lifecycle_event: {
+        Args: {
+          p_actor_id: string
+          p_canonical_role: string
+          p_event_type: string
+          p_from_membership: string
+          p_from_status: string
+          p_org_id: string
+          p_target_id: string
+          p_to_membership: string
+          p_to_status: string
+        }
+        Returns: undefined
+      }
       _m6_apply_canonical_role_permissions: {
         Args: { p_canonical_code: string; p_organization_id: string }
         Returns: undefined
@@ -5989,6 +6071,56 @@ export type Database = {
           p_target_user_id: string
         }
         Returns: string
+      }
+      _m6_assign_canonical_staff_role_on_member: {
+        Args: { p_canonical_code: string; p_org_id: string; p_user_id: string }
+        Returns: string
+      }
+      _m6_end_active_canonical_staff_roles: {
+        Args: { p_org_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      _m6_lifecycle_lock_target: {
+        Args: {
+          p_lock_entitlement: boolean
+          p_org_id: string
+          p_target_user_id: string
+        }
+        Returns: {
+          auth_user_id: string | null
+          created_at: string
+          created_by: string | null
+          display_name: string
+          email: string
+          id: string
+          membership_status: string
+          organization_id: string
+          preferred_locale: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "app_user"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      _m6_lifecycle_require_owner: {
+        Args: never
+        Returns: {
+          actor_id: string
+          org_id: string
+        }[]
+      }
+      _m6_lifecycle_result: {
+        Args: {
+          p_canonical_role: string
+          p_noop: boolean
+          p_target: Database["public"]["Tables"]["app_user"]["Row"]
+        }
+        Returns: Json
       }
       _m6_provisioning_assert_owner_for_org: {
         Args: { p_organization_id: string; p_owner_app_user_id: string }
@@ -6019,6 +6151,7 @@ export type Database = {
         Returns: Json
       }
       _m6_provisioning_staff_roles: { Args: never; Returns: string[] }
+      _m6_staff_lifecycle_roles: { Args: never; Returns: string[] }
       _m6_t02_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _m6_t02_record: {
         Args: { passed: boolean; test_name: string; test_no: number }
@@ -6031,6 +6164,23 @@ export type Database = {
       }
       _m6_t04_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _m6_t04_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m6_t05_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m6_t05_count_seats: { Args: never; Returns: number }
+      _m6_t05_make_staff: {
+        Args: {
+          p_auth?: string
+          p_email: string
+          p_membership?: string
+          p_name: string
+          p_role?: string
+          p_status?: string
+        }
+        Returns: string
+      }
+      _m6_t05_record: {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
@@ -7099,6 +7249,10 @@ export type Database = {
         Args: { p_capital_asset_id: string; p_through_month: string }
         Returns: number
       }
+      reactivate_staff_member: {
+        Args: { p_target_user_id: string }
+        Returns: Json
+      }
       recognition_lesson_amount: {
         Args: {
           p_lesson_count: number
@@ -7136,6 +7290,10 @@ export type Database = {
           p_processing_token: string
           p_request_id: string
         }
+        Returns: Json
+      }
+      remove_staff_from_center: {
+        Args: { p_target_user_id: string }
         Returns: Json
       }
       reschedule_lead_trial: {
@@ -7225,6 +7383,10 @@ export type Database = {
           p_scenario: Database["public"]["Tables"]["class_financial_scenario"]["Row"]
         }
         Returns: number
+      }
+      restore_removed_staff: {
+        Args: { p_canonical_role: string; p_target_user_id: string }
+        Returns: Json
       }
       retire_capital_asset: {
         Args: { p_capital_asset_id: string; p_retired_at?: string }
@@ -7563,6 +7725,10 @@ export type Database = {
       sum_pending_consultant_declarations: {
         Args: { p_end_date: string; p_start_date: string }
         Returns: number
+      }
+      suspend_staff_member: {
+        Args: { p_target_user_id: string }
+        Returns: Json
       }
       teacher_has_unavailability: {
         Args: {

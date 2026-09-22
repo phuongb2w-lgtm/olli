@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { CenterAccountSummary } from "@/components/users/center-account-summary";
 import { ProvisionStaffForm } from "@/components/users/provision-staff-form";
+import { RemovedStaffList } from "@/components/users/removed-staff-list";
 import { StaffAccountListCards } from "@/components/users/staff-account-list-cards";
 import { StaffAccountListTable } from "@/components/users/staff-account-list-table";
 import { resolveLocale } from "@/i18n/resolve-locale";
@@ -52,8 +53,25 @@ export default async function UsersPage() {
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-slate-900">{t("staffSectionTitle")}</h2>
-        <StaffAccountListTable staff={data.staff} />
-        <StaffAccountListCards staff={data.staff} />
+        <StaffAccountListTable
+          staff={data.staff}
+          staffSeatsUsed={data.staffSeatsUsed}
+          staffLimit={data.staffLimit}
+        />
+        <StaffAccountListCards
+          staff={data.staff}
+          staffSeatsUsed={data.staffSeatsUsed}
+          staffLimit={data.staffLimit}
+        />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-slate-900">{t("removedSectionTitle")}</h2>
+        <RemovedStaffList
+          staff={data.removedStaff}
+          staffSeatsUsed={data.staffSeatsUsed}
+          staffLimit={data.staffLimit}
+        />
       </section>
 
       <ProvisionStaffForm seatsFull={seatsFull} defaultLocale={locale} />

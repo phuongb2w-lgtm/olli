@@ -322,6 +322,8 @@ BEGIN
   UPDATE organization SET status = 'inactive' WHERE id = 'a0000000-0000-4000-8000-000000000001';
   PERFORM _m6_t02_as_auth('a1111111-1111-4111-8111-111111111111');
   SELECT public.is_primary_owner() INTO v_ok;
+  RESET ROLE;
+  SET LOCAL ROLE postgres;
   UPDATE organization SET status = 'active' WHERE id = 'a0000000-0000-4000-8000-000000000001';
   PERFORM _m6_t02_record(22, 'inactive organization denies is_primary_owner', NOT v_ok);
 END $$;

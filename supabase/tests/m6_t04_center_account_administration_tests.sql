@@ -136,12 +136,17 @@ BEGIN
   SELECT public.fetch_center_account_administration() INTO v_data;
   v_before := (v_data->>'staff_seats_used')::integer;
 
+  RESET ROLE;
+  SET LOCAL ROLE postgres;
   UPDATE app_user SET status = 'inactive'
   WHERE id = 'a2000000-0000-4000-8000-000000000001';
 
+  PERFORM _m6_t04_as_auth('a1111111-1111-4111-8111-111111111111');
   SELECT public.fetch_center_account_administration() INTO v_data;
   v_after := (v_data->>'staff_seats_used')::integer;
 
+  RESET ROLE;
+  SET LOCAL ROLE postgres;
   UPDATE app_user SET status = 'active'
   WHERE id = 'a2000000-0000-4000-8000-000000000001';
 
@@ -160,12 +165,17 @@ BEGIN
   SELECT public.fetch_center_account_administration() INTO v_data;
   v_before := (v_data->>'staff_seats_used')::integer;
 
+  RESET ROLE;
+  SET LOCAL ROLE postgres;
   UPDATE app_user SET status = 'locked'
   WHERE id = 'a2000000-0000-4000-8000-000000000001';
 
+  PERFORM _m6_t04_as_auth('a1111111-1111-4111-8111-111111111111');
   SELECT public.fetch_center_account_administration() INTO v_data;
   v_after := (v_data->>'staff_seats_used')::integer;
 
+  RESET ROLE;
+  SET LOCAL ROLE postgres;
   UPDATE app_user SET status = 'active'
   WHERE id = 'a2000000-0000-4000-8000-000000000001';
 
