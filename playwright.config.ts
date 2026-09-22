@@ -19,7 +19,7 @@ export default defineConfig({
     actionTimeout: 30_000,
   },
   webServer: {
-    command: `npm run start -- -p ${port}`,
+    command: `node scripts/playwright-webserver.mjs`,
     url: baseURL,
     reuseExistingServer: false,
     timeout: 120_000,

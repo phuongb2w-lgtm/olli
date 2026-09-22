@@ -76,7 +76,7 @@ test.describe("M6-T04 users administration", () => {
     await page.locator("#staff-display-name").fill("Duplicate");
     await page.getByRole("button", { name: /create staff|tạo tài khoản nhân sự/i }).click();
     await expect(
-      page.getByText(/already belongs to your center|đã thuộc nhân sự/i),
+      page.getByText(/already belongs to your center|đã thuộc nhân sự trong trung tâm/i),
     ).toBeVisible({ timeout: 60_000 });
   });
 
