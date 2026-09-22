@@ -37,6 +37,7 @@
     "test:crm": "node scripts/crm-leads-smoke.mjs",
     "test:m5-foundation": "node scripts/m5-foundation-smoke.mjs",
     "test:m5-hardening": "node scripts/reporting-period-parse-smoke.mjs",
+    "pretest:app": "playwright install chromium",
     "test:app": "playwright test",
     "test:app:install": "playwright install chromium",
     "test:locale": "powershell -ExecutionPolicy Bypass -Command \"Get-Content supabase/tests/m0_locale_tests.sql -Raw | docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1\"",

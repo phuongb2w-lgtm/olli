@@ -6029,6 +6029,11 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m6_t04_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m6_t04_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -6568,10 +6573,7 @@ export type Database = {
           user_id: string
         }[]
       }
-      fetch_center_account_administration: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      fetch_center_account_administration: { Args: never; Returns: Json }
       finalize_class_financial_scenario: {
         Args: { p_scenario_id: string }
         Returns: Json
