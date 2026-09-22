@@ -10,6 +10,8 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: 1,
   reporter: "list",
+  // Full-suite local runs: signIn waits up to 60s for GoTrue; default 30s test timeout caused flakes.
+  timeout: 90_000,
   expect: {
     timeout: 60_000,
   },
