@@ -1,6 +1,7 @@
 # M0-T04 — Auth Identity Model
 
 **Date:** 2026-09-14
+**M6-T05 / M6-T06:** Usable application identity and sensitive-field rules below reflect the current canonical model.
 
 Supabase Auth identity and Olli application identity are related but **not the same business concept**.
 
@@ -34,7 +35,35 @@ Migration: `20260914140200_auth_identity.sql`
 
 1. **Stable references** — sessions, charges, audit columns reference `app_user.id`, not Auth lifecycle.
 2. **Auth lifecycle isolation** — removing a Supabase Auth account must not delete business history.
-3. **Application access gate** — when `auth_user_id` is NULL, `app_user.status != 'active'`, `membership_status != 'member'`, or the organization is not `active`, RLS helpers return no organization context (M6-T05).
+3. **Application access gate** — when identity is not *usable* (see below), RLS helpers return no organization context.
+
+---
+
+## Usable application identity (current)
+
+A JWT may still map to an `app_user` row while the **application** treats the session as non-operational. Usable identity requires **all** of:
+
+```text
+organization.status = 'active'
+AND app_user.status = 'active'
+AND app_user.membership_status = 'member'
+```
+
+Implemented in `current_app_user_id()` and `current_organization_id()` (M6-T05, SECURITY DEFINER, `SET search_path = public`).
+
+**Never trust** client-supplied `organization_id` for authorization.
+
+The Next.js gate `getIdentityState()` applies the same usable-identity rule for UX routing.
+
+### Auth vs application access
+
+| State | Auth account | Application access |
+|-------|--------------|-------------------|
+| Suspended staff (`inactive`, `member`) | May still exist | **Denied** — helpers NULL |
+| Removed from center (`removed`, any status) | May still exist | **Denied** |
+| Malformed `removed` + `active` | May still exist | **Denied** — membership in gate |
+
+Staff lifecycle mutations (suspend, remove, restore, role change) use **trusted SECURITY DEFINER RPCs** (M6-T05), not direct PostgREST updates to sensitive columns.
 
 ---
 
@@ -44,7 +73,7 @@ When `auth.users` row is deleted:
 
 | Preserved | Blocked |
 |-----------|---------|
-| `app_user` row | Login / `auth.uid()` resolution |
+| `app_user` row | Login / usable identity |
 | Historical `created_by` / `updated_by` | Operational SELECT/INSERT/UPDATE via RLS |
 | Financial transactions | New sessions for that identity |
 | Teacher business records | |
@@ -58,25 +87,30 @@ When `auth.users` row is deleted:
 
 ## Organization Context (Trusted)
 
-For M0, each `app_user` belongs to **one** organization. Active organization is derived only from database state:
-
-```text
-auth.uid()
-  → app_user.auth_user_id
-  → app_user.organization_id   (status = 'active')
-```
-
-Implemented in `current_organization_id()` (SECURITY DEFINER, fixed `search_path`).
+For M0–M6, each `app_user` belongs to **one** organization. Organization context is derived only from **usable** identity (see above).
 
 **Never trust** client-supplied `organization_id` (forms, URL, local storage, JWT custom claims) for authorization.
 
 ---
 
-## Sensitive Field Protection
+## Sensitive Field Protection (current)
 
-`protect_app_user_sensitive_fields` trigger blocks changes to `organization_id`, `auth_user_id`, and `status` unless caller has `user.manage` permission (or `olli.bypass_app_user_guard` is set for bootstrap/tests).
+`protect_app_user_sensitive_fields` and `protect_primary_owner_app_user` are **`SECURITY INVOKER`** triggers (M6-T05).
 
-Ordinary users may update safe profile fields on their own row per RLS policy.
+Authenticated PostgREST callers **cannot** change:
+
+- `organization_id`
+- `auth_user_id`
+- `status`
+- `membership_status`
+
+Changes to those fields occur only through **trusted paths** (e.g. lifecycle RPCs running as the function owner, where `is_trusted_schema_mutation_role()` applies).
+
+**Historical note:** Early M0 used `user.manage` and `olli.bypass_app_user_guard` on an older trigger shape. Those bypasses are **not** part of the live model after M6-T05.
+
+### Column-limited self-service UPDATE
+
+`authenticated` may `UPDATE` only on `app_user`: `preferred_locale`, `display_name`, `updated_at`, `updated_by` (plus RLS: own row or legacy `user.manage` path on non-sensitive columns — centers normally use profile fields only).
 
 ---
 
@@ -86,11 +120,17 @@ Fixture domain: `@olli.local` — **never use real personal emails.**
 
 | Auth UUID | App user | Org | Role fixture |
 |-----------|----------|-----|--------------|
-| `a1111111-…` | Org A Admin | A | admin (all permissions) |
-| `a2222222-…` | Org A Staff | A | staff (read-only subset) |
-| `b1111111-…` | Org B Admin | B | admin |
-| `b2222222-…` | Org B Staff | B | staff |
+| `a1111111-…` | Org A Admin (primary Owner) | A | `center_manager` canonical |
+| `a2222222-…` | Org A Staff | A | canonical staff template |
+| `b1111111-…` | Org B Admin (primary Owner) | B | `center_manager` canonical |
+| `b2222222-…` | Org B Staff | B | canonical staff template |
 | `c1111111-…` | *(unmapped)* | — | no app_user |
 | `a3333333-…` | Disabled User | A | inactive status |
 
 Defined in `supabase/seed.sql` (development only).
+
+---
+
+## Permission catalog note
+
+`user.read` remains in the global permission catalog but is **not** used by live `app_user` RLS after M6-T02 (Owner/self model + `identity.read` projection RPC). Treat as legacy/orphan for documentation; do not use for new features.

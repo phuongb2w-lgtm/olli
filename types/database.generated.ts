@@ -6184,6 +6184,11 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m6_t06_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m6_t06_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string

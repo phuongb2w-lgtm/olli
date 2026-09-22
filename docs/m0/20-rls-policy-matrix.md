@@ -15,8 +15,8 @@ Helpers/grants: `20260914140300_rls_helpers_and_grants.sql`
 
 | Function | Purpose |
 |----------|---------|
-| `current_app_user_id()` | Active `app_user.id` for `auth.uid()` |
-| `current_organization_id()` | Trusted org from active app_user |
+| `current_app_user_id()` | Usable `app_user.id` for `auth.uid()` (M6-T05: active org, `status = active`, `membership_status = member`) |
+| `current_organization_id()` | Trusted org from usable identity |
 | `has_permission(text)` | Permission code check via role chain |
 | `is_active_app_user()` | Shorthand for resolved active identity |
 
@@ -48,10 +48,10 @@ Legend: **Org** = `organization_id = current_organization_id()` and `is_active_a
 | Table | RLS | anon | auth grant | SELECT | INSERT | UPDATE | Permission(s) | Org rule |
 |-------|-----|------|------------|--------|--------|--------|---------------|----------|
 | `organization` | ✓ | ✗ | S,U | same org | — | same org | `organization.read` / `.update` | own org only |
-| `app_user` | ✓ | ✗ | S,I,U | self or `user.read` | `user.manage` | self* or `user.manage` | `user.*` | same org; trigger guards sensitive fields |
-| `role` | ✓ | ✗ | S,I,U | `role.read` | `role.manage` | `role.manage` | `role.*` | same org |
-| `role_permission` | ✓ | ✗ | S,I,U | `role.read` | `role.manage` | `role.manage` | `role.*` | role must belong to same org |
-| `user_role` | ✓ | ✗ | S,I,U | self or `role.read` | `role.manage` | `role.manage` | `role.*` | same org |
+| `app_user` | ✓ | ✗ | **S**; **UPDATE** limited columns† | self or **`is_primary_owner()`** | **Revoked** | self† or `user.manage`‡ | — | same org; sensitive fields via RPC only |
+| `role` | ✓ | ✗ | **S only** (M6-T02) | `role.read` | **Revoked** | **Revoked** | `role.read` | same org |
+| `role_permission` | ✓ | ✗ | **S only** | `role.read` | **Revoked** | **Revoked** | `role.read` | role in same org |
+| `user_role` | ✓ | ✗ | **S only** | self or `role.read` | **Revoked** | **Revoked** | `role.read` | assignments via RPC |
 | `permission` | ✓ | ✗ | S | `permission.read` | — | — | read-only catalog | global |
 | `observation_indicator` | ✓ | ✗ | S | `observation.read` | — | — | read-only catalog | global |
 | `student` | ✓ | ✗ | S,I,U | `student.read` | `student.create` | `student.update` | student.* | Org |
@@ -79,7 +79,31 @@ Legend: **Org** = `organization_id = current_organization_id()` and `is_active_a
 | `expense_category` | ✓ | ✗ | S,I,U | `expense.read` | `expense.create` | `expense.create` | expense.* | Org |
 | `expense` | ✓ | ✗ | S,I,U | `expense.read` | `expense.create` | `expense.create` | expense.* | Org + category/group triggers |
 
-\* Self-update on `app_user` excludes sensitive fields (see doc 18).
+† **M6-T05 `app_user` UPDATE grant:** `preferred_locale`, `display_name`, `updated_at`, `updated_by` only.
+‡ Legacy `user.manage` RLS path; canonical templates exclude it. Sensitive columns blocked by trigger regardless.
+
+**Historical:** Pre-M6 matrix listed `user.read` on `app_user` SELECT. Live policy uses Owner/self (M6-T02). `user.read` in the permission catalog is legacy/orphan.
+
+---
+
+## M6 — Identity & center administration (current)
+
+Legend unchanged. Migrations: `20260922100000_m6_t02_*`, `20260923100000_m6_t03_*`, `20260925100000_m6_t05_*`.
+
+| Table | RLS FORCE | authenticated GRANT | SELECT | INSERT/UPDATE/DELETE | Notes |
+|-------|-----------|---------------------|--------|----------------------|-------|
+| `organization_entitlement` | ✓ | S | **`is_primary_owner()`** + Org | none | Seat limit / primary Owner pointer |
+| `staff_provisioning_request` | ✓ | S | **`is_primary_owner()`** + Org | none (RPC + `service_role`) | T03 pipeline state |
+| `staff_lifecycle_event` | ✓ | S | **`is_primary_owner()`** + Org | **none** | Append-only via lifecycle RPCs |
+
+**Lifecycle / role graph writes (authenticated EXECUTE, DEFINER authorization):**
+
+- `suspend_staff_member`, `reactivate_staff_member`, `remove_staff_from_center`, `restore_removed_staff`
+- `assign_canonical_staff_role`
+- `begin_staff_provisioning`, `claim_provisioning_auth_execution`
+- `fetch_center_account_administration` (Owner read model including `removed_staff`)
+
+**service_role only (no authenticated EXECUTE):** `finalize_staff_provisioning`, `record_provisioning_auth_created`, compensation markers, `set_primary_owner_for_organization`, `create_staff_membership_record`, internal `_m6_*` helpers.
 
 ---
 
