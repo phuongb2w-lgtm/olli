@@ -66,7 +66,7 @@ test.describe("M6-T04 users administration", () => {
     await expect(
       page.getByText(/staff account created|đã tạo tài khoản nhân sự/i),
     ).toBeVisible({ timeout: 90_000 });
-    await expect(page.getByText(unique)).toBeVisible({ timeout: 45_000 });
+    await expect(page.getByRole("cell", { name: unique })).toBeVisible({ timeout: 45_000 });
   });
 
   test("5. duplicate member maps to localized error", async ({ page }) => {
