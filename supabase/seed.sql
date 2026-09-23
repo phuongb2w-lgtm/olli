@@ -72,6 +72,10 @@ BEGIN
     (v_org_b, 'Olli Test Org B'),
     (v_org_c, 'Olli Test Org C (M6 E2E fixtures)');
 
+  PERFORM public._m7_initialize_organization_subscription(v_org_a, 'active');
+  PERFORM public._m7_initialize_organization_subscription(v_org_b, 'active');
+  PERFORM public._m7_initialize_organization_subscription(v_org_c, 'active');
+
   INSERT INTO app_user (id, organization_id, email, display_name, auth_user_id, status) VALUES
     (v_app_a_admin, v_org_a, 'org-a-admin@olli.local', 'Org A Admin', v_auth_a_admin, 'active'),
     (v_app_a_staff, v_org_a, 'org-a-staff@olli.local', 'Org A Staff', v_auth_a_staff, 'active'),

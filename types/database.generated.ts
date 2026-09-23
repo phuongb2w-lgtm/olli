@@ -1128,6 +1128,36 @@ export type Database = {
           },
         ]
       }
+      commercial_plan: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          name: string
+          staff_limit: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+          staff_limit: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+          staff_limit?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       consultant_revenue_declaration: {
         Row: {
           approved_payment_id: string | null
@@ -3813,30 +3843,43 @@ export type Database = {
       }
       organization_entitlement: {
         Row: {
+          commercial_plan_id: string | null
           created_at: string
           organization_id: string
+          organization_subscription_id: string | null
           primary_app_user_id: string | null
           primary_owner_limit: number
           staff_limit: number
           updated_at: string
         }
         Insert: {
+          commercial_plan_id?: string | null
           created_at?: string
           organization_id: string
+          organization_subscription_id?: string | null
           primary_app_user_id?: string | null
           primary_owner_limit?: number
           staff_limit?: number
           updated_at?: string
         }
         Update: {
+          commercial_plan_id?: string | null
           created_at?: string
           organization_id?: string
+          organization_subscription_id?: string | null
           primary_app_user_id?: string | null
           primary_owner_limit?: number
           staff_limit?: number
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "organization_entitlement_commercial_plan_id_fkey"
+            columns: ["commercial_plan_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_plan"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "organization_entitlement_organization_id_fkey"
             columns: ["organization_id"]
@@ -3845,11 +3888,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "organization_entitlement_organization_subscription_id_fkey"
+            columns: ["organization_subscription_id"]
+            isOneToOne: false
+            referencedRelation: "organization_subscription"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "organization_entitlement_primary_user_fk"
             columns: ["organization_id", "primary_app_user_id"]
             isOneToOne: false
             referencedRelation: "app_user"
             referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      organization_subscription: {
+        Row: {
+          activated_at: string | null
+          cancelled_at: string | null
+          commercial_plan_id: string
+          created_at: string
+          id: string
+          organization_id: string
+          status: string
+          suspended_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string | null
+          cancelled_at?: string | null
+          commercial_plan_id: string
+          created_at?: string
+          id?: string
+          organization_id: string
+          status: string
+          suspended_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string | null
+          cancelled_at?: string | null
+          commercial_plan_id?: string
+          created_at?: string
+          id?: string
+          organization_id?: string
+          status?: string
+          suspended_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_subscription_commercial_plan_id_fkey"
+            columns: ["commercial_plan_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_plan"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_subscription_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -6267,6 +6368,10 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m7_assert_subscription_transition: {
+        Args: { p_from: string; p_to: string }
+        Returns: undefined
+      }
       _m7_assign_center_manager_to_primary_owner: {
         Args: { p_app_user_id: string; p_organization_id: string }
         Returns: string
@@ -6289,8 +6394,46 @@ export type Database = {
         }
         Returns: Json
       }
+      _m7_get_base_commercial_plan_id: { Args: never; Returns: string }
+      _m7_initialize_organization_subscription: {
+        Args: { p_initial_status?: string; p_organization_id: string }
+        Returns: string
+      }
+      _m7_operator_load_subscription: {
+        Args: { p_organization_id: string }
+        Returns: {
+          activated_at: string | null
+          cancelled_at: string | null
+          commercial_plan_id: string
+          created_at: string
+          id: string
+          organization_id: string
+          status: string
+          suspended_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "organization_subscription"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      _m7_operator_resolve_plan: {
+        Args: { p_plan_code: string }
+        Returns: string
+      }
+      _m7_sync_entitlement_from_subscription: {
+        Args: { p_organization_id: string }
+        Returns: undefined
+      }
       _m7_t02_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
       _m7_t02_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m7_t03_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m7_t03_record: {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
@@ -6403,6 +6546,10 @@ export type Database = {
       activate_enrollment_financial_terms: {
         Args: { p_terms_id: string }
         Returns: undefined
+      }
+      activate_organization_subscription: {
+        Args: { p_organization_id: string }
+        Returns: Json
       }
       add_lead_activity: {
         Args: {
@@ -6537,6 +6684,10 @@ export type Database = {
         Args: { p_note?: string; p_trial_id: string }
         Returns: Json
       }
+      cancel_organization_subscription: {
+        Args: { p_organization_id: string }
+        Returns: Json
+      }
       cancel_teaching_session: {
         Args: { p_reason: string; p_session_id: string }
         Returns: string
@@ -6544,6 +6695,10 @@ export type Database = {
       capital_asset_period_month: {
         Args: { p_period_number: number; p_placed_in_service: string }
         Returns: string
+      }
+      change_organization_commercial_plan: {
+        Args: { p_organization_id: string; p_plan_code: string }
+        Returns: Json
       }
       change_session_room: {
         Args: {
@@ -6847,6 +7002,7 @@ export type Database = {
         }[]
       }
       fetch_center_account_administration: { Args: never; Returns: Json }
+      fetch_owner_commercial_status: { Args: never; Returns: Json }
       finalize_center_provisioning: {
         Args: { p_request_id: string }
         Returns: Json
@@ -7384,6 +7540,10 @@ export type Database = {
         Args: { p_capital_asset_id: string; p_through_month: string }
         Returns: number
       }
+      reactivate_organization_subscription: {
+        Args: { p_organization_id: string }
+        Returns: Json
+      }
       reactivate_staff_member: {
         Args: { p_target_user_id: string }
         Returns: Json
@@ -7529,6 +7689,10 @@ export type Database = {
       }
       restore_removed_staff: {
         Args: { p_canonical_role: string; p_target_user_id: string }
+        Returns: Json
+      }
+      resync_organization_entitlement: {
+        Args: { p_organization_id: string }
         Returns: Json
       }
       retire_capital_asset: {
@@ -7868,6 +8032,10 @@ export type Database = {
       sum_pending_consultant_declarations: {
         Args: { p_end_date: string; p_start_date: string }
         Returns: number
+      }
+      suspend_organization_subscription: {
+        Args: { p_organization_id: string }
+        Returns: Json
       }
       suspend_staff_member: {
         Args: { p_target_user_id: string }

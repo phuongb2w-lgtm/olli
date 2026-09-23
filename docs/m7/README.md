@@ -16,7 +16,7 @@ M7 adds the **productization layer** required to provision and operate Olli as a
 |------|----------|--------|
 | M7-T01 | [Commercial readiness audit & design gate](./01-m7-t01-commercial-readiness-audit-design.md) | **Complete** |
 | M7-T02 | [Trusted center + primary Owner provisioning](./02-m7-t02-trusted-center-owner-provisioning.md) | **Complete** |
-| M7-T03 | Subscription & entitlement domain | Planned |
+| M7-T03 | [Subscription & entitlement domain](./03-m7-t03-subscription-entitlement-domain.md) | **Complete** |
 | M7-T04 | Subscription access enforcement | Planned |
 | M7-T05 | Owner onboarding & center setup UX | Planned |
 | M7-T06 | Owner subscription / commercial status UX | Planned |

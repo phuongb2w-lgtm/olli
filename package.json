@@ -21,6 +21,7 @@
     "test:api": "node scripts/api-security-smoke.mjs",
     "test:staff-provisioning": "node scripts/staff-provisioning-smoke.mjs",
     "test:center-provisioning": "node scripts/center-provisioning-smoke.mjs",
+    "test:subscription-commercial": "node scripts/subscription-commercial-smoke.mjs",
     "test:students": "node scripts/student-list-smoke.mjs && node scripts/student-mutations-smoke.mjs",
     "test:guardians": "node scripts/guardian-relationships-smoke.mjs",
     "test:academic": "node scripts/course-class-smoke.mjs",
@@ -47,7 +48,7 @@
     "test:types:stale": "node scripts/check-generated-types.mjs",
     "db:inventory": "node scripts/generate-security-inventory.mjs",
     "test:foundation": "npm run db:verify && npm run test:api && npm run test:app",
-    "verify": "npm run db:verify && npm run test:i18n && npm run test:env && npm run lint && npm run typecheck && npm run build && npm run test:api && npm run test:staff-provisioning && npm run test:center-provisioning && npm run test:students && npm run test:guardians && npm run test:academic && npm run test:enrollments && npm run test:teaching && npm run test:operations && npm run test:session-operations && npm run test:operations-analytics && npm run test:operations-daily && npm run test:session-execution && npm run test:assessments && npm run test:reporting && npm run test:m1-acceptance && npm run test:m3-acceptance && npm run test:crm && npm run test:m5-foundation && npm run test:m5-hardening && npm run test:app"
+    "verify": "npm run db:verify && npm run test:i18n && npm run test:env && npm run lint && npm run typecheck && npm run build && npm run test:api && npm run test:staff-provisioning && npm run test:center-provisioning && npm run test:subscription-commercial && npm run test:students && npm run test:guardians && npm run test:academic && npm run test:enrollments && npm run test:teaching && npm run test:operations && npm run test:session-operations && npm run test:operations-analytics && npm run test:operations-daily && npm run test:session-execution && npm run test:assessments && npm run test:reporting && npm run test:m1-acceptance && npm run test:m3-acceptance && npm run test:crm && npm run test:m5-foundation && npm run test:m5-hardening && npm run test:app"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
