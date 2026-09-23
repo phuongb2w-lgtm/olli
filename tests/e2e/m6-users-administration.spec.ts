@@ -10,7 +10,7 @@ const academicOpsEmail = "m6-t04-academic-ops@olli.local";
 const deniedUsers = [teacherEmail, accountantEmail, consultantEmail, academicOpsEmail];
 
 test.describe("M6-T04 users administration", () => {
-  test.describe.configure({ timeout: 120_000 });
+  test.describe.configure({ mode: "serial", timeout: 120_000 });
 
   test("1. primary Owner sees users nav and workspace", async ({ page }) => {
     await signIn(page, ownerEmail);

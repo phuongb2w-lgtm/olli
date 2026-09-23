@@ -247,7 +247,7 @@
     "actionsColumn": "Thao tác",
     "roleUnknown": "Chưa gán",
     "accessStatus": {
-      "active": "Đang hoạt động",
+      "active": "Truy cập đang hoạt động",
       "inactive": "Tạm ngưng truy cập",
       "locked": "Khóa truy cập"
     },
@@ -304,7 +304,7 @@
       "suspendTitle": "Tạm ngưng truy cập",
       "suspendBody": "Người này sẽ không dùng được Olli khi bị tạm ngưng. Ghế nhân sự vẫn được giữ, nên tạm ngưng không giải phóng hạn mức. Hồ sơ lịch sử được giữ nguyên.",
       "confirmSuspend": "Xác nhận tạm ngưng",
-      "reactivateTitle": "Khôi phục truy cập",
+      "reactivateTitle": "Kích hoạt lại truy cập",
       "reactivateBody": "Người này sẽ dùng lại được Olli. Vai trò và ghế nhân sự không đổi.",
       "confirmReactivate": "Xác nhận kích hoạt lại",
       "removeTitle": "Gỡ khỏi trung tâm",

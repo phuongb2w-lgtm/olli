@@ -304,7 +304,7 @@
       "suspendTitle": "Suspend access",
       "suspendBody": "This person will not be able to use Olli while suspended. Their staff seat stays occupied, so suspension does not free capacity. Historical records remain.",
       "confirmSuspend": "Confirm suspend",
-      "reactivateTitle": "Restore access",
+      "reactivateTitle": "Reactivate access",
       "reactivateBody": "This person will be able to use Olli again. Their role and staff seat stay the same.",
       "confirmReactivate": "Confirm reactivate",
       "removeTitle": "Remove from center",

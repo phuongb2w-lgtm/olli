@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import {
   changeStaffRole,
@@ -34,6 +34,14 @@ function roleLabelKey(role: StaffCanonicalRole): string {
   return map[role];
 }
 
+function panelIdFor(memberId: string, kind: Exclude<ActionKind, null>): string {
+  return `lifecycle-panel-${memberId}-${kind}`;
+}
+
+function panelTitleIdFor(memberId: string, kind: Exclude<ActionKind, null>): string {
+  return `lifecycle-panel-title-${memberId}-${kind}`;
+}
+
 export function StaffLifecycleActions({
   member,
   staffSeatsUsed,
@@ -50,6 +58,15 @@ export function StaffLifecycleActions({
   const [result, setResult] = useState<StaffLifecycleResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (!action) return;
+    const node = document.getElementById(panelIdFor(member.appUserId, action));
+    if (!node) return;
+    const focusTarget =
+      node.querySelector<HTMLElement>("button:not([disabled]), select, [tabindex='0']") ?? node;
+    focusTarget.focus();
+  }, [action, member.appUserId]);
 
   if (variant === "current" && member.accessStatus === "locked") {
     return null;
@@ -77,6 +94,18 @@ export function StaffLifecycleActions({
     });
   };
 
+  const openAction = (kind: Exclude<ActionKind, null>, setup?: () => void) => {
+    setResult(null);
+    setup?.();
+    setAction(kind);
+  };
+
+  const confirmPanelProps = (kind: Exclude<ActionKind, null>) => ({
+    id: panelIdFor(member.appUserId, kind),
+    role: "region" as const,
+    "aria-labelledby": panelTitleIdFor(member.appUserId, kind),
+  });
+
   return (
     <div className="space-y-2" data-testid={testId}>
       {variant === "current" ? (
@@ -84,12 +113,14 @@ export function StaffLifecycleActions({
           <button
             type="button"
             data-testid={includeTestIds ? `action-change-role-${member.email}` : undefined}
+            aria-expanded={action === "changeRole"}
+            aria-controls={
+              action === "changeRole" ? panelIdFor(member.appUserId, "changeRole") : undefined
+            }
             className="rounded border border-slate-300 px-2.5 py-1 text-xs font-medium text-slate-800 hover:bg-slate-50"
-            onClick={() => {
-              setResult(null);
-              setAction("changeRole");
-              setNextRole(member.canonicalRole ?? "teacher");
-            }}
+            onClick={() =>
+              openAction("changeRole", () => setNextRole(member.canonicalRole ?? "teacher"))
+            }
           >
             {t("changeRole")}
           </button>
@@ -97,11 +128,12 @@ export function StaffLifecycleActions({
             <button
               type="button"
               data-testid={includeTestIds ? `action-suspend-${member.email}` : undefined}
+              aria-expanded={action === "suspend"}
+              aria-controls={
+                action === "suspend" ? panelIdFor(member.appUserId, "suspend") : undefined
+              }
               className="rounded border border-slate-300 px-2.5 py-1 text-xs font-medium text-slate-800 hover:bg-slate-50"
-              onClick={() => {
-                setResult(null);
-                setAction("suspend");
-              }}
+              onClick={() => openAction("suspend")}
             >
               {t("suspend")}
             </button>
@@ -110,11 +142,12 @@ export function StaffLifecycleActions({
             <button
               type="button"
               data-testid={includeTestIds ? `action-reactivate-${member.email}` : undefined}
+              aria-expanded={action === "reactivate"}
+              aria-controls={
+                action === "reactivate" ? panelIdFor(member.appUserId, "reactivate") : undefined
+              }
               className="rounded border border-slate-300 px-2.5 py-1 text-xs font-medium text-slate-800 hover:bg-slate-50"
-              onClick={() => {
-                setResult(null);
-                setAction("reactivate");
-              }}
+              onClick={() => openAction("reactivate")}
             >
               {t("reactivate")}
             </button>
@@ -122,11 +155,10 @@ export function StaffLifecycleActions({
           <button
             type="button"
             data-testid={includeTestIds ? `action-remove-${member.email}` : undefined}
+            aria-expanded={action === "remove"}
+            aria-controls={action === "remove" ? panelIdFor(member.appUserId, "remove") : undefined}
             className="rounded border border-red-200 px-2.5 py-1 text-xs font-medium text-red-800 hover:bg-red-50"
-            onClick={() => {
-              setResult(null);
-              setAction("remove");
-            }}
+            onClick={() => openAction("remove")}
           >
             {t("remove")}
           </button>
@@ -135,12 +167,14 @@ export function StaffLifecycleActions({
         <button
           type="button"
           data-testid={includeTestIds ? `action-restore-${member.email}` : undefined}
+          aria-expanded={action === "restore"}
+          aria-controls={
+            action === "restore" ? panelIdFor(member.appUserId, "restore") : undefined
+          }
           className="rounded border border-slate-300 px-2.5 py-1 text-xs font-medium text-slate-800 hover:bg-slate-50"
-          onClick={() => {
-            setResult(null);
-            setAction("restore");
-            setNextRole(member.canonicalRole ?? "teacher");
-          }}
+          onClick={() =>
+            openAction("restore", () => setNextRole(member.canonicalRole ?? "teacher"))
+          }
         >
           {t("restore")}
         </button>
@@ -148,10 +182,13 @@ export function StaffLifecycleActions({
 
       {action === "changeRole" ? (
         <div
+          {...confirmPanelProps("changeRole")}
           className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm"
           data-testid={includeTestIds ? "confirm-change-role" : undefined}
         >
-          <p className="font-medium text-slate-900">{t("changeRoleTitle")}</p>
+          <p id={panelTitleIdFor(member.appUserId, "changeRole")} className="font-medium text-slate-900">
+            {t("changeRoleTitle")}
+          </p>
           <p className="mt-1 text-slate-600">
             {t("changeRoleSummary", {
               current: member.canonicalRole
@@ -165,7 +202,8 @@ export function StaffLifecycleActions({
           </label>
           <select
             id={`role-${member.appUserId}`}
-            className="mt-1 w-full rounded border border-slate-300 px-2 py-1.5 text-sm"
+            disabled={submitting}
+            className="mt-1 w-full rounded border border-slate-300 px-2 py-1.5 text-sm disabled:bg-slate-100"
             value={nextRole}
             onChange={(event) => setNextRole(event.target.value as StaffCanonicalRole)}
           >
@@ -179,6 +217,7 @@ export function StaffLifecycleActions({
             <button
               type="button"
               disabled={submitting}
+              aria-busy={submitting}
               className="rounded bg-slate-900 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
               onClick={() =>
                 run(() =>
@@ -190,6 +229,7 @@ export function StaffLifecycleActions({
             </button>
             <button
               type="button"
+              disabled={submitting}
               className="rounded border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-800"
               onClick={() => setAction(null)}
             >
@@ -201,15 +241,19 @@ export function StaffLifecycleActions({
 
       {action === "suspend" ? (
         <div
+          {...confirmPanelProps("suspend")}
           className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm"
           data-testid={includeTestIds ? "confirm-suspend" : undefined}
         >
-          <p className="font-medium text-amber-950">{t("suspendTitle")}</p>
+          <p id={panelTitleIdFor(member.appUserId, "suspend")} className="font-medium text-amber-950">
+            {t("suspendTitle")}
+          </p>
           <p className="mt-1 text-amber-900">{t("suspendBody")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               disabled={submitting}
+              aria-busy={submitting}
               className="rounded bg-slate-900 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
               onClick={() => run(() => suspendStaff({ appUserId: member.appUserId }))}
             >
@@ -217,6 +261,7 @@ export function StaffLifecycleActions({
             </button>
             <button
               type="button"
+              disabled={submitting}
               className="rounded border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800"
               onClick={() => setAction(null)}
             >
@@ -228,15 +273,19 @@ export function StaffLifecycleActions({
 
       {action === "reactivate" ? (
         <div
+          {...confirmPanelProps("reactivate")}
           className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm"
           data-testid={includeTestIds ? "confirm-reactivate" : undefined}
         >
-          <p className="font-medium text-slate-900">{t("reactivateTitle")}</p>
+          <p id={panelTitleIdFor(member.appUserId, "reactivate")} className="font-medium text-slate-900">
+            {t("reactivateTitle")}
+          </p>
           <p className="mt-1 text-slate-600">{t("reactivateBody")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               disabled={submitting}
+              aria-busy={submitting}
               className="rounded bg-slate-900 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
               onClick={() => run(() => reactivateStaff({ appUserId: member.appUserId }))}
             >
@@ -244,6 +293,7 @@ export function StaffLifecycleActions({
             </button>
             <button
               type="button"
+              disabled={submitting}
               className="rounded border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-800"
               onClick={() => setAction(null)}
             >
@@ -255,15 +305,19 @@ export function StaffLifecycleActions({
 
       {action === "remove" ? (
         <div
+          {...confirmPanelProps("remove")}
           className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm"
           data-testid={includeTestIds ? "confirm-remove" : undefined}
         >
-          <p className="font-medium text-red-950">{t("removeTitle")}</p>
+          <p id={panelTitleIdFor(member.appUserId, "remove")} className="font-medium text-red-950">
+            {t("removeTitle")}
+          </p>
           <p className="mt-1 text-red-900">{t("removeBody")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               disabled={submitting}
+              aria-busy={submitting}
               className="rounded bg-red-800 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
               onClick={() => run(() => removeStaff({ appUserId: member.appUserId }))}
             >
@@ -271,6 +325,7 @@ export function StaffLifecycleActions({
             </button>
             <button
               type="button"
+              disabled={submitting}
               className="rounded border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800"
               onClick={() => setAction(null)}
             >
@@ -282,20 +337,27 @@ export function StaffLifecycleActions({
 
       {action === "restore" ? (
         <div
+          {...confirmPanelProps("restore")}
           className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm"
           data-testid={includeTestIds ? "confirm-restore" : undefined}
         >
-          <p className="font-medium text-slate-900">{t("restoreTitle")}</p>
+          <p id={panelTitleIdFor(member.appUserId, "restore")} className="font-medium text-slate-900">
+            {t("restoreTitle")}
+          </p>
           <p className="mt-1 text-slate-600">
             {t("restoreBody", { used: staffSeatsUsed, limit: staffLimit })}
           </p>
-          <label className="mt-2 block text-xs font-medium text-slate-700" htmlFor={`restore-role-${member.appUserId}`}>
+          <label
+            className="mt-2 block text-xs font-medium text-slate-700"
+            htmlFor={`restore-role-${member.appUserId}`}
+          >
             {t("restoreRoleLabel")}
           </label>
           <select
             id={`restore-role-${member.appUserId}`}
             data-testid={includeTestIds ? `restore-role-${member.email}` : undefined}
-            className="mt-1 w-full rounded border border-slate-300 px-2 py-1.5 text-sm"
+            disabled={submitting}
+            className="mt-1 w-full rounded border border-slate-300 px-2 py-1.5 text-sm disabled:bg-slate-100"
             value={nextRole}
             onChange={(event) => setNextRole(event.target.value as StaffCanonicalRole)}
           >
@@ -309,6 +371,7 @@ export function StaffLifecycleActions({
             <button
               type="button"
               disabled={submitting}
+              aria-busy={submitting}
               className="rounded bg-slate-900 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
               onClick={() =>
                 run(() =>
@@ -323,6 +386,7 @@ export function StaffLifecycleActions({
             </button>
             <button
               type="button"
+              disabled={submitting}
               className="rounded border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-800"
               onClick={() => setAction(null)}
             >
@@ -338,7 +402,7 @@ export function StaffLifecycleActions({
         </p>
       ) : null}
       {result?.ok ? (
-        <p className="text-xs text-emerald-800" data-testid="lifecycle-success">
+        <p className="text-xs text-emerald-800" role="status" data-testid="lifecycle-success">
           {t("success")}
         </p>
       ) : null}

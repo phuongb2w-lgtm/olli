@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCurrentAppUser } from "@/lib/auth/get-identity-state";
+import { requireCenterAccountAdmin } from "@/lib/auth/require-center-account-admin";
 import { mapLifecycleError, type StaffLifecycleErrorCode } from "@/lib/staff-lifecycle/errors";
 import { STAFF_CANONICAL_ROLES, type StaffCanonicalRole } from "@/lib/staff-provisioning/constants";
 import { createClient } from "@/lib/supabase/server";
@@ -19,9 +19,9 @@ function mapRpcError(message: string | undefined): StaffLifecycleErrorCode {
 }
 
 async function requireOwnerSession(): Promise<StaffLifecycleResult | null> {
-  const appUser = await getCurrentAppUser();
-  if (!appUser) {
-    return { ok: false, error: "not_authenticated" };
+  const denial = await requireCenterAccountAdmin();
+  if (denial) {
+    return { ok: false, error: denial };
   }
   return null;
 }

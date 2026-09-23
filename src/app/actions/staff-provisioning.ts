@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCurrentAppUser } from "@/lib/auth/get-identity-state";
+import { requireCenterAccountAdmin } from "@/lib/auth/require-center-account-admin";
 import { STAFF_CANONICAL_ROLES, type StaffCanonicalRole } from "@/lib/staff-provisioning/constants";
 import {
   orchestrateStaffProvisioning,
@@ -22,9 +22,9 @@ export async function provisionStaffAccount(input: {
   idempotencyKey: string;
   preferredLocale?: "vi" | "en";
 }): Promise<ProvisionStaffAccountState> {
-  const appUser = await getCurrentAppUser();
-  if (!appUser) {
-    return { ok: false, error: "not_authenticated" };
+  const denial = await requireCenterAccountAdmin();
+  if (denial) {
+    return { ok: false, error: denial };
   }
 
   if (!isStaffRole(input.canonicalRole)) {
