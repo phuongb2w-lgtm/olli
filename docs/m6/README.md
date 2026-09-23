@@ -19,6 +19,8 @@ M6 turns existing authentication, organization, role, and permission foundations
 
 **M6 — CLOSED / PASS** (T08 milestone closeout). See [08 — acceptance closeout](./08-m6-acceptance-closeout.md).
 
+**Successor milestone:** [M7 — Center onboarding, subscription & commercial readiness](../m7/README.md) (OPEN; T01 design gate).
+
 ## Task sequence
 
 | Task | Focus |
