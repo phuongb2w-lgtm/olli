@@ -407,6 +407,84 @@ export type Database = {
           },
         ]
       }
+      center_provisioning_request: {
+        Row: {
+          auth_created_by_this_request: boolean
+          auth_user_id: string | null
+          created_at: string
+          currency_code: string
+          default_locale: string
+          id: string
+          idempotency_key: string
+          organization_id: string | null
+          organization_name: string
+          owner_app_user_id: string | null
+          owner_display_name: string
+          owner_normalized_email: string
+          owner_preferred_locale: string
+          payload_fingerprint: string
+          result_code: string | null
+          status: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          auth_created_by_this_request?: boolean
+          auth_user_id?: string | null
+          created_at?: string
+          currency_code?: string
+          default_locale?: string
+          id?: string
+          idempotency_key: string
+          organization_id?: string | null
+          organization_name: string
+          owner_app_user_id?: string | null
+          owner_display_name: string
+          owner_normalized_email: string
+          owner_preferred_locale?: string
+          payload_fingerprint: string
+          result_code?: string | null
+          status: string
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          auth_created_by_this_request?: boolean
+          auth_user_id?: string | null
+          created_at?: string
+          currency_code?: string
+          default_locale?: string
+          id?: string
+          idempotency_key?: string
+          organization_id?: string | null
+          organization_name?: string
+          owner_app_user_id?: string | null
+          owner_display_name?: string
+          owner_normalized_email?: string
+          owner_preferred_locale?: string
+          payload_fingerprint?: string
+          result_code?: string | null
+          status?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "center_provisioning_request_org_owner_fk"
+            columns: ["organization_id", "owner_app_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "center_provisioning_request_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       charge: {
         Row: {
           agreed_tuition_snapshot: number | null
@@ -6189,6 +6267,33 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m7_assign_center_manager_to_primary_owner: {
+        Args: { p_app_user_id: string; p_organization_id: string }
+        Returns: string
+      }
+      _m7_center_provisioning_payload_fingerprint: {
+        Args: {
+          p_currency_code: string
+          p_default_locale: string
+          p_organization_name: string
+          p_owner_display_name: string
+          p_owner_email: string
+          p_owner_preferred_locale: string
+          p_timezone: string
+        }
+        Returns: string
+      }
+      _m7_center_provisioning_to_json: {
+        Args: {
+          p_row: Database["public"]["Tables"]["center_provisioning_request"]["Row"]
+        }
+        Returns: Json
+      }
+      _m7_t02_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m7_t02_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -6368,6 +6473,19 @@ export type Database = {
           p_assigned_user_id?: string
           p_lead_id: string
           p_note?: string
+        }
+        Returns: Json
+      }
+      begin_center_provisioning: {
+        Args: {
+          p_currency_code?: string
+          p_default_locale?: string
+          p_idempotency_key: string
+          p_organization_name: string
+          p_owner_display_name: string
+          p_owner_email: string
+          p_owner_preferred_locale?: string
+          p_timezone?: string
         }
         Returns: Json
       }
@@ -6729,6 +6847,10 @@ export type Database = {
         }[]
       }
       fetch_center_account_administration: { Args: never; Returns: Json }
+      finalize_center_provisioning: {
+        Args: { p_request_id: string }
+        Returns: Json
+      }
       finalize_class_financial_scenario: {
         Args: { p_scenario_id: string }
         Returns: Json
@@ -7227,6 +7349,14 @@ export type Database = {
           status: string
         }[]
       }
+      mark_center_provisioning_compensated: {
+        Args: { p_request_id: string }
+        Returns: undefined
+      }
+      mark_center_provisioning_reconciliation_required: {
+        Args: { p_request_id: string; p_result_code: string }
+        Returns: undefined
+      }
       mark_lead_trial_no_show: {
         Args: { p_note?: string; p_trial_id: string }
         Returns: Json
@@ -7272,6 +7402,14 @@ export type Database = {
       }
       recognize_teaching_session_revenue: {
         Args: { p_teaching_session_id: string }
+        Returns: Json
+      }
+      record_center_provisioning_auth_created: {
+        Args: {
+          p_auth_created_by_this_request?: boolean
+          p_auth_user_id: string
+          p_request_id: string
+        }
         Returns: Json
       }
       record_payment: {
