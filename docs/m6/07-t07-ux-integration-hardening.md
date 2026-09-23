@@ -57,7 +57,7 @@ Full `npm run verify` exit **0** on closeout:
 
 - Auth ban/disable UI, Owner transfer, audit UI, teacher sync, legacy `user.read` removal.
 - Modal dialog refactor for confirmations (inline regions retained).
-- M6 milestone closeout (M6-T08).
+- M6 milestone closeout — completed in M6-T08.
 
 ## Final T07 verdict
 

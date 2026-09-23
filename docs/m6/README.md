@@ -14,10 +14,10 @@ M6 turns existing authentication, organization, role, and permission foundations
 | M6-T04 | [Owner `/users` administration workspace](./04-t04-users-administration-workspace.md) | **Complete** (pending owner acceptance) |
 | M6-T05 | [Staff lifecycle & history](./05-t05-staff-lifecycle-and-history.md) | **Complete** (pending owner acceptance) |
 | M6-T06 | [Security & organization-isolation hardening](./06-t06-security-isolation-hardening.md) | **Complete** (pending owner acceptance) |
-| M6-T07 | [UX, i18n, integration & regression hardening](./07-t07-ux-integration-hardening.md) | **Complete** (pending owner acceptance) |
-| M6-T08 | Final acceptance & milestone closeout | Not started |
+| M6-T07 | [UX, i18n, integration & regression hardening](./07-t07-ux-integration-hardening.md) | **Complete** |
+| M6-T08 | [Final acceptance & milestone closeout](./08-m6-acceptance-closeout.md) | **Complete** |
 
-**M6 — OPEN** (T07 product hardening complete). M6-T08 owns milestone closeout.
+**M6 — CLOSED / PASS** (T08 milestone closeout). See [08 — acceptance closeout](./08-m6-acceptance-closeout.md).
 
 ## Task sequence
 

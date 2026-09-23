@@ -13,6 +13,23 @@ async function readSeatUsage(page: Page): Promise<{ used: number; limit: number 
   return { used: Number(match[1]), limit: Number(match[2]) };
 }
 
+async function provisionStaffUntilSeatCount(
+  page: Page,
+  email: string,
+  displayName: string,
+): Promise<void> {
+  const before = await readSeatUsage(page);
+  await page.locator("#staff-email").fill(email);
+  await page.locator("#staff-display-name").fill(displayName);
+  const submit = page.getByRole("button", { name: /create staff|tạo tài khoản nhân sự/i });
+  await expect(submit).toBeEnabled({ timeout: 30_000 });
+  await submit.click();
+  await expect(
+    page.getByText(/staff account created|đã tạo tài khoản nhân sự/i),
+  ).toBeVisible({ timeout: 90_000 });
+  await expect.poll(async () => (await readSeatUsage(page)).used).toBe(before.used + 1);
+}
+
 async function provisionLifecycleStaff(page: Page, email: string): Promise<void> {
   await page.locator("#staff-email").fill(email);
   await page.locator("#staff-display-name").fill("M6 T05 Lifecycle");
@@ -173,22 +190,10 @@ test.describe("M6-T05 staff lifecycle", () => {
       const { used, limit } = await readSeatUsage(page);
       if (used >= limit - 1) break;
       const unique = `m6-t07-fill-${Date.now()}-${i}@olli.local`;
-      await page.locator("#staff-email").fill(unique);
-      await page.locator("#staff-display-name").fill(`Fill ${i}`);
-      const submit = page.getByRole("button", { name: /create staff|tạo tài khoản nhân sự/i });
-      if (await submit.isDisabled()) break;
-      await submit.click();
-      await expect(
-        page.getByText(/staff account created|đã tạo tài khoản nhân sự/i),
-      ).toBeVisible({ timeout: 90_000 });
+      await provisionStaffUntilSeatCount(page, unique, `Fill ${i}`);
     }
 
-    await page.locator("#staff-email").fill(victimEmail);
-    await page.locator("#staff-display-name").fill("M6 T07 Removed Victim");
-    await page.getByRole("button", { name: /create staff|tạo tài khoản nhân sự/i }).click();
-    await expect(
-      page.getByText(/staff account created|đã tạo tài khoản nhân sự/i),
-    ).toBeVisible({ timeout: 90_000 });
+    await provisionStaffUntilSeatCount(page, victimEmail, "M6 T07 Removed Victim");
     await expect(page.getByTestId(`staff-row-${victimEmail}`)).toBeVisible({ timeout: 45_000 });
 
     const row = page.getByTestId(`staff-row-${victimEmail}`);
@@ -200,14 +205,7 @@ test.describe("M6-T05 staff lifecycle", () => {
       const { used, limit } = await readSeatUsage(page);
       if (used >= limit) break;
       const unique = `m6-t07-refill-${Date.now()}-${i}@olli.local`;
-      await page.locator("#staff-email").fill(unique);
-      await page.locator("#staff-display-name").fill(`Refill ${i}`);
-      const submit = page.getByRole("button", { name: /create staff|tạo tài khoản nhân sự/i });
-      if (await submit.isDisabled()) break;
-      await submit.click();
-      await expect(
-        page.getByText(/staff account created|đã tạo tài khoản nhân sự/i),
-      ).toBeVisible({ timeout: 90_000 });
+      await provisionStaffUntilSeatCount(page, unique, `Refill ${i}`);
     }
 
     const seatsFull = await readSeatUsage(page);
