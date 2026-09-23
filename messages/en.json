@@ -19,6 +19,27 @@
     "noOrganization": "No organization could be resolved for this account.",
     "contactAdmin": "Contact an administrator for assistance."
   },
+  "commercial": {
+    "restrictedLabel": "Commercial access",
+    "ownerTitle": "Subscription status",
+    "ownerContact": "Contact Olli support or your account operator if you believe this status is incorrect.",
+    "plan": "Plan",
+    "subscriptionStatus": "Subscription",
+    "seats": "Staff seats",
+    "organizationStatus": "Organization",
+    "statusProvisioning": "This center is being set up. Normal Olli workspaces stay unavailable until your subscription is activated.",
+    "statusSuspended": "This center’s subscription is suspended. Operational data is preserved, but normal Olli use is unavailable until reactivation.",
+    "statusCancelled": "This center’s subscription has been cancelled. You can review status here, but normal Olli workspaces remain unavailable.",
+    "statusMissing": "No commercial subscription was found for this center. Normal Olli use is unavailable until subscription is configured.",
+    "statusRestricted": "Commercial access to normal Olli workspaces is currently unavailable for this center.",
+    "staffTitle": "Workspace unavailable",
+    "staffProvisioning": "This center is not active yet. Staff workspace access will open after the primary owner completes commercial activation.",
+    "staffSuspended": "This center’s subscription is suspended. Staff cannot use normal Olli workspaces until the center is reactivated.",
+    "staffCancelled": "This center’s subscription has been cancelled. Staff workspace access remains unavailable.",
+    "staffMissing": "This center has no active commercial subscription. Staff workspace access is unavailable.",
+    "staffRestricted": "Normal Olli workspace access is unavailable for this center.",
+    "staffContactOwner": "Contact your center’s primary owner or operator for assistance."
+  },
   "shell": {
     "organization": "Organization",
     "account": "Account",

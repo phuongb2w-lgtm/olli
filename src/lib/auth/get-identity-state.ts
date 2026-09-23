@@ -1,5 +1,24 @@
 import { createClient } from "@/lib/supabase/server";
-import type { AppUserContext, IdentityState } from "@/types/app-user";
+import { parseSessionCommercialAccess } from "@/lib/auth/session-commercial-access";
+import type {
+  AppUserContext,
+  IdentityState,
+  OrganizationSubscriptionStatus,
+} from "@/types/app-user";
+
+function parseSubscriptionStatus(
+  value: string | null | undefined,
+): OrganizationSubscriptionStatus | "missing" {
+  if (
+    value === "provisioning" ||
+    value === "active" ||
+    value === "suspended" ||
+    value === "cancelled"
+  ) {
+    return value;
+  }
+  return "missing";
+}
 
 export async function getIdentityState(): Promise<IdentityState> {
   const supabase = await createClient();
@@ -51,7 +70,26 @@ export async function getIdentityState(): Promise<IdentityState> {
     status: appUserRow.status as AppUserContext["status"],
   };
 
-  return { kind: "active", appUser };
+  const { data: commercialAccess, error: commercialError } = await supabase.rpc(
+    "fetch_session_commercial_access",
+  );
+
+  if (commercialError) {
+    throw commercialError;
+  }
+
+  const sessionAccess = parseSessionCommercialAccess(commercialAccess);
+  const allowsNormalUse = sessionAccess.allows_normal_use === true;
+  if (allowsNormalUse) {
+    return { kind: "active", appUser };
+  }
+
+  return {
+    kind: "commercially_restricted",
+    appUser,
+    subscriptionStatus: parseSubscriptionStatus(sessionAccess.subscription_status),
+    isPrimaryOwner: sessionAccess.is_primary_owner === true,
+  };
 }
 
 export async function getCurrentAppUser(): Promise<AppUserContext | null> {

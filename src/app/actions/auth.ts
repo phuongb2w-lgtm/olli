@@ -2,6 +2,11 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import {
+  COMMERCIAL_ACCESS_PATH,
+  SUBSCRIPTION_STATUS_PATH,
+} from "@/lib/auth/commercial-access-paths";
+import { parseSessionCommercialAccess } from "@/lib/auth/session-commercial-access";
 import { isValidLocale, LOCALE_COOKIE } from "@/i18n/config";
 import { cookies } from "next/headers";
 
@@ -43,6 +48,20 @@ export async function signIn(
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 365,
     });
+  }
+
+  const { data: commercialAccess, error: commercialError } = await supabase.rpc(
+    "fetch_session_commercial_access",
+  );
+  if (!commercialError) {
+    const sessionAccess = parseSessionCommercialAccess(commercialAccess);
+    if (sessionAccess.allows_normal_use === false) {
+      redirect(
+        sessionAccess.is_primary_owner === true
+          ? SUBSCRIPTION_STATUS_PATH
+          : COMMERCIAL_ACCESS_PATH,
+      );
+    }
   }
 
   redirect("/");

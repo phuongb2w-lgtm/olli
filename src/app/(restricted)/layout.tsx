@@ -1,20 +1,14 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { AccessDenied } from "@/components/access-denied";
-import { AppShell } from "@/components/app-shell";
-import { commercialRestrictedPath } from "@/lib/auth/commercial-access-paths";
+import { RestrictedShell } from "@/components/restricted-shell";
 import { getIdentityState } from "@/lib/auth/get-identity-state";
-import {
-  APP_NAV_ITEMS,
-  filterNavItemsByPermissions,
-} from "@/lib/navigation/app-navigation";
-import { loadUserPermissions } from "@/lib/navigation/load-user-permissions";
 import { isValidLocale, LOCALE_COOKIE } from "@/i18n/config";
 import { resolveLocale } from "@/i18n/resolve-locale";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProtectedLayout({
+export default async function RestrictedLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const identity = await getIdentityState();
@@ -23,11 +17,11 @@ export default async function ProtectedLayout({
     redirect("/login");
   }
 
-  if (identity.kind === "commercially_restricted") {
-    redirect(commercialRestrictedPath(identity));
+  if (identity.kind === "active") {
+    redirect("/");
   }
 
-  if (identity.kind !== "active") {
+  if (identity.kind !== "commercially_restricted") {
     return <AccessDenied reason={identity.kind} />;
   }
 
@@ -42,14 +36,5 @@ export default async function ProtectedLayout({
     });
   }
 
-  const permissions = await loadUserPermissions();
-  const navItems = filterNavItemsByPermissions(APP_NAV_ITEMS, permissions).map(
-    (item) => ({ key: item.key, href: item.href }),
-  );
-
-  return (
-    <AppShell appUser={identity.appUser} navItems={navItems}>
-      {children}
-    </AppShell>
-  );
+  return <RestrictedShell appUser={identity.appUser}>{children}</RestrictedShell>;
 }

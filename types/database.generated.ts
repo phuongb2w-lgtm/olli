@@ -6437,6 +6437,12 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m7_t04_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m7_t04_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _m7_t04_seed_auth: { Args: { p_auth: string }; Returns: string }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -6610,6 +6616,10 @@ export type Database = {
           p_terms_id: string
         }
         Returns: string
+      }
+      assert_organization_commercially_entitled: {
+        Args: never
+        Returns: undefined
       }
       assign_canonical_staff_role: {
         Args: { p_canonical_code: string; p_target_user_id: string }
@@ -7003,6 +7013,7 @@ export type Database = {
       }
       fetch_center_account_administration: { Args: never; Returns: Json }
       fetch_owner_commercial_status: { Args: never; Returns: Json }
+      fetch_session_commercial_access: { Args: never; Returns: Json }
       finalize_center_provisioning: {
         Args: { p_request_id: string }
         Returns: Json
@@ -7287,6 +7298,9 @@ export type Database = {
         Args: { p_class_id: string }
         Returns: boolean
       }
+      is_operational_primary_owner: { Args: never; Returns: boolean }
+      is_operationally_active_app_user: { Args: never; Returns: boolean }
+      is_organization_commercially_entitled: { Args: never; Returns: boolean }
       is_owner_only_permission: { Args: { p_code: string }; Returns: boolean }
       is_primary_owner: { Args: never; Returns: boolean }
       is_same_organization_app_user: {
@@ -7531,6 +7545,10 @@ export type Database = {
       normalize_recognition_basis_code: {
         Args: { p_code: string }
         Returns: string
+      }
+      organization_subscription_allows_normal_use: {
+        Args: { p_organization_id: string }
+        Returns: boolean
       }
       payment_allocated_amount: {
         Args: { p_payment_id: string }
