@@ -11,7 +11,7 @@ Legend: **S** schema, **P** product code, **I** infrastructure, **D** docs/runbo
 | ID | Current behavior | Production risk | Remediation | Task | Layers |
 |----|------------------|-----------------|-------------|------|--------|
 | **B-01** | No hosting/deploy config in repository | Application cannot ship | Select host; add deploy pipeline + env injection | M8-T03 | I, D |
-| **B-02** | No linked Supabase production project documented | No authoritative DB/Auth | Create project; `db push` 58 migrations; lint | M8-T02 | I, D |
+| **B-02** | ~~No linked Supabase production project documented~~ | No authoritative DB/Auth until RIUDA runs Cloud acceptance | Repo workflow: [11 — Operator procedure](./11-supabase-production-operator-procedure.md); **`npm run db:production:*`** | **M8-T02 done (cloud pending)** | I, D |
 | **B-03** | Center provision creates Auth user without password; no reset UI | Owner cannot log in after provision | Invite + SMTP or reset flow or operator password SOP | M8-T04 | P, D, I |
 | **B-04** | Staff provisioning defaults to email invite; local disables via env | Staff never receive credentials if SMTP missing | Configure Supabase SMTP; verify invite redirect | M8-T04 | I, D |
 | **B-05** | Subscription activate/suspend only in test smokes, no operator CLI doc | Centers stuck in `provisioning` | Operator script/runbook wrapping service_role RPCs | M8-T08 | D, P |

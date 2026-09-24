@@ -5,7 +5,7 @@
 
 | Task | Title | Primary deliverables | Acceptance |
 |------|--------|----------------------|------------|
-| **M8-T02** | Supabase production project & migration pipeline | Cloud project; `supabase link`; documented `db push` + lint; staging DB | 58 migrations applied; no seed; lint clean |
+| **M8-T02** | Supabase production project & migration pipeline | **Done (repo):** [11 — Operator procedure](./11-supabase-production-operator-procedure.md), `db:production:*` scripts, `.env.production.example` | **Cloud acceptance:** 58 migrations applied; no seed; lint + smoke clean on linked project |
 | **M8-T03** | Application hosting & deploy topology | Host choice; deploy config; staging URL; build env wiring | Staging serves `next build` artifact; secrets server-only |
 | **M8-T04** | Domain, TLS, Auth & mail | `olli.riuda.click` DNS; Supabase Site URL/redirects; SMTP; Owner first-login policy | Owner + staff auth paths work on staging |
 | **M8-T05** | Environment & secrets hardening | `.env.production.example`; `OLLI_*` docs; cross-platform `test:env`; key rotation SOP | `test:env` pass; no secret in client bundle |

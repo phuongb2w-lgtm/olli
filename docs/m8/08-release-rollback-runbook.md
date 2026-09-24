@@ -9,7 +9,8 @@ All must pass on release commit:
 | Gate | Command / check |
 |------|-----------------|
 | Branch | `main` (or release tag) |
-| Migrations | Count matches released tag (**58** at M8-T01 baseline unless release adds migrations) |
+| Migrations | Count matches released tag (**58** at M8-T01 baseline unless release adds migrations); `npm run db:migrations:count` |
+| Pre-deploy DB gate | `npm run db:production:predeploy-gate` (local); optional `OLLI_PREDEPLOY_INCLUDE_REMOTE=1` |
 | Full local verify | `npm run verify` exit 0 |
 | Secrets audit | `npm run test:env` |
 | Types | `npm run test:types:stale` (local against matching schema) |
@@ -23,8 +24,8 @@ All must pass on release commit:
 
 1. Announce maintenance window if migration locks heavy tables (review migration SQL).
 2. **Backup** — manual Supabase snapshot (even if daily backups exist).
-3. `supabase link` + `supabase db push` (or approved pipeline) from release tag.
-4. `supabase db lint` on linked project.
+3. Follow [11 — Supabase production operator procedure](./11-supabase-production-operator-procedure.md): link verify → migration status → dry-run → **`npm run db:production:migration-deploy`** from release tag.
+4. **`npm run db:production:smoke`** on linked project (lint included in deploy script).
 5. If types changed: regenerate `--linked`, commit already done in tag — verify hash.
 6. Proceed to app deploy only if DB step succeeds.
 

@@ -15,8 +15,16 @@
 | `POSTGRES_*` | Scripts only | `scripts/db-verify.ps1` generic Postgres path | Not used by Next.js app |
 | `DOCKER_VERIFY_PORT` | Scripts only | Generic DB verify | Local Docker Postgres |
 | `CI` | CI | GitHub Actions | Playwright retries / forbidOnly |
+| `OLLI_SUPABASE_PROJECT_REF` | Operator-only | Cloud DB deploy / verify scripts | Must match `<ref>` in `NEXT_PUBLIC_SUPABASE_URL` |
+| `OLLI_EXPECTED_MIGRATION_COUNT` | Operator-only | Pre-deploy gate | Defaults to current repo migration file count |
+| `OLLI_RELEASE_GIT_SHA` | Operator-only | Pre-deploy gate | Optional pin to release commit |
+| `OLLI_CONFIRM_PRODUCTION_DEPLOY` | Operator-only | **`db:production:migration-deploy` only** | Must be `yes` to apply Cloud migrations |
+| `OLLI_PREDEPLOY_INCLUDE_REMOTE` | Operator-only | Pre-deploy gate | `1` = run Cloud env/link/status checks |
+| `SUPABASE_ACCESS_TOKEN` | CI/CD-only | Non-interactive `supabase login` | Never in client bundle or git |
 
 **Not canonical:** `NEXT_PUBLIC_SUPABASE_ANON_KEY` (use publishable key naming per M0-T05).
+
+**Production template (M8-T02):** [`.env.production.example`](../../.env.production.example) — placeholders only; real values in host/CI secret store.
 
 **Legacy script aliases:** Smokes accept `SECRET_KEY` from `supabase status -o env` when `SUPABASE_SECRET_KEY` unset — **production operators must set `SUPABASE_SECRET_KEY` explicitly** on the app host and in CI secrets for any remote smoke job.
 
@@ -59,5 +67,5 @@ OLLI_STAFF_PROVISION_USE_INVITE=true # default; omit = invite path
 | Gap | Remediation task |
 |-----|------------------|
 | `.env.example` omits `OLLI_STAFF_PROVISION_USE_INVITE` | M8-T05 — document in example with production default comment |
-| No staging/production env template file | M8-T05 — add `.env.production.example` (placeholders only) |
+| ~~No staging/production env template file~~ | **Addressed M8-T02** — `.env.production.example`; further hardening in M8-T05 |
 | Remote smokes not wired in CI | M8-T09 — optional workflow job with secrets |

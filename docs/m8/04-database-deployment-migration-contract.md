@@ -1,6 +1,7 @@
 # M8 — Database Deployment & Migration Contract
 
-**Baseline (M8-T01):** 58 migration files in `supabase/migrations/` — **do not change count in T01**.
+**Baseline (M8-T01):** 58 migration files in `supabase/migrations/`.  
+**M8-T02:** Executable operator workflow — [11 — Supabase production operator procedure](./11-supabase-production-operator-procedure.md).
 
 ## Source of truth
 
@@ -13,12 +14,13 @@
 
 1. Create empty Supabase Cloud project (Postgres **15** to match `[db] major_version = 15`).
 2. Link CLI: `supabase link --project-ref <ref>` (operator).
-3. Apply migrations: `supabase db push` **or** `supabase migration up` per Supabase CLI policy — **same ordered set as local**.
-4. Verify: `supabase db lint` on linked project (M8-T02 acceptance).
-5. Regenerate types from **linked** project for release tag:  
-   `supabase gen types typescript --linked > types/database.generated.ts`  
+3. Apply migrations: **`npm run db:production:migration-deploy`** (wraps `supabase db push --linked --yes` without seed) after `OLLI_CONFIRM_PRODUCTION_DEPLOY=yes` and identity checks — **same ordered set as local**.
+4. Verify: `supabase db lint --linked --fail-on error` (included in deploy script) + **`npm run db:production:smoke`**.
+5. Regenerate types from **linked** project when schema changed on release:  
+   **`npm run db:types:linked`** (`supabase gen types typescript --linked > types/database.generated.ts`)  
    Commit types only when schema changed; `test:types:stale` remains local-dev gate.
-6. **Do not** run `supabase db reset` on production.
+6. **Do not** run `supabase db reset` or `npm run db:reset` on production/staging Cloud projects.
+7. **Do not** use `supabase db push --include-seed` against Cloud.
 
 ## Bootstrap data (production)
 
@@ -39,15 +41,24 @@ Per M6/M7 docs — no manual SQL for cost groups, CRM reference catalogs, entitl
 |--------------|----------|
 | Push fails mid-chain | **Stop deploy.** Do not run app against partial schema. Fix forward migration or restore DB snapshot (see backup contract). |
 | Lint errors | Block release; fix SQL in new migration (avoid editing applied remote history). |
-| Drift (manual Dashboard SQL) | Treat as incident; compare `supabase db diff` / pull; reconcile via new migration |
+| Drift (manual Dashboard SQL) | Treat as incident; **`npm run db:production:drift-check`**; reconcile via new migration — never silent Dashboard fix |
 
 ## Schema drift detection
 
 | Method | When |
 |--------|------|
 | `npm run test:types:stale` | Dev/CI — local DB vs committed types |
-| `supabase db lint` | Pre-push and CI |
-| Optional M8-T10 | Scheduled `db diff` against production linked ref |
+| `supabase db lint --linked` | After Cloud push (deploy script) |
+| `npm run db:production:drift-check` | Operator investigation (`supabase db diff --linked`) |
+| Optional M8-T10 | Scheduled drift check on production linked ref |
+
+## Pre-deploy gate (repository)
+
+**`npm run db:production:predeploy-gate`** — clean tree, migration count, `test:env`, `test:types:stale`, full local `db:verify`. Set `OLLI_PREDEPLOY_INCLUDE_REMOTE=1` to add Cloud link/status checks when credentials exist.
+
+## Migration inventory
+
+Count files: **`npm run db:migrations:count`** (must match release expectation, default 58 at T02).
 
 ## Local vs production verification
 
