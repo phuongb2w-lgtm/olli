@@ -5,11 +5,18 @@ import {
 } from "@/lib/auth/commercial-access-paths";
 import type { SessionCommercialAccess } from "@/lib/auth/session-commercial-access";
 
+/** UX-only: Primary Owner must finish onboarding before other restricted surfaces. */
+export function sessionRequiresOnboardingRedirect(
+  sessionAccess: SessionCommercialAccess,
+): boolean {
+  return sessionAccess.requires_center_setup === true;
+}
+
 /** Post-login and layout-adjacent UX routing (not authorization). */
 export function resolveAuthenticatedLandingPath(
   sessionAccess: SessionCommercialAccess,
 ): string {
-  if (sessionAccess.requires_center_setup === true) {
+  if (sessionRequiresOnboardingRedirect(sessionAccess)) {
     return ONBOARDING_PATH;
   }
 

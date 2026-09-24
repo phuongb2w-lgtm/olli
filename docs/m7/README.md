@@ -20,8 +20,8 @@ M7 adds the **productization layer** required to provision and operate Olli as a
 | M7-T04 | [Commercial access enforcement](./04-m7-t04-commercial-access-enforcement.md) | **Complete** |
 | M7-T04.1 | [Regression stabilization](./04.1-m7-t04-regression-stabilization.md) | **Complete** |
 | M7-T05 | [Owner subscription / commercial status UX](./05-m7-t05-owner-subscription-commercial-status-ux.md) | **Complete** |
-| M7-T06 | Owner onboarding & center setup UX | Implemented |
-| M7-T07 | Integration, security & production hardening | Planned |
+| M7-T06 | Owner onboarding & center setup UX | **Complete** |
+| M7-T07 | [Integration & production hardening](./07-m7-t07-integration-hardening.md) | **Complete** |
 | M7-T08 | Final acceptance & milestone closeout | Planned |
 
 ## Task sequence
@@ -40,6 +40,10 @@ M7 adds the **productization layer** required to provision and operate Olli as a
 ## Foundation document (T01)
 
 - [01 — M7-T01 audit & design report](./01-m7-t01-commercial-readiness-audit-design.md)
+
+## Integration contract (T07)
+
+- [06 — Commercialization milestone contract](./06-m7-commercialization-milestone-contract.md)
 
 ## Related contracts (preserved)
 

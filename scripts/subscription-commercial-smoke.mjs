@@ -112,6 +112,13 @@ async function main() {
       .single();
     record(4, "new center subscription starts provisioning", subBefore?.status === "provisioning");
 
+    const { data: orgRow } = await svc
+      .from("organization")
+      .select("setup_completed_at")
+      .eq("id", tempOrgId)
+      .single();
+    record(7, "new center starts with setup incomplete", orgRow?.setup_completed_at == null);
+
     const { error: actErr } = await svc.rpc("activate_organization_subscription", {
       p_organization_id: tempOrgId,
     });
