@@ -22,7 +22,9 @@ M7 adds the **productization layer** required to provision and operate Olli as a
 | M7-T05 | [Owner subscription / commercial status UX](./05-m7-t05-owner-subscription-commercial-status-ux.md) | **Complete** |
 | M7-T06 | Owner onboarding & center setup UX | **Complete** |
 | M7-T07 | [Integration & production hardening](./07-m7-t07-integration-hardening.md) | **Complete** |
-| M7-T08 | Final acceptance & milestone closeout | Planned |
+| M7-T08 | [Final acceptance & milestone closeout](./08-m7-t08-final-milestone-closeout.md) | **Complete** |
+
+**M7 — COMMERCIALIZATION / SUBSCRIPTION — CLOSED / PASS** (T08 milestone closeout). See [08 — final acceptance closeout](./08-m7-t08-final-milestone-closeout.md).
 
 ## Task sequence
 

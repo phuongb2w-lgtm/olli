@@ -80,6 +80,7 @@ Existing production/dev fixture orgs from seed/backfill receive `setup_completed
 | T05 | `m7_t05_owner_subscription_status_ux_tests.sql`, subscription E2E |
 | T06 | `m7_t06_owner_onboarding_center_setup_tests.sql`, onboarding E2E |
 | T07 | `m7_t07_commercialization_integration_tests.sql`, integration E2E, full `npm run verify` |
+| T08 | [Final acceptance matrix & closeout](./08-m7-t08-final-milestone-closeout.md), full `npm run verify` |
 
 ## Deferred (post-M7)
 
