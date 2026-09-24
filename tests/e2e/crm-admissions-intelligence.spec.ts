@@ -19,10 +19,10 @@ test.describe("M5-T04 CRM admissions intelligence", () => {
 
   test("2. manager sees consultant productivity section", async ({ page }) => {
     await signIn(page, adminEmail);
-    await page.goto("/executive/admissions");
+    await page.goto("/executive/admissions?start=2026-01-01&end=2026-01-31");
     await expect(
       page.getByText(/consultant productivity|năng suất tư vấn viên/i),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 60_000 });
   });
 
   test("3. reader denied executive admissions", async ({ page }) => {

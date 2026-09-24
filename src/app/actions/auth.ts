@@ -2,11 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import {
-  COMMERCIAL_ACCESS_PATH,
-  SUBSCRIPTION_STATUS_PATH,
-} from "@/lib/auth/commercial-access-paths";
 import { parseSessionCommercialAccess } from "@/lib/auth/session-commercial-access";
+import { resolveAuthenticatedLandingPath } from "@/lib/auth/resolve-authenticated-landing";
 import { isValidLocale, LOCALE_COOKIE } from "@/i18n/config";
 import { cookies } from "next/headers";
 
@@ -55,13 +52,7 @@ export async function signIn(
   );
   if (!commercialError) {
     const sessionAccess = parseSessionCommercialAccess(commercialAccess);
-    if (sessionAccess.allows_normal_use === false) {
-      redirect(
-        sessionAccess.is_primary_owner === true
-          ? SUBSCRIPTION_STATUS_PATH
-          : COMMERCIAL_ACCESS_PATH,
-      );
-    }
+    redirect(resolveAuthenticatedLandingPath(sessionAccess));
   }
 
   redirect("/");

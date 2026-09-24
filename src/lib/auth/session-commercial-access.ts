@@ -5,7 +5,25 @@ export type SessionCommercialAccess = {
   allows_normal_use?: boolean;
   subscription_status?: string | null;
   is_primary_owner?: boolean;
+  requires_center_setup?: boolean;
+  setup_completed?: boolean;
 };
+
+export type OwnerCenterSetupPayload = {
+  organization_id?: string;
+  name?: string;
+  default_locale?: string;
+  timezone?: string;
+  preferred_locale?: string;
+  subscription_status?: string | null;
+};
+
+export function parseOwnerCenterSetup(data: Json | null): OwnerCenterSetupPayload | null {
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    return null;
+  }
+  return data as OwnerCenterSetupPayload;
+}
 
 export function parseSessionCommercialAccess(data: Json | null): SessionCommercialAccess {
   if (!data || typeof data !== "object" || Array.isArray(data)) {

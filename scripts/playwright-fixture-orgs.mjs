@@ -191,6 +191,9 @@ export function restoreFixtureOrgCommercialState() {
     runPsql(
       `UPDATE public.organization_subscription SET status = 'active', activated_at = COALESCE(activated_at, now()), suspended_at = NULL, cancelled_at = NULL WHERE organization_id = '${orgId}';`,
     );
+    runPsql(
+      `UPDATE public.organization SET setup_completed_at = COALESCE(setup_completed_at, now()) WHERE id = '${orgId}';`,
+    );
   }
 
   runPsql(

@@ -381,6 +381,39 @@
     "organizationFoundation": "Cài đặt tổ chức (placeholder nền tảng).",
     "rolesFoundation": "Cấu hình vai trò và quyền (placeholder nền tảng)."
   },
+  "onboarding": {
+    "title": "Thiết lập trung tâm",
+    "intro": "Xác nhận một vài thông tin trung tâm trước khi dùng Olli. Bạn có thể chỉnh sau trong cài đặt khi phần hồ sơ tổ chức được bổ sung.",
+    "provisioningNotice": "Gói đăng ký trung tâm vẫn đang được kích hoạt. Hoàn tất thiết lập này trước; không gian làm việc đầy đủ sẽ mở khi gói được kích hoạt.",
+    "submit": "Hoàn tất thiết lập",
+    "submitting": "Đang lưu…",
+    "unauthorized": "Chỉ chủ sở hữu chính mới có thể hoàn tất thiết lập trung tâm.",
+    "commercialRestricted": "Không thể thiết lập trung tâm khi gói đăng ký bị tạm ngưng hoặc đã hủy. Xem trạng thái thương mại để biết bước tiếp theo.",
+    "alreadyComplete": "Thiết lập trung tâm đã hoàn tất.",
+    "loadError": "Không thể tải thiết lập trung tâm. Thử lại hoặc liên hệ hỗ trợ nếu lỗi tiếp diễn.",
+    "viewSubscriptionStatus": "Xem trạng thái đăng ký",
+    "fields": {
+      "centerName": "Tên hiển thị trung tâm",
+      "defaultLocale": "Ngôn ngữ mặc định của trung tâm",
+      "timezone": "Múi giờ",
+      "timezoneHint": "Dùng cho lịch và báo cáo (tên IANA, ví dụ Asia/Ho_Chi_Minh).",
+      "yourLanguage": "Ngôn ngữ của bạn"
+    },
+    "locales": {
+      "vi": "Tiếng Việt",
+      "en": "Tiếng Anh"
+    },
+    "errors": {
+      "invalidName": "Nhập tên trung tâm từ 2 đến 200 ký tự.",
+      "invalidLocale": "Chọn ngôn ngữ được hỗ trợ (Tiếng Việt hoặc Tiếng Anh).",
+      "invalidTimezone": "Nhập tên múi giờ hợp lệ.",
+      "commercialRestricted": "Không thể lưu thiết lập khi gói đăng ký bị tạm ngưng hoặc đã hủy.",
+      "unauthorized": "Chỉ chủ sở hữu chính mới có thể hoàn tất thiết lập trung tâm.",
+      "alreadyComplete": "Thiết lập cho trung tâm này đã hoàn tất.",
+      "saveFailed": "Không thể lưu thiết lập trung tâm. Vui lòng thử lại."
+    },
+    "completeSuccess": "Thiết lập trung tâm hoàn tất. Chào mừng đến Olli."
+  },
   "roles": {
     "centerManager": "Quản lý trung tâm",
     "accountant": "Kế toán",

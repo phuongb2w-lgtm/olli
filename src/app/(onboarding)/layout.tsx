@@ -1,22 +1,18 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { AccessDenied } from "@/components/access-denied";
+import { RestrictedShell } from "@/components/restricted-shell";
 import { AppShell } from "@/components/app-shell";
-import { commercialRestrictedPath, ONBOARDING_PATH } from "@/lib/auth/commercial-access-paths";
+import { resolveAuthenticatedLandingPath } from "@/lib/auth/resolve-authenticated-landing";
 import { getIdentityState } from "@/lib/auth/get-identity-state";
 import { parseSessionCommercialAccess } from "@/lib/auth/session-commercial-access";
 import { createClient } from "@/lib/supabase/server";
-import {
-  APP_NAV_ITEMS,
-  filterNavItemsByPermissions,
-} from "@/lib/navigation/app-navigation";
-import { loadUserPermissions } from "@/lib/navigation/load-user-permissions";
 import { isValidLocale, LOCALE_COOKIE } from "@/i18n/config";
 import { resolveLocale } from "@/i18n/resolve-locale";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProtectedLayout({
+export default async function OnboardingLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const identity = await getIdentityState();
@@ -25,19 +21,22 @@ export default async function ProtectedLayout({
     redirect("/login");
   }
 
-  if (identity.kind === "commercially_restricted") {
-    redirect(commercialRestrictedPath(identity));
-  }
-
-  if (identity.kind !== "active") {
+  if (identity.kind !== "active" && identity.kind !== "commercially_restricted") {
     return <AccessDenied reason={identity.kind} />;
   }
 
   const supabase = await createClient();
-  const { data: commercialAccess } = await supabase.rpc("fetch_session_commercial_access");
+  const { data: commercialAccess, error: commercialError } = await supabase.rpc(
+    "fetch_session_commercial_access",
+  );
+  if (commercialError) {
+    throw commercialError;
+  }
+
   const sessionAccess = parseSessionCommercialAccess(commercialAccess);
-  if (sessionAccess.requires_center_setup === true) {
-    redirect(ONBOARDING_PATH);
+
+  if (sessionAccess.requires_center_setup !== true) {
+    redirect(resolveAuthenticatedLandingPath(sessionAccess));
   }
 
   const resolvedLocale = await resolveLocale(identity.appUser);
@@ -51,14 +50,13 @@ export default async function ProtectedLayout({
     });
   }
 
-  const permissions = await loadUserPermissions();
-  const navItems = filterNavItemsByPermissions(APP_NAV_ITEMS, permissions).map(
-    (item) => ({ key: item.key, href: item.href }),
-  );
+  if (identity.kind === "active") {
+    return (
+      <AppShell appUser={identity.appUser} navItems={[]}>
+        {children}
+      </AppShell>
+    );
+  }
 
-  return (
-    <AppShell appUser={identity.appUser} navItems={navItems}>
-      {children}
-    </AppShell>
-  );
+  return <RestrictedShell appUser={identity.appUser}>{children}</RestrictedShell>;
 }

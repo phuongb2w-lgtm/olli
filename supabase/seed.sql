@@ -67,10 +67,10 @@ BEGIN
   -- Auth users are created via scripts/seed-auth-users.mjs (GoTrue admin API)
   -- so password sign-in works through the HTTP Auth boundary.
 
-  INSERT INTO organization (id, name) VALUES
-    (v_org_a, 'Olli Test Org A'),
-    (v_org_b, 'Olli Test Org B'),
-    (v_org_c, 'Olli Test Org C (M6 E2E fixtures)');
+  INSERT INTO organization (id, name, setup_completed_at) VALUES
+    (v_org_a, 'Olli Test Org A', now()),
+    (v_org_b, 'Olli Test Org B', now()),
+    (v_org_c, 'Olli Test Org C (M6 E2E fixtures)', now());
 
   PERFORM public._m7_initialize_organization_subscription(v_org_a, 'active');
   PERFORM public._m7_initialize_organization_subscription(v_org_b, 'active');

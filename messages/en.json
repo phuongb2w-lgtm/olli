@@ -381,6 +381,39 @@
     "organizationFoundation": "Organization settings (foundation placeholder).",
     "rolesFoundation": "Role and permission configuration (foundation placeholder)."
   },
+  "onboarding": {
+    "title": "Center setup",
+    "intro": "Confirm a few details for your center before using Olli. You can change these later in settings when organization profile editing is available.",
+    "provisioningNotice": "Your center subscription is still being activated. Complete this setup now; full workspaces will open once your subscription is active.",
+    "submit": "Complete setup",
+    "submitting": "Saving…",
+    "unauthorized": "Only the primary owner can complete center setup.",
+    "commercialRestricted": "Center setup is unavailable while your subscription is suspended or cancelled. Review your commercial status for next steps.",
+    "alreadyComplete": "Center setup is already complete.",
+    "loadError": "We could not load center setup. Try again or contact support if this continues.",
+    "viewSubscriptionStatus": "View subscription status",
+    "fields": {
+      "centerName": "Center display name",
+      "defaultLocale": "Default center language",
+      "timezone": "Timezone",
+      "timezoneHint": "Used for schedules and reporting (IANA name, e.g. Asia/Ho_Chi_Minh).",
+      "yourLanguage": "Your language"
+    },
+    "locales": {
+      "vi": "Vietnamese",
+      "en": "English"
+    },
+    "errors": {
+      "invalidName": "Enter a center name between 2 and 200 characters.",
+      "invalidLocale": "Choose a supported language (Vietnamese or English).",
+      "invalidTimezone": "Enter a valid timezone name.",
+      "commercialRestricted": "Setup cannot be saved while your subscription is suspended or cancelled.",
+      "unauthorized": "Only the primary owner can complete center setup.",
+      "alreadyComplete": "Setup was already completed for this center.",
+      "saveFailed": "We could not save your center setup. Try again."
+    },
+    "completeSuccess": "Center setup complete. Welcome to Olli."
+  },
   "roles": {
     "centerManager": "Center manager",
     "accountant": "Accountant",

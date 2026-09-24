@@ -128,7 +128,7 @@ test.describe("M6-T04 users administration", () => {
       await submit.click();
       const success = page.getByText(/staff account created|đã tạo tài khoản nhân sự/i);
       const full = page.getByText(/seat limit reached|giới hạn ghế/i);
-      await expect(success.or(full)).toBeVisible({ timeout: 90_000 });
+      await expect(success.or(full).first()).toBeVisible({ timeout: 90_000 });
       if (await full.isVisible()) break;
     }
 

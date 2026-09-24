@@ -2,6 +2,7 @@ import type { IdentityState } from "@/types/app-user";
 
 export const SUBSCRIPTION_STATUS_PATH = "/subscription-status";
 export const COMMERCIAL_ACCESS_PATH = "/commercial-access";
+export const ONBOARDING_PATH = "/onboarding";
 
 export function commercialRestrictedPath(
   identity: Extract<IdentityState, { kind: "commercially_restricted" }>,

@@ -217,6 +217,9 @@ Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m7_t04_comm
 Write-Host "==> M7-T05 owner subscription UX tests (6)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m7_t05_owner_subscription_status_ux_tests.sql")
 
+Write-Host "==> M7-T06 owner onboarding center setup tests (8)..."
+Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m7_t06_owner_onboarding_center_setup_tests.sql")
+
 Write-Host "==> Generating TypeScript types..."
 New-Item -ItemType Directory -Force -Path (Join-Path $ProjectRoot "types") | Out-Null
 npx supabase gen types typescript --local | Set-Content -Path (Join-Path $ProjectRoot "types\database.generated.ts") -Encoding utf8

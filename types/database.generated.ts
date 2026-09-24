@@ -3815,6 +3815,7 @@ export type Database = {
           default_locale: string
           id: string
           name: string
+          setup_completed_at: string | null
           status: string
           timezone: string
           updated_at: string
@@ -3825,6 +3826,7 @@ export type Database = {
           default_locale?: string
           id?: string
           name: string
+          setup_completed_at?: string | null
           status?: string
           timezone?: string
           updated_at?: string
@@ -3835,6 +3837,7 @@ export type Database = {
           default_locale?: string
           id?: string
           name?: string
+          setup_completed_at?: string | null
           status?: string
           timezone?: string
           updated_at?: string
@@ -6448,6 +6451,11 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m7_t06_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m7_t06_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -6779,6 +6787,15 @@ export type Database = {
         Args: { p_class_id?: string; p_scenario_ids?: string[] }
         Returns: Json
       }
+      complete_center_setup: {
+        Args: {
+          p_default_locale: string
+          p_name: string
+          p_preferred_locale?: string
+          p_timezone: string
+        }
+        Returns: Json
+      }
       complete_lead_follow_up: {
         Args: { p_follow_up_id: string; p_note?: string }
         Returns: string
@@ -7017,6 +7034,7 @@ export type Database = {
         }[]
       }
       fetch_center_account_administration: { Args: never; Returns: Json }
+      fetch_owner_center_setup: { Args: never; Returns: Json }
       fetch_owner_commercial_status: { Args: never; Returns: Json }
       fetch_session_commercial_access: { Args: never; Returns: Json }
       finalize_center_provisioning: {
@@ -7551,7 +7569,15 @@ export type Database = {
         Args: { p_code: string }
         Returns: string
       }
+      organization_center_setup_complete: {
+        Args: { p_organization_id: string }
+        Returns: boolean
+      }
       organization_subscription_allows_normal_use: {
+        Args: { p_organization_id: string }
+        Returns: boolean
+      }
+      organization_subscription_allows_owner_setup: {
         Args: { p_organization_id: string }
         Returns: boolean
       }
@@ -7622,6 +7648,7 @@ export type Database = {
         Args: { p_target_user_id: string }
         Returns: Json
       }
+      requires_center_setup: { Args: never; Returns: boolean }
       reschedule_lead_trial: {
         Args: {
           p_class_id?: string
