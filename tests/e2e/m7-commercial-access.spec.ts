@@ -1,6 +1,14 @@
 import { expect, test } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 import { execSync } from "node:child_process";
+import path from "node:path";
+
+function restorePlaywrightFixtures() {
+  execSync("node scripts/playwright-restore-fixtures.mjs", {
+    cwd: path.join(__dirname, "../.."),
+    stdio: "pipe",
+  });
+}
 
 const ORG_A = "a0000000-0000-4000-8000-000000000001";
 const adminEmail = "org-a-admin@olli.local";
@@ -54,6 +62,11 @@ test.describe("M7-T04 commercial access", () => {
 
   test.afterEach(async () => {
     await ensureOrgAActive(serviceClient());
+    restorePlaywrightFixtures();
+  });
+
+  test.afterAll(async () => {
+    restorePlaywrightFixtures();
   });
 
   test("suspended owner reaches subscription status, not workspace shell", async ({ page }) => {

@@ -18,6 +18,7 @@ M7 adds the **productization layer** required to provision and operate Olli as a
 | M7-T02 | [Trusted center + primary Owner provisioning](./02-m7-t02-trusted-center-owner-provisioning.md) | **Complete** |
 | M7-T03 | [Subscription & entitlement domain](./03-m7-t03-subscription-entitlement-domain.md) | **Complete** |
 | M7-T04 | [Commercial access enforcement](./04-m7-t04-commercial-access-enforcement.md) | **Complete** |
+| M7-T04.1 | [Regression stabilization](./04.1-m7-t04-regression-stabilization.md) | **Complete** |
 | M7-T05 | Owner onboarding & center setup UX | Planned |
 | M7-T06 | Owner subscription / commercial status UX | Planned |
 | M7-T07 | Integration, security & production hardening | Planned |

@@ -26,6 +26,7 @@ desktop.ini
 
 # Logs & temp
 *.log
+verify-log.txt
 npm-debug.log*
 tmp/
 temp/

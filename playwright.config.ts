@@ -1,10 +1,16 @@
+import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
+
+if (!process.env.PLAYWRIGHT_BROWSERS_PATH && process.env.LOCALAPPDATA) {
+  process.env.PLAYWRIGHT_BROWSERS_PATH = path.join(process.env.LOCALAPPDATA, "ms-playwright");
+}
 
 const port = process.env.PLAYWRIGHT_PORT ?? "3001";
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${port}`;
 
 export default defineConfig({
   globalSetup: "./scripts/playwright-global-setup.mjs",
+  globalTeardown: "./scripts/playwright-global-teardown.mjs",
   testDir: "./tests/e2e",
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
