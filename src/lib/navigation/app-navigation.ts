@@ -11,6 +11,7 @@ export type NavItemKey =
   | "mySchedule"
   | "finance"
   | "users"
+  | "subscription"
   | "settings";
 
 export type NavItemDefinition = {
@@ -60,6 +61,7 @@ export const APP_NAV_ITEMS: NavItemDefinition[] = [
     ],
   },
   { key: "users", href: "/users", anyOf: ["center_account.manage"] },
+  { key: "subscription", href: "/subscription", anyOf: ["center_account.manage"] },
   {
     key: "settings",
     href: "/settings",

@@ -6443,6 +6443,11 @@ export type Database = {
         Returns: undefined
       }
       _m7_t04_seed_auth: { Args: { p_auth: string }; Returns: string }
+      _m7_t05_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m7_t05_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string

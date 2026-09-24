@@ -19,8 +19,8 @@ M7 adds the **productization layer** required to provision and operate Olli as a
 | M7-T03 | [Subscription & entitlement domain](./03-m7-t03-subscription-entitlement-domain.md) | **Complete** |
 | M7-T04 | [Commercial access enforcement](./04-m7-t04-commercial-access-enforcement.md) | **Complete** |
 | M7-T04.1 | [Regression stabilization](./04.1-m7-t04-regression-stabilization.md) | **Complete** |
-| M7-T05 | Owner onboarding & center setup UX | Planned |
-| M7-T06 | Owner subscription / commercial status UX | Planned |
+| M7-T05 | [Owner subscription / commercial status UX](./05-m7-t05-owner-subscription-commercial-status-ux.md) | **Complete** |
+| M7-T06 | Owner onboarding & center setup UX | Planned |
 | M7-T07 | Integration, security & production hardening | Planned |
 | M7-T08 | Final acceptance & milestone closeout | Planned |
 
@@ -32,8 +32,8 @@ M7 adds the **productization layer** required to provision and operate Olli as a
 | M7-T02 | Trusted center + primary Owner provisioning (production-safe) |
 | M7-T03 | Provider-neutral plan, subscription, entitlement linkage |
 | M7-T04 | Subscription vs RBAC enforcement (DB-authoritative) |
-| M7-T05 | Minimal Owner first-use / center setup flow |
-| M7-T06 | Owner-facing subscription & seat status surface |
+| M7-T05 | Owner-facing subscription & seat status surface |
+| M7-T06 | Minimal Owner first-use / center setup flow |
 | M7-T07 | Security, operator boundaries, regression hardening |
 | M7-T08 | Acceptance SQL, API, Playwright, `npm run verify` closeout |
 

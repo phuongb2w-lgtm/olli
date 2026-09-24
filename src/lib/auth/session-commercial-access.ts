@@ -21,6 +21,9 @@ export type OwnerCommercialStatusPayload = {
   staff_limit?: number;
   staff_seats_used?: number;
   organization_status?: string;
+  activated_at?: string | null;
+  suspended_at?: string | null;
+  cancelled_at?: string | null;
 };
 
 export function parseOwnerCommercialStatus(data: Json | null): OwnerCommercialStatusPayload | null {

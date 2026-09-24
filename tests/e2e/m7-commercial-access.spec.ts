@@ -78,7 +78,9 @@ test.describe("M7-T04 commercial access", () => {
     await page.locator('input[name="password"]').fill("testpass123");
     await page.getByRole("button", { name: /sign in|đăng nhập/i }).click();
     await expect(page).toHaveURL(/\/subscription-status/);
-    await expect(page.getByText(/subscription status|trạng thái đăng ký/i)).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /subscription|đăng ký/i }),
+    ).toBeVisible();
 
     await page.goto("/");
     await expect(page).toHaveURL(/\/subscription-status/);
