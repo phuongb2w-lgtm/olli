@@ -16,7 +16,7 @@ All must pass on release commit:
 | Secrets audit | `npm run test:env` |
 | Types | `npm run test:types:stale` (local against matching schema) |
 | No seed on target DB | Confirm production/staging has never applied `seed.sql` |
-| Auth dashboard | Site URL + redirects match [05 — Auth contract](./05-auth-domain-contract.md) |
+| Auth dashboard | Site URL + redirects + SMTP per [05 — Auth contract](./05-auth-domain-contract.md) and [13 — Auth/SMTP procedure](./13-auth-smtp-operator-procedure.md) |
 | Env | [03 — Environment contract](./03-environment-secrets-contract.md) populated on host |
 
 **Do not weaken** M0–M7 suites; production adds **additional** smokes (M8-T09), not replacements.
@@ -57,7 +57,7 @@ Minimum manual or automated checklist:
 | P-3 | `fetch_session_commercial_access` path — restricted center shows `/subscription-status` or `/commercial-access` |
 | P-4 | Staff sign-in denied when subscription not active (fixture center) |
 | P-5 | One read RPC (e.g. student list) and one denied cross-org attempt (API smoke pattern) |
-| P-6 | Staff invite email received (SMTP) — optional first customer |
+| P-6 | Owner invite + staff invite + forgot-password emails received (SMTP) |
 
 Reuse patterns from `scripts/api-security-smoke.mjs` against production URL with **non-seed** identities.
 

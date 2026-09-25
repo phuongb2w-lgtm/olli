@@ -37,9 +37,11 @@ Organization context is **never** taken from client-supplied UUIDs.
 
 ## Staff-only scope (M0-T05)
 
-Implemented: email/password sign-in, sign-out.
+Implemented: email/password sign-in, sign-out, forgot password, password/invite setup (`/update-password` via `/auth/callback`).
 
-Deferred: registration, magic link, password reset product flows, invitations.
+Deferred: self-serve registration, magic link sign-in.
+
+Production Owner/staff first credentials: Supabase Auth invite email (M8-T04); see `docs/m8/13-auth-smtp-operator-procedure.md`.
 
 ## Elevated credentials
 

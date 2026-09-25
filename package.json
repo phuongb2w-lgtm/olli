@@ -59,10 +59,11 @@
     "test:locale": "powershell -ExecutionPolicy Bypass -Command \"Get-Content supabase/tests/m0_locale_tests.sql -Raw | docker exec -i supabase_db_olli-local psql -U postgres -d postgres -v ON_ERROR_STOP=1\"",
     "test:i18n": "node scripts/i18n-key-parity.mjs",
     "test:env": "node scripts/env-secrets-audit.mjs",
+    "test:auth-redirect": "node scripts/auth-redirect-smoke.mjs",
     "test:types:stale": "node scripts/check-generated-types.mjs",
     "db:inventory": "node scripts/generate-security-inventory.mjs",
     "test:foundation": "npm run db:verify && npm run test:api && npm run test:app",
-    "verify": "npm run db:verify && npm run test:i18n && npm run test:env && npm run lint && npm run typecheck && npm run build && npm run test:api && npm run test:staff-provisioning && npm run test:center-provisioning && npm run test:subscription-commercial && npm run test:commercial-access && npm run test:students && npm run test:guardians && npm run test:academic && npm run test:enrollments && npm run test:teaching && npm run test:operations && npm run test:session-operations && npm run test:operations-analytics && npm run test:operations-daily && npm run test:session-execution && npm run test:assessments && npm run test:reporting && npm run test:m1-acceptance && npm run test:m3-acceptance && npm run test:crm && npm run test:m5-foundation && npm run test:m5-hardening && npm run test:app"
+    "verify": "npm run db:verify && npm run test:i18n && npm run test:env && npm run test:auth-redirect && npm run lint && npm run typecheck && npm run build && npm run test:api && npm run test:staff-provisioning && npm run test:center-provisioning && npm run test:subscription-commercial && npm run test:commercial-access && npm run test:students && npm run test:guardians && npm run test:academic && npm run test:enrollments && npm run test:teaching && npm run test:operations && npm run test:session-operations && npm run test:operations-analytics && npm run test:operations-daily && npm run test:session-execution && npm run test:assessments && npm run test:reporting && npm run test:m1-acceptance && npm run test:m3-acceptance && npm run test:crm && npm run test:m5-foundation && npm run test:m5-hardening && npm run test:app"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

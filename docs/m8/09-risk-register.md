@@ -12,8 +12,8 @@ Legend: **S** schema, **P** product code, **I** infrastructure, **D** docs/runbo
 |----|------------------|-----------------|-------------|------|--------|
 | **B-01** | ~~No hosting/deploy config in repository~~ | Application cannot ship | **Addressed M8-T03** — Vercel contract, gates, `/api/health`, [12 — Procedure](./12-application-deployment-operator-procedure.md) | **M8-T03 done (live pending)** | I, D |
 | **B-02** | ~~No linked Supabase production project documented~~ | No authoritative DB/Auth until RIUDA runs Cloud acceptance | Repo workflow: [11 — Operator procedure](./11-supabase-production-operator-procedure.md); **`npm run db:production:*`** | **M8-T02 done (cloud pending)** | I, D |
-| **B-03** | Center provision creates Auth user without password; no reset UI | Owner cannot log in after provision | Invite + SMTP or reset flow or operator password SOP | M8-T04 | P, D, I |
-| **B-04** | Staff provisioning defaults to email invite; local disables via env | Staff never receive credentials if SMTP missing | Configure Supabase SMTP; verify invite redirect | M8-T04 | I, D |
+| **B-03** | ~~Center provision creates Auth user without password; no reset UI~~ | Owner cannot log in after provision | **Addressed M8-T04 (repo):** Owner `inviteUserByEmail` + `/forgot-password` / `/update-password`; live SMTP pending | **M8-T04 done (live pending)** | P, D, I |
+| **B-04** | Staff invite requires SMTP + redirect allowlist | Staff never receive credentials if SMTP missing | **Addressed M8-T04 (repo):** `redirectTo` callback; configure Supabase SMTP | **M8-T04 done (live pending)** | I, D |
 | **B-05** | Subscription activate/suspend only in test smokes, no operator CLI doc | Centers stuck in `provisioning` | Operator script/runbook wrapping service_role RPCs | M8-T08 | D, P |
 
 ---
@@ -41,7 +41,7 @@ Legend: **S** schema, **P** product code, **I** infrastructure, **D** docs/runbo
 | **M-04** | No dependency audit in verify | CVE drift | Add `npm audit` gate or Dependabot policy | M8-T06 | I |
 | **M-05** | Storage disabled — no file uploads | Future feature surprise | Keep disabled until designed | — | D |
 | **M-06** | Long verify (~30–45 min) | Release friction | Parallel CI jobs; keep full gate pre-release | M8-T09 | I |
-| **M-07** | Operator must manually set Owner password (documented M7-T02) | Support load | Productize invite or reset | M8-T04 | P |
+| **M-07** | ~~Operator must manually set Owner password (documented M7-T02)~~ | Support load | **Addressed M8-T04** — Owner invite email path | **M8-T04** | P |
 
 ---
 

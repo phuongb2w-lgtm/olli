@@ -32,8 +32,9 @@ port = 54424
 
 [auth]
 enabled = true
-site_url = "http://127.0.0.1:54421"
-additional_redirect_urls = ["http://127.0.0.1:54421"]
+# Next.js dev server — Auth email links must redirect to the app, not the Supabase API port.
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = ["http://127.0.0.1:3000/**", "http://localhost:3000/**"]
 jwt_expiry = 3600
 enable_signup = false
 

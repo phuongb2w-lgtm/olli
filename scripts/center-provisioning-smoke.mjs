@@ -181,6 +181,26 @@ async function main() {
     record(6, "Owner is primary with staff_limit 5 and center_manager", false, "skipped");
   }
 
+  // CP-8: Owner Auth user created via invite path (no operator password)
+  if (first.ok && process.env.OLLI_CENTER_PROVISION_USE_INVITE !== "false") {
+    const { data: authUser, error: authLookupError } = await admin.auth.admin.getUserById(
+      first.authUserId,
+    );
+    const invited =
+      !authLookupError &&
+      Boolean(authUser?.user?.invited_at ?? authUser?.user?.confirmation_sent_at);
+    record(
+      8,
+      "Owner Auth user provisioned via invite (setup email path)",
+      invited,
+      authLookupError?.message,
+    );
+  } else if (first.ok) {
+    record(8, "Owner Auth user provisioned via invite (setup email path)", true, "createUser fallback");
+  } else {
+    record(8, "Owner Auth user provisioned via invite (setup email path)", false, "skipped");
+  }
+
   // CP-7: idempotency conflict
   {
     const { error } = await admin.rpc("begin_center_provisioning", {

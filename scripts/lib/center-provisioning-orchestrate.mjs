@@ -4,6 +4,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { buildPasswordSetupCallbackUrl } from "./auth-app-origin.mjs";
 
 export const CENTER_PROVISIONING_METADATA_KEY = "olli_center_provisioning_request_id";
 
@@ -45,20 +46,37 @@ async function ensureAuthUserForCenterRequest(admin, row, normalizedEmail) {
   }
 
   const metadata = { [CENTER_PROVISIONING_METADATA_KEY]: requestId };
-  const { data, error } = await admin.auth.admin.createUser({
-    email: normalizedEmail,
-    email_confirm: true,
-    user_metadata: metadata,
-  });
+  const useInvite = process.env.OLLI_CENTER_PROVISION_USE_INVITE !== "false";
+  const redirectTo = buildPasswordSetupCallbackUrl();
 
-  if (error) {
-    if (error.message.toLowerCase().includes("already")) {
-      return { ok: false, error: "identity_conflict", requestId };
+  let authUserId;
+
+  if (useInvite) {
+    const { data, error } = await admin.auth.admin.inviteUserByEmail(normalizedEmail, {
+      data: metadata,
+      redirectTo,
+    });
+    if (error) {
+      if (error.message.toLowerCase().includes("already")) {
+        return { ok: false, error: "identity_conflict", requestId };
+      }
+      return { ok: false, error: "auth_provisioning_failed", requestId };
     }
-    return { ok: false, error: "auth_provisioning_failed", requestId };
+    authUserId = data.user?.id;
+  } else {
+    const { data, error } = await admin.auth.admin.createUser({
+      email: normalizedEmail,
+      email_confirm: true,
+      user_metadata: metadata,
+    });
+    if (error) {
+      if (error.message.toLowerCase().includes("already")) {
+        return { ok: false, error: "identity_conflict", requestId };
+      }
+      return { ok: false, error: "auth_provisioning_failed", requestId };
+    }
+    authUserId = data.user?.id;
   }
-
-  const authUserId = data.user?.id;
   if (!authUserId) {
     return { ok: false, error: "auth_provisioning_failed", requestId };
   }

@@ -5,7 +5,16 @@ import { getIdentityState } from "@/lib/auth/get-identity-state";
 import { parseSessionCommercialAccess } from "@/lib/auth/session-commercial-access";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function LoginPage() {
+type Props = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function LoginPage({ searchParams }: Props) {
+  const rawParams = await searchParams;
+  const errorParam = rawParams.error;
+  const callbackError =
+    errorParam === "auth_callback" ||
+    (Array.isArray(errorParam) && errorParam.includes("auth_callback"));
   const identity = await getIdentityState();
   if (identity.kind === "active" || identity.kind === "commercially_restricted") {
     const supabase = await createClient();
@@ -13,5 +22,5 @@ export default async function LoginPage() {
     redirect(resolveAuthenticatedLandingPath(parseSessionCommercialAccess(commercialAccess)));
   }
 
-  return <LoginForm />;
+  return <LoginForm callbackError={callbackError} />;
 }

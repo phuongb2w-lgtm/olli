@@ -11,6 +11,7 @@
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | **Public** | App runtime (all envs) | Anon/publishable key for user-scoped clients |
 | `SUPABASE_SECRET_KEY` | **Server-only** | Server Actions using `createAdminClient()`, operator scripts | Service role — Auth Admin + bypass RLS for trusted orchestration |
 | `OLLI_STAFF_PROVISION_USE_INVITE` | Server-only | Optional; default invite **on** in production | `"false"` forces `createUser` (local/Playwright only) |
+| `OLLI_CENTER_PROVISION_USE_INVITE` | Server-only | Optional; default invite **on** in production | `"false"` forces `createUser` without setup email (local smoke only) |
 | `PLAYWRIGHT_*` | CI/local test only | Playwright | Port, base URL, browser path — **never production** |
 | `POSTGRES_*` | Scripts only | `scripts/db-verify.ps1` generic Postgres path | Not used by Next.js app |
 | `DOCKER_VERIFY_PORT` | Scripts only | Generic DB verify | Local Docker Postgres |
@@ -60,7 +61,10 @@ NEXT_PUBLIC_OLLI_CANONICAL_APP_ORIGIN=https://olli.riuda.click
 SUPABASE_SECRET_KEY=<service_role>   # server runtime only
 OLLI_SUPABASE_PROJECT_REF=<ref>      # must match URL; required on production host
 OLLI_STAFF_PROVISION_USE_INVITE=true # default; omit = invite path
+OLLI_CENTER_PROVISION_USE_INVITE=true # default; omit = Owner invite email path
 ```
+
+SMTP credentials for Supabase Auth email live **only** in the Supabase Dashboard (not application env). See [13 — Auth & SMTP procedure](./13-auth-smtp-operator-procedure.md).
 
 ## Leak verification (mandatory gates)
 

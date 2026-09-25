@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { signIn, type SignInState } from "@/app/actions/auth";
@@ -7,12 +8,17 @@ import { LanguageSwitch } from "@/components/language-switch";
 
 const initialState: SignInState = {};
 
-export function LoginForm() {
+type LoginFormProps = {
+  callbackError?: boolean;
+};
+
+export function LoginForm({ callbackError = false }: LoginFormProps) {
   const t = useTranslations();
   const [state, formAction, pending] = useActionState(signIn, initialState);
 
-  const errorMessage =
-    state.error === "invalid_credentials"
+  const errorMessage = callbackError
+    ? t("auth.authCallbackError")
+    : state.error === "invalid_credentials"
       ? t("auth.invalidCredentials")
       : state.error === "network"
         ? t("auth.networkError")
@@ -45,9 +51,14 @@ export function LoginForm() {
           />
         </div>
         <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium">
-            {t("auth.password")}
-          </label>
+          <div className="mb-1 flex items-center justify-between">
+            <label htmlFor="password" className="text-sm font-medium">
+              {t("auth.password")}
+            </label>
+            <Link href="/forgot-password" className="text-xs text-slate-600 underline">
+              {t("auth.forgotPasswordLink")}
+            </Link>
+          </div>
           <input
             id="password"
             name="password"

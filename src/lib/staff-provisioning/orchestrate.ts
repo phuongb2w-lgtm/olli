@@ -12,6 +12,7 @@ import {
   type StaffCanonicalRole,
 } from "@/lib/staff-provisioning/constants";
 import { mapProvisioningError, type StaffProvisioningErrorCode } from "@/lib/staff-provisioning/errors";
+import { buildPasswordSetupCallbackUrl } from "@/lib/auth/app-origin";
 
 export type ProvisionStaffInput = {
   email: string;
@@ -160,6 +161,7 @@ async function ensureAuthUserForRequest(
   if (useInvite) {
     const { data, error } = await admin.auth.admin.inviteUserByEmail(normalizedEmail, {
       data: metadata,
+      redirectTo: buildPasswordSetupCallbackUrl(),
     });
     if (error) {
       if (error.message.toLowerCase().includes("already")) {

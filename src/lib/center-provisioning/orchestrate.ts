@@ -4,6 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CENTER_PROVISIONING_METADATA_KEY } from "@/lib/center-provisioning/constants";
+import { buildPasswordSetupCallbackUrl } from "@/lib/auth/app-origin";
 
 export type ProvisionCustomerCenterInput = {
   idempotencyKey: string;
@@ -101,20 +102,37 @@ async function ensureAuthUserForCenterRequest(
   }
 
   const metadata = { [CENTER_PROVISIONING_METADATA_KEY]: requestId };
-  const { data, error } = await admin.auth.admin.createUser({
-    email: normalizedEmail,
-    email_confirm: true,
-    user_metadata: metadata,
-  });
+  const useInvite = process.env.OLLI_CENTER_PROVISION_USE_INVITE !== "false";
+  const redirectTo = buildPasswordSetupCallbackUrl();
 
-  if (error) {
-    if (error.message.toLowerCase().includes("already")) {
-      return { ok: false, error: "identity_conflict", requestId };
+  let authUserId: string | undefined;
+
+  if (useInvite) {
+    const { data, error } = await admin.auth.admin.inviteUserByEmail(normalizedEmail, {
+      data: metadata,
+      redirectTo,
+    });
+    if (error) {
+      if (error.message.toLowerCase().includes("already")) {
+        return { ok: false, error: "identity_conflict", requestId };
+      }
+      return { ok: false, error: "auth_provisioning_failed", requestId };
     }
-    return { ok: false, error: "auth_provisioning_failed", requestId };
+    authUserId = data.user?.id;
+  } else {
+    const { data, error } = await admin.auth.admin.createUser({
+      email: normalizedEmail,
+      email_confirm: true,
+      user_metadata: metadata,
+    });
+    if (error) {
+      if (error.message.toLowerCase().includes("already")) {
+        return { ok: false, error: "identity_conflict", requestId };
+      }
+      return { ok: false, error: "auth_provisioning_failed", requestId };
+    }
+    authUserId = data.user?.id;
   }
-
-  const authUserId = data.user?.id;
   if (!authUserId) {
     return { ok: false, error: "auth_provisioning_failed", requestId };
   }
