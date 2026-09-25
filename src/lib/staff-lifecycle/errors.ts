@@ -13,6 +13,7 @@ export type StaffLifecycleErrorCode =
   | "identity_conflict"
   | "removed_member_exists"
   | "lifecycle_conflict"
+  | "rate_limited"
   | "unknown";
 
 const LIFECYCLE_CODES: StaffLifecycleErrorCode[] = [

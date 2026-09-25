@@ -9,6 +9,27 @@
 export type Database = {
   public: {
     Tables: {
+      app_rate_limit_bucket: {
+        Row: {
+          attempt_count: number
+          bucket_key: string
+          updated_at: string
+          window_started_at: string
+        }
+        Insert: {
+          attempt_count: number
+          bucket_key: string
+          updated_at?: string
+          window_started_at: string
+        }
+        Update: {
+          attempt_count?: number
+          bucket_key?: string
+          updated_at?: string
+          window_started_at?: string
+        }
+        Relationships: []
+      }
       app_user: {
         Row: {
           auth_user_id: string | null
@@ -6461,6 +6482,16 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _m8_rl_as_anon: { Args: never; Returns: undefined }
+      _m8_rl_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _m8_rl_consume: {
+        Args: { p_key: string; p_max: number; p_window: number }
+        Returns: Json
+      }
+      _m8_rl_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _payment_allocation_status: {
         Args: { p_payment_id: string }
         Returns: string
@@ -6838,6 +6869,14 @@ export type Database = {
           p_notes?: string
         }
         Returns: string
+      }
+      consume_app_rate_limit: {
+        Args: {
+          p_bucket_key: string
+          p_max_attempts: number
+          p_window_seconds: number
+        }
+        Returns: Json
       }
       convert_lead: {
         Args: {
@@ -7592,6 +7631,10 @@ export type Database = {
       }
       post_depreciation_through: {
         Args: { p_capital_asset_id: string; p_through_month: string }
+        Returns: number
+      }
+      purge_stale_app_rate_limit_buckets: {
+        Args: { p_retention_seconds?: number }
         Returns: number
       }
       reactivate_organization_subscription: {

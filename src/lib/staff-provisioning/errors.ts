@@ -16,6 +16,7 @@ export type StaffProvisioningErrorCode =
   | "provisioning_pending"
   | "reconciliation_required"
   | "not_found"
+  | "rate_limited"
   | "unknown";
 
 export function mapProvisioningError(message: string): StaffProvisioningErrorCode {

@@ -24,6 +24,7 @@ M7 closed with a **commercially ready application** verified entirely against **
 | [13 — Auth & SMTP operator procedure](./13-auth-smtp-operator-procedure.md) | Site URL, redirects, SMTP, Owner/staff email (M8-T04) |
 | [14 — Secret rotation & incident](./14-secret-rotation-incident-procedure.md) | Rotate credentials; suspected leak response (M8-T05) |
 | [15 — Security headers & CSP](./15-security-headers-csp-contract.md) | Browser CSP/header policy (M8-T06) |
+| [16 — Rate limiting & abuse protection](./16-rate-limit-abuse-contract.md) | Postgres-backed limits, abuse tiers (M8-T07) |
 
 ## Authoritative upstream
 

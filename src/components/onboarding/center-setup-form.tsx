@@ -31,6 +31,8 @@ function errorMessageKey(error: NonNullable<CompleteCenterSetupState & { ok: fal
       return "errors.unauthorized";
     case "setup_already_complete":
       return "errors.alreadyComplete";
+    case "rate_limited":
+      return "errors.rateLimited";
     default:
       return "errors.saveFailed";
   }

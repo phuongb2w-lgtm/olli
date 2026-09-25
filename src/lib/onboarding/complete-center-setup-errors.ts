@@ -6,6 +6,7 @@ export type CompleteCenterSetupErrorCode =
   | "invalid_default_locale"
   | "invalid_timezone"
   | "invalid_preferred_locale"
+  | "rate_limited"
   | "unknown";
 
 export function mapCompleteCenterSetupError(

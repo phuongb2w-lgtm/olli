@@ -16,6 +16,7 @@ export function lifecycleErrorMessageKey(code: StaffLifecycleErrorCode): string 
     identity_conflict: "identityConflict",
     removed_member_exists: "removedMemberExists",
     lifecycle_conflict: "lifecycleConflict",
+    rate_limited: "rateLimited",
     unknown: "unknown",
   };
   return map[code];

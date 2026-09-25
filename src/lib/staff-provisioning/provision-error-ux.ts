@@ -92,6 +92,11 @@ const ERROR_UX: Record<StaffProvisioningErrorCode, ProvisionErrorUx> = {
     retryable: false,
     classification: "terminal",
   },
+  rate_limited: {
+    messageKey: "rateLimited",
+    retryable: true,
+    classification: "retry",
+  },
   unknown: {
     messageKey: "unknown",
     retryable: true,

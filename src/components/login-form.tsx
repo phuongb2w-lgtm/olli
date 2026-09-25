@@ -20,9 +20,11 @@ export function LoginForm({ callbackError = false }: LoginFormProps) {
     ? t("auth.authCallbackError")
     : state.error === "invalid_credentials"
       ? t("auth.invalidCredentials")
-      : state.error === "network"
-        ? t("auth.networkError")
-        : state.error
+      : state.error === "rate_limited"
+        ? t("auth.rateLimited")
+        : state.error === "network"
+          ? t("auth.networkError")
+          : state.error
           ? t("common.error")
           : null;
 

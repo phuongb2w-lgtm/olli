@@ -29,7 +29,8 @@
     "recoveryLinkExpiredTitle": "Liên kết đã hết hạn",
     "recoveryLinkExpiredHint": "Liên kết thiết lập đăng nhập và đặt lại mật khẩu sẽ hết hạn để bảo vệ bạn.",
     "requestNewResetLink": "Yêu cầu liên kết mới",
-    "authCallbackError": "Không thể hoàn tất đăng nhập từ liên kết đó. Thử lại hoặc yêu cầu liên kết mới."
+    "authCallbackError": "Không thể hoàn tất đăng nhập từ liên kết đó. Thử lại hoặc yêu cầu liên kết mới.",
+    "rateLimited": "Quá nhiều lần thử trong thời gian ngắn. Vui lòng đợi vài phút rồi thử lại."
   },
   "access": {
     "denied": "Truy cập bị từ chối",
@@ -344,6 +345,7 @@
         "provisioningPending": "Chúng tôi vẫn đang thiết lập tài khoản này.",
         "reconciliationRequired": "Tài khoản này cần được xử lý thủ công trước khi sử dụng. Liên hệ hỗ trợ RIUDA.",
         "notFound": "Không tìm thấy yêu cầu thiết lập. Hãy bắt đầu yêu cầu mới.",
+        "rateLimited": "Quá nhiều lần thiết lập nhân viên. Vui lòng đợi vài phút rồi thử lại.",
         "unknown": "Đã xảy ra lỗi. Hãy thử tiếp tục thiết lập hoặc bắt đầu yêu cầu mới."
       }
     },
@@ -389,6 +391,7 @@
         "identityConflict": "Không thể khôi phục danh tính này tự động. Hãy liên hệ hỗ trợ.",
         "removedMemberExists": "Người này đã được gỡ. Hãy khôi phục từ mục Nhân sự đã gỡ.",
         "lifecycleConflict": "Không thể thay đổi tài khoản ở trạng thái hiện tại.",
+        "rateLimited": "Quá nhiều thao tác quản lý nhân viên. Vui lòng đợi vài phút rồi thử lại.",
         "unknown": "Đã xảy ra lỗi. Vui lòng thử lại."
       }
     }
@@ -429,7 +432,8 @@
       "commercialRestricted": "Không thể lưu thiết lập khi gói đăng ký bị tạm ngưng hoặc đã hủy.",
       "unauthorized": "Chỉ chủ sở hữu chính mới có thể hoàn tất thiết lập trung tâm.",
       "alreadyComplete": "Thiết lập cho trung tâm này đã hoàn tất.",
-      "saveFailed": "Không thể lưu thiết lập trung tâm. Vui lòng thử lại."
+      "saveFailed": "Không thể lưu thiết lập trung tâm. Vui lòng thử lại.",
+      "rateLimited": "Quá nhiều lần thử thiết lập. Vui lòng đợi vài phút rồi thử lại."
     },
     "completeSuccess": "Thiết lập trung tâm hoàn tất. Chào mừng đến Olli."
   },

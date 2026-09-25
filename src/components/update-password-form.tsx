@@ -17,9 +17,11 @@ export function UpdatePasswordForm() {
       ? t("auth.passwordValidationError")
       : state.error === "session"
         ? t("auth.recoverySessionExpired")
-        : state.error
-          ? t("auth.networkError")
-          : null;
+        : state.error === "rate_limited"
+          ? t("auth.rateLimited")
+          : state.error
+            ? t("auth.networkError")
+            : null;
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4">

@@ -37,7 +37,7 @@ Legend: **S** schema, **P** product code, **I** infrastructure, **D** docs/runbo
 |----|------------------|-----------------|-------------|------|--------|
 | **M-01** | Playwright uses `OLLI_STAFF_PROVISION_USE_INVITE=false` | None in prod if env correct | **Addressed M8-T05** — `.env.example` documents production default | **M8-T05** | D |
 | **M-02** | ~~`test:env` bundle grep uses Windows-fragile shell~~ | Weaker leak detection on some dev machines | **Addressed M8-T05** — Node file walk of `.next/static` | **M8-T05 done** | P |
-| **M-03** | No rate limiting on login Server Action | Credential stuffing | Host WAF or Supabase rate limits | M8-T06 | I, P |
+| **M-03** | ~~No app-side rate limiting on auth / invite / Owner admin surfaces~~ | Credential stuffing, email amplification | **Addressed M8-T07 (repo):** Postgres-backed limits ([16](./16-rate-limit-abuse-contract.md)); live edge/WAF exercise pending | **M8-T07 done (live pending)** | P, S, D |
 | **M-04** | No dependency audit in verify | CVE drift | Add `npm audit` gate or Dependabot policy | M8-T06 | I |
 | **M-05** | Storage disabled — no file uploads | Future feature surprise | Keep disabled until designed | — | D |
 | **M-06** | Long verify (~30–45 min) | Release friction | Parallel CI jobs; keep full gate pre-release | M8-T09 | I |

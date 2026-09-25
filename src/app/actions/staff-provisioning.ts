@@ -7,6 +7,8 @@ import {
   orchestrateStaffProvisioning,
   type ProvisionStaffResult,
 } from "@/lib/staff-provisioning/orchestrate";
+import { getCurrentAppUser } from "@/lib/auth/get-identity-state";
+import { enforceStaffProvisionRateLimit } from "@/lib/rate-limit/enforce";
 import { createClient } from "@/lib/supabase/server";
 
 export type ProvisionStaffAccountState = ProvisionStaffResult;
@@ -29,6 +31,19 @@ export async function provisionStaffAccount(input: {
 
   if (!isStaffRole(input.canonicalRole)) {
     return { ok: false, error: "invalid_role" };
+  }
+
+  const appUser = await getCurrentAppUser();
+  if (!appUser) {
+    return { ok: false, error: "not_authenticated" };
+  }
+
+  const provisionLimit = await enforceStaffProvisionRateLimit({
+    organizationId: appUser.organizationId,
+    actorAppUserId: appUser.appUserId,
+  });
+  if (!provisionLimit.allowed) {
+    return { ok: false, error: "rate_limited" };
   }
 
   const supabase = await createClient();

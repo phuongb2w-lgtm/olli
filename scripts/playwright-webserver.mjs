@@ -27,6 +27,8 @@ const childEnv = {
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? statusEnv.PUBLISHABLE_KEY,
   SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY ?? statusEnv.SECRET_KEY,
   OLLI_STAFF_PROVISION_USE_INVITE: "false",
+  /** E2E issues many sign-in attempts from one IP; limits stay verified in test:rate-limit + SQL tests. */
+  OLLI_RATE_LIMIT_DISABLED: "1",
 };
 
 if (!childEnv.SUPABASE_SECRET_KEY) {

@@ -20,7 +20,7 @@ Harden Olli’s browser-facing HTTP posture for hosted deployment without changi
 | SSL downgrade (production HTTPS) | `upgrade-insecure-requests` + HSTS on production tier only |
 | Preview/dev weakening production | Tier-specific builder; production CSP never lists localhost dev origins |
 
-Out of scope for T06 (documented elsewhere): application rate limiting ([09 — Risk register](./09-risk-register.md) M-03), WAF rules, Supabase Dashboard CORS, dependency audit automation.
+Out of scope for T06 (addressed in M8-T07): application rate limiting ([16 — Rate limit contract](./16-rate-limit-abuse-contract.md), M-03). Still out of scope here: WAF rules, Supabase Dashboard CORS, dependency audit automation.
 
 ## Architecture
 

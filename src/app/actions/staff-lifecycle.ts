@@ -1,7 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getCurrentAppUser } from "@/lib/auth/get-identity-state";
 import { requireCenterAccountAdmin } from "@/lib/auth/require-center-account-admin";
+import { enforceStaffLifecycleRateLimit } from "@/lib/rate-limit/enforce";
 import { mapLifecycleError, type StaffLifecycleErrorCode } from "@/lib/staff-lifecycle/errors";
 import { STAFF_CANONICAL_ROLES, type StaffCanonicalRole } from "@/lib/staff-provisioning/constants";
 import { createClient } from "@/lib/supabase/server";
@@ -26,11 +28,30 @@ async function requireOwnerSession(): Promise<StaffLifecycleResult | null> {
   return null;
 }
 
+async function requireOwnerSessionWithRateLimit(): Promise<StaffLifecycleResult | null> {
+  const denied = await requireOwnerSession();
+  if (denied) {
+    return denied;
+  }
+  const appUser = await getCurrentAppUser();
+  if (!appUser) {
+    return { ok: false, error: "not_authenticated" };
+  }
+  const decision = await enforceStaffLifecycleRateLimit({
+    organizationId: appUser.organizationId,
+    actorAppUserId: appUser.appUserId,
+  });
+  if (!decision.allowed) {
+    return { ok: false, error: "rate_limited" };
+  }
+  return null;
+}
+
 export async function changeStaffRole(input: {
   appUserId: string;
   canonicalRole: string;
 }): Promise<StaffLifecycleResult> {
-  const denied = await requireOwnerSession();
+  const denied = await requireOwnerSessionWithRateLimit();
   if (denied) return denied;
   if (!isStaffRole(input.canonicalRole)) {
     return { ok: false, error: "invalid_role" };
@@ -51,7 +72,7 @@ export async function changeStaffRole(input: {
 }
 
 export async function suspendStaff(input: { appUserId: string }): Promise<StaffLifecycleResult> {
-  const denied = await requireOwnerSession();
+  const denied = await requireOwnerSessionWithRateLimit();
   if (denied) return denied;
 
   const supabase = await createClient();
@@ -68,7 +89,7 @@ export async function suspendStaff(input: { appUserId: string }): Promise<StaffL
 }
 
 export async function reactivateStaff(input: { appUserId: string }): Promise<StaffLifecycleResult> {
-  const denied = await requireOwnerSession();
+  const denied = await requireOwnerSessionWithRateLimit();
   if (denied) return denied;
 
   const supabase = await createClient();
@@ -85,7 +106,7 @@ export async function reactivateStaff(input: { appUserId: string }): Promise<Sta
 }
 
 export async function removeStaff(input: { appUserId: string }): Promise<StaffLifecycleResult> {
-  const denied = await requireOwnerSession();
+  const denied = await requireOwnerSessionWithRateLimit();
   if (denied) return denied;
 
   const supabase = await createClient();
@@ -105,7 +126,7 @@ export async function restoreRemovedStaff(input: {
   appUserId: string;
   canonicalRole: string;
 }): Promise<StaffLifecycleResult> {
-  const denied = await requireOwnerSession();
+  const denied = await requireOwnerSessionWithRateLimit();
   if (denied) return denied;
   if (!isStaffRole(input.canonicalRole)) {
     return { ok: false, error: "invalid_role" };

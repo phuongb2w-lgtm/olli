@@ -6,6 +6,7 @@ import { isValidLocale, LOCALE_COOKIE, type Locale } from "@/i18n/config";
 import { resolveAuthenticatedLandingPath } from "@/lib/auth/resolve-authenticated-landing";
 import { parseSessionCommercialAccess } from "@/lib/auth/session-commercial-access";
 import { mapCompleteCenterSetupError } from "@/lib/onboarding/complete-center-setup-errors";
+import { enforceCompleteCenterSetupRateLimit } from "@/lib/rate-limit/enforce";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 
@@ -23,6 +24,23 @@ export async function completeCenterSetup(
   const preferredLocaleRaw = String(formData.get("preferred_locale") ?? "").trim();
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    const { data: appUserRow } = await supabase
+      .from("app_user")
+      .select("id")
+      .eq("auth_user_id", user.id)
+      .maybeSingle();
+    if (appUserRow?.id) {
+      const setupLimit = await enforceCompleteCenterSetupRateLimit(appUserRow.id);
+      if (!setupLimit.allowed) {
+        return { ok: false, error: "rate_limited" };
+      }
+    }
+  }
+
   const { data, error } = await supabase.rpc("complete_center_setup", {
     p_name: name,
     p_default_locale: defaultLocale,

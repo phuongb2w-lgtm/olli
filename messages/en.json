@@ -29,7 +29,8 @@
     "recoveryLinkExpiredTitle": "Link expired",
     "recoveryLinkExpiredHint": "Sign-in setup and password reset links expire for your security.",
     "requestNewResetLink": "Request a new link",
-    "authCallbackError": "We could not complete sign-in from that link. Try again or request a new reset link."
+    "authCallbackError": "We could not complete sign-in from that link. Try again or request a new reset link.",
+    "rateLimited": "Too many attempts in a short time. Please wait a few minutes and try again."
   },
   "access": {
     "denied": "Access denied",
@@ -344,6 +345,7 @@
         "provisioningPending": "We're still setting up this account.",
         "reconciliationRequired": "This account needs manual follow-up before it can be used. Contact RIUDA support.",
         "notFound": "The setup request was not found. Start a new request.",
+        "rateLimited": "Too many staff setup attempts. Wait a few minutes and try again.",
         "unknown": "Something went wrong. Try continuing setup or start a new request."
       }
     },
@@ -389,6 +391,7 @@
         "identityConflict": "This identity cannot be restored automatically. Contact support.",
         "removedMemberExists": "This person was removed. Restore them from Removed staff.",
         "lifecycleConflict": "This account cannot be changed in its current state.",
+        "rateLimited": "Too many staff management actions. Wait a few minutes and try again.",
         "unknown": "Something went wrong. Please try again."
       }
     }
@@ -429,7 +432,8 @@
       "commercialRestricted": "Setup cannot be saved while your subscription is suspended or cancelled.",
       "unauthorized": "Only the primary owner can complete center setup.",
       "alreadyComplete": "Setup was already completed for this center.",
-      "saveFailed": "We could not save your center setup. Try again."
+      "saveFailed": "We could not save your center setup. Try again.",
+      "rateLimited": "Too many setup attempts. Wait a few minutes and try again."
     },
     "completeSuccess": "Center setup complete. Welcome to Olli."
   },

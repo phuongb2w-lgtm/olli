@@ -7,11 +7,16 @@ import { resolveAuthenticatedLandingPath } from "@/lib/auth/resolve-authenticate
 import { buildPasswordSetupCallbackUrl } from "@/lib/auth/app-origin";
 import { isValidLocale, LOCALE_COOKIE } from "@/i18n/config";
 import { cookies } from "next/headers";
+import {
+  enforcePasswordResetRateLimit,
+  enforceSignInRateLimit,
+  enforceUpdatePasswordRateLimit,
+} from "@/lib/rate-limit/enforce";
 
 const MIN_PASSWORD_LENGTH = 8;
 
 export type SignInState = {
-  error?: "invalid_credentials" | "network" | "unknown";
+  error?: "invalid_credentials" | "network" | "rate_limited" | "unknown";
 };
 
 export type ForgotPasswordState = {
@@ -20,7 +25,7 @@ export type ForgotPasswordState = {
 };
 
 export type UpdatePasswordState = {
-  error?: "validation" | "session" | "network" | "unknown";
+  error?: "validation" | "session" | "network" | "rate_limited" | "unknown";
 };
 
 export async function signIn(
@@ -32,6 +37,11 @@ export async function signIn(
 
   if (!email || !password) {
     return { error: "invalid_credentials" };
+  }
+
+  const signInLimit = await enforceSignInRateLimit(email);
+  if (!signInLimit.allowed) {
+    return { error: "rate_limited" };
   }
 
   const supabase = await createClient();
@@ -86,6 +96,11 @@ export async function requestPasswordReset(
     return { submitted: true };
   }
 
+  const resetLimit = await enforcePasswordResetRateLimit();
+  if (!resetLimit.allowed) {
+    return { submitted: true };
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: buildPasswordSetupCallbackUrl(),
@@ -116,6 +131,11 @@ export async function updatePassword(
 
   if (!user) {
     return { error: "session" };
+  }
+
+  const updateLimit = await enforceUpdatePasswordRateLimit(user.id);
+  if (!updateLimit.allowed) {
+    return { error: "rate_limited" };
   }
 
   const { error } = await supabase.auth.updateUser({ password });
