@@ -6,7 +6,7 @@
 
 | Signal | Source | Alert threshold (initial) |
 |--------|--------|---------------------------|
-| **App availability** | HTTP GET health endpoint (M8-T07) | 2 consecutive failures / 5 min |
+| **App availability** | HTTP GET `/api/health` (M8-T03) | 2 consecutive failures / 5 min |
 | **5xx rate** | Host platform metrics | Above baseline |
 | **Auth sign-in failures** | Supabase Auth logs | Spike vs 24h median |
 | **PostgREST / RPC errors** | Supabase API logs | Sustained 5xx or policy errors |
@@ -31,7 +31,7 @@
 Post-deploy (see runbook):
 
 1. `GET /login` — 200
-2. Health route (to add) — DB reachable
+2. `GET /api/health` — `status: ok` (503 when env/degraded); optional Supabase ping when `OLLI_HEALTH_CHECK_SUPABASE=1`
 3. Optional: remote `npm run test:api` against staging with service credentials in CI
 
 ## Log retention
@@ -44,7 +44,7 @@ Post-deploy (see runbook):
 
 | Gap | M8 task |
 |-----|---------|
-| No `/health` or `/api/health` | M8-T07 |
+| ~~No `/health` or `/api/health`~~ | **Baseline added M8-T03** — `/api/health`; deeper metrics M8-T07 |
 | No error reporting SaaS | M8-T07 (choose one vendor or host-native) |
 | No auth failure dashboard | M8-T07 Supabase + optional export |
 | CI does not alert on verify failure beyond GitHub email | M8-T09 |

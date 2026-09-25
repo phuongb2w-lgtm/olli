@@ -1,6 +1,6 @@
 # M8 — Target Production Architecture
 
-**Status:** Design target (T01). No deployment manifests exist in-repo yet.
+**Status:** Implemented (M8-T03). Application host: **Vercel** + [`vercel.json`](../../vercel.json). Supabase Cloud unchanged.
 
 ## Intended production URL
 
@@ -46,7 +46,7 @@ flowchart LR
 | Layer | Target | Rationale |
 |-------|--------|-----------|
 | **Frontend / runtime** | Single Next.js app (`npm run build` → `next start` or host-native Next adapter) | Matches [M0 web stack](../m0/23-web-stack.md); one deployable unit |
-| **Hosting** | Managed Node/Next host (e.g. Vercel, Railway, Fly, or RIUDA VM with Node 22) | Repository has **no** `vercel.json`, Dockerfile, or IaC — **host choice is an M8 implementation task** |
+| **Hosting** | **Vercel** (Next.js 16; `vercel.json`, `npm ci` + `npm run build`) | Standard managed Next host; operator procedure [12](./12-application-deployment-operator-procedure.md) |
 | **Database & Auth** | **Supabase Cloud** project (Postgres 15, Auth, PostgREST) | All business rules live in SQL migrations + RLS; local `supabase/` folder is source of truth |
 | **Background workers** | **None required for MVP** | Provisioning orchestration runs synchronously in Server Actions / operator CLI |
 | **Email** | Supabase Auth SMTP (transactional) | Staff `inviteUserByEmail` and future Owner invite/reset depend on configured mail |

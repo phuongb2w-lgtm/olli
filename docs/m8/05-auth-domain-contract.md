@@ -66,4 +66,4 @@ Local `supabase/config.toml` uses `http://127.0.0.1:54421` — **must not** ship
 | A-01 | Owner Auth user without password after center provision | Owner cannot sign in | M8-T04 |
 | A-02 | No in-app password reset | Lockout / support burden | M8-T04 (minimal reset or documented operator procedure) |
 | A-03 | Local Inbucket for mail | Staff invites fail silently | M8-T04 SMTP |
-| A-04 | Auth site URL localhost in config.toml only | Misconfiguration if copied to cloud | M8-T03 dashboard checklist |
+| A-04 | Auth site URL localhost in config.toml only | Misconfiguration if copied to cloud | **M8-T03** — [12 — App deploy checklist](./12-application-deployment-operator-procedure.md) §3; validated in T04 |

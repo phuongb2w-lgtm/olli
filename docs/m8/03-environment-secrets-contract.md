@@ -20,6 +20,13 @@
 | `OLLI_RELEASE_GIT_SHA` | Operator-only | Pre-deploy gate | Optional pin to release commit |
 | `OLLI_CONFIRM_PRODUCTION_DEPLOY` | Operator-only | **`db:production:migration-deploy` only** | Must be `yes` to apply Cloud migrations |
 | `OLLI_PREDEPLOY_INCLUDE_REMOTE` | Operator-only | Pre-deploy gate | `1` = run Cloud env/link/status checks |
+| `OLLI_APP_PREDEPLOY_INCLUDE_HOST_ENV` | Operator-only | App pre-deploy gate | `1` = run `app:production:env-check` |
+| `OLLI_APP_BASE_URL` | Operator-only | Post-deploy smoke | Deployed origin, e.g. `https://olli.riuda.click` |
+| `NEXT_PUBLIC_OLLI_CANONICAL_APP_ORIGIN` | **Public** | Production/staging app | Default `https://olli.riuda.click`; Auth Site URL must align |
+| `OLLI_DEPLOYMENT_TIER` | Server-only | Runtime validation | `production` \| `preview` \| `development` (Vercel sets via `VERCEL_ENV` when omitted) |
+| `OLLI_PRODUCTION_SUPABASE_PROJECT_REF` | Operator-only | Preview safety | Fail preview smokes/env-check if preview uses production Supabase ref |
+| `OLLI_GIT_SHA` / `VERCEL_GIT_COMMIT_SHA` | Build/runtime | `/api/health` | Safe release identification (not a secret) |
+| `OLLI_HEALTH_CHECK_SUPABASE` | Server-only | Health route | `1` = optional Supabase `/auth/v1/health` ping |
 | `SUPABASE_ACCESS_TOKEN` | CI/CD-only | Non-interactive `supabase login` | Never in client bundle or git |
 
 **Not canonical:** `NEXT_PUBLIC_SUPABASE_ANON_KEY` (use publishable key naming per M0-T05).
@@ -49,7 +56,9 @@
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<publishable>
+NEXT_PUBLIC_OLLI_CANONICAL_APP_ORIGIN=https://olli.riuda.click
 SUPABASE_SECRET_KEY=<service_role>   # server runtime only
+OLLI_SUPABASE_PROJECT_REF=<ref>      # must match URL; required on production host
 OLLI_STAFF_PROVISION_USE_INVITE=true # default; omit = invite path
 ```
 

@@ -1,7 +1,7 @@
 # M8 — Production Readiness & Release Architecture
 
 **Milestone:** M8 — Safe, repeatable production deployment  
-**Status:** In progress (T02 Supabase pipeline implemented; cloud acceptance pending RIUDA credentials)
+**Status:** In progress (T02 Supabase pipeline implemented; T03 app hosting contract implemented; cloud + live hosting acceptance pending RIUDA credentials)
 
 M7 closed with a **commercially ready application** verified entirely against **local Supabase + dev fixtures**. M8 does not change M1–M7 domain semantics; it defines and implements the path to **`https://olli.riuda.click`** (or equivalent staging) backed by a **hosted Supabase production project**.
 
@@ -20,6 +20,7 @@ M7 closed with a **commercially ready application** verified entirely against **
 | [09 — Risk register](./09-risk-register.md) | Blocker / high / medium / low |
 | [10 — Task roadmap (T02–closeout)](./10-m8-task-roadmap.md) | Implementation sequence after T01 |
 | [11 — Supabase production operator procedure](./11-supabase-production-operator-procedure.md) | Link, migrate, drift, smoke (M8-T02) |
+| [12 — Application deployment operator procedure](./12-application-deployment-operator-procedure.md) | Vercel deploy, env, smokes, rollback (M8-T03) |
 
 ## Authoritative upstream
 

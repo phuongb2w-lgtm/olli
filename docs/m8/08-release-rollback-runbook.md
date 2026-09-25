@@ -11,6 +11,7 @@ All must pass on release commit:
 | Branch | `main` (or release tag) |
 | Migrations | Count matches released tag (**58** at M8-T01 baseline unless release adds migrations); `npm run db:migrations:count` |
 | Pre-deploy DB gate | `npm run db:production:predeploy-gate` (local); optional `OLLI_PREDEPLOY_INCLUDE_REMOTE=1` |
+| Pre-deploy app gate | `npm run app:production:predeploy-gate`; optional `OLLI_APP_PREDEPLOY_INCLUDE_HOST_ENV=1` |
 | Full local verify | `npm run verify` exit 0 |
 | Secrets audit | `npm run test:env` |
 | Types | `npm run test:types:stale` (local against matching schema) |
@@ -31,7 +32,16 @@ All must pass on release commit:
 
 ## Application deploy sequence
 
-1. Set/build env vars on host (no secret in build args logged publicly).
+1. **`npm run app:production:predeploy-gate`** on release SHA (includes `test:env`, lint, typecheck, build).
+2. Set/build env vars on Vercel **Production** scope ([03 — Environment contract](./03-environment-secrets-contract.md)).
+3. Deploy: Vercel production build from `main` (see [12 — App operator procedure](./12-application-deployment-operator-procedure.md)).
+4. **`GET /api/health`** — confirm `gitSha` + `status: ok`.
+5. **`OLLI_APP_BASE_URL=https://olli.riuda.click npm run app:production:smoke`**
+6. Monitor error rate 30 minutes.
+
+Legacy manual build (non-Vercel fallback):
+
+1. Set env vars on host (no secret in build args logged publicly).
 2. `npm ci` → `npm run build` → deploy artifact / `next start`.
 3. Run post-deploy smokes (below).
 4. Monitor error rate 30 minutes.

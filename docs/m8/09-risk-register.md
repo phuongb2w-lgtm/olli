@@ -10,7 +10,7 @@ Legend: **S** schema, **P** product code, **I** infrastructure, **D** docs/runbo
 
 | ID | Current behavior | Production risk | Remediation | Task | Layers |
 |----|------------------|-----------------|-------------|------|--------|
-| **B-01** | No hosting/deploy config in repository | Application cannot ship | Select host; add deploy pipeline + env injection | M8-T03 | I, D |
+| **B-01** | ~~No hosting/deploy config in repository~~ | Application cannot ship | **Addressed M8-T03** — Vercel contract, gates, `/api/health`, [12 — Procedure](./12-application-deployment-operator-procedure.md) | **M8-T03 done (live pending)** | I, D |
 | **B-02** | ~~No linked Supabase production project documented~~ | No authoritative DB/Auth until RIUDA runs Cloud acceptance | Repo workflow: [11 — Operator procedure](./11-supabase-production-operator-procedure.md); **`npm run db:production:*`** | **M8-T02 done (cloud pending)** | I, D |
 | **B-03** | Center provision creates Auth user without password; no reset UI | Owner cannot log in after provision | Invite + SMTP or reset flow or operator password SOP | M8-T04 | P, D, I |
 | **B-04** | Staff provisioning defaults to email invite; local disables via env | Staff never receive credentials if SMTP missing | Configure Supabase SMTP; verify invite redirect | M8-T04 | I, D |
@@ -23,8 +23,8 @@ Legend: **S** schema, **P** product code, **I** infrastructure, **D** docs/runbo
 | ID | Current behavior | Production risk | Remediation | Task | Layers |
 |----|------------------|-----------------|-------------|------|--------|
 | **H-01** | `foundation-ci.yml` ≠ full `npm run verify` | Regressions merge undetected | Extend CI or mandatory pre-release verify | M8-T09 | I, D |
-| **H-02** | No health endpoint / external uptime | Outages unnoticed | `/health` + monitor | M8-T07 | P, I |
-| **H-03** | No security headers in `next.config.ts` | Clickjacking, MIME sniffing | Add baseline headers / CSP report-only first | M8-T06 | P |
+| **H-02** | ~~No health endpoint / external uptime~~ | Outages unnoticed | **`GET /api/health`** (M8-T03); external monitor wiring M8-T07 | M8-T07 | P, I |
+| **H-03** | ~~No security headers in `next.config.ts`~~ | Clickjacking, MIME sniffing | **Baseline headers M8-T03** in `next.config.ts`; CSP report-only M8-T06 | M8-T06 | P |
 | **H-04** | No backup/restore drill | Unknown RTO; migration fear | Staging restore exercise | M8-T10 | D, I |
 | **H-05** | Auth Site URL localhost in local config only — easy to misconfigure cloud | Redirect loops / auth failure | Production checklist + staging validation | M8-T03, M8-T04 | D, I |
 | **H-06** | `createAdminClient` in Server Actions for provisioning | Service role on app server — correct but high impact if leaked | Keep server-only; rotate key procedure; audit imports | M8-T05 | P, D |
@@ -53,7 +53,7 @@ Legend: **S** schema, **P** product code, **I** infrastructure, **D** docs/runbo
 | **L-02** | Security inventory doc stale (M0 table counts) | Review noise | Regenerate optional | M8-T12 | D |
 | **L-03** | `enable_signup = false` — no self-serve | Expected for B2B | Document | M8-T04 | D |
 | **L-04** | Single region Supabase | Latency for distant users | Accept for MVP | — | D |
-| **L-05** | No staging hostname yet | Test in prod risk | Staging DNS in T03 | M8-T03 | I |
+| **L-05** | Staging hostname optional | Test in prod risk | Documented staging pattern in [12](./12-application-deployment-operator-procedure.md) §5 | **M8-T03 docs** | I |
 
 ---
 
