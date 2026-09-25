@@ -9,7 +9,7 @@
 | **M8-T03** | Application hosting & deploy topology | **Done (repo):** Vercel, gates, `/api/health`, [12 — Procedure](./12-application-deployment-operator-procedure.md) | **Live acceptance:** production deploy + smokes on `olli.riuda.click` |
 | **M8-T04** | Domain, TLS, Auth & mail | **Done (repo):** [13 — Auth/SMTP procedure](./13-auth-smtp-operator-procedure.md), recovery UI, Owner invite provisioning | **Live acceptance:** DNS, SMTP, Auth Dashboard on production project |
 | **M8-T05** | Environment & secrets hardening | **Done (repo):** hosted tier validation, `test:env` + contract smokes, repo scan, [14 — Rotation](./14-secret-rotation-incident-procedure.md) | `test:env` pass; no secret in client bundle |
-| **M8-T06** | Security hardening | Security headers; CSP baseline; abuse/rate-limit notes; audit dependency gate | Headers verified; login surface reviewed |
+| **M8-T06** | Security headers & CSP | **Done (repo):** [15 — Contract](./15-security-headers-csp-contract.md), `test:security`, centralized `browser-security-policy` | `test:security` pass; CSP enforced; production tier has no dev origins |
 | **M8-T07** | Observability & health | Health route; structured server logging; uptime monitor hook | Alert on staging failure drill |
 | **M8-T08** | Operator tooling & runbooks | CLI/scripts: `activate_organization_subscription`, suspend/reactivate/cancel; provision center doc | RIUDA can onboard center without Dashboard SQL |
 | **M8-T09** | Production smoke & CI alignment | Remote smoke suite; optional CI job; **full verify** remains release gate | Staging smokes green; CI policy documented |

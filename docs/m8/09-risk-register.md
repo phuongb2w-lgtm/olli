@@ -24,7 +24,7 @@ Legend: **S** schema, **P** product code, **I** infrastructure, **D** docs/runbo
 |----|------------------|-----------------|-------------|------|--------|
 | **H-01** | `foundation-ci.yml` ≠ full `npm run verify` | Regressions merge undetected | Extend CI or mandatory pre-release verify | M8-T09 | I, D |
 | **H-02** | ~~No health endpoint / external uptime~~ | Outages unnoticed | **`GET /api/health`** (M8-T03); external monitor wiring M8-T07 | M8-T07 | P, I |
-| **H-03** | ~~No security headers in `next.config.ts`~~ | Clickjacking, MIME sniffing | **Baseline headers M8-T03** in `next.config.ts`; CSP report-only M8-T06 | M8-T06 | P |
+| **H-03** | ~~No CSP / incomplete headers~~ | XSS, clickjacking, MIME sniffing | **Addressed M8-T06 (repo):** enforced CSP + centralized headers ([15](./15-security-headers-csp-contract.md)); live header spot-check pending deploy | **M8-T06 done (live pending)** | P, D |
 | **H-04** | No backup/restore drill | Unknown RTO; migration fear | Staging restore exercise | M8-T10 | D, I |
 | **H-05** | Auth Site URL localhost in local config only — easy to misconfigure cloud | Redirect loops / auth failure | Production checklist + staging validation | M8-T03, M8-T04 | D, I |
 | **H-06** | `createAdminClient` in Server Actions for provisioning | Service role on app server — correct but high impact if leaked | **Addressed M8-T05 (repo):** server-only + rotation SOP + import audit | **M8-T05 done** | P, D |
