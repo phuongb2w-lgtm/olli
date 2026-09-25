@@ -39,6 +39,8 @@ Configure under **Project → Settings → Environment Variables**. Scope secret
 
 **Never** set `SUPABASE_SECRET_KEY` or `OLLI_CONFIRM_PRODUCTION_DEPLOY` on Preview if Preview uses a shared machine — Preview must use a **staging Supabase project**, not production.
 
+**Operator CLI:** `provision-customer-center.mjs` against a Cloud Supabase URL requires `OLLI_CONFIRM_PRODUCTION_OPERATOR_ACTION=yes` (see [03 — Environment contract](./03-environment-secrets-contract.md)).
+
 Verify from an operator workstation with secrets loaded:
 
 ```bash

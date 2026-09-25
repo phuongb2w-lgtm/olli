@@ -1,7 +1,8 @@
 # M8 — Environment & Secrets Contract
 
 **Applies to:** local dev, CI, staging, production  
-**Enforcement today:** `scripts/env-secrets-audit.mjs` (`npm run test:env`), M0-T06 rules
+**Enforcement today:** `npm run test:env` (`env-secrets-audit.mjs` + `env-contract-smoke.mjs`), startup `assertProductionAppEnv()` (production + preview tiers), M0-T06 rules  
+**Rotation / leak:** [14 — Secret rotation & incident procedure](./14-secret-rotation-incident-procedure.md)
 
 ## Variable inventory
 
@@ -20,6 +21,8 @@
 | `OLLI_EXPECTED_MIGRATION_COUNT` | Operator-only | Pre-deploy gate | Defaults to current repo migration file count |
 | `OLLI_RELEASE_GIT_SHA` | Operator-only | Pre-deploy gate | Optional pin to release commit |
 | `OLLI_CONFIRM_PRODUCTION_DEPLOY` | Operator-only | **`db:production:migration-deploy` only** | Must be `yes` to apply Cloud migrations |
+| `OLLI_CONFIRM_PRODUCTION_OPERATOR_ACTION` | Operator-only | `provision-customer-center.mjs` against Cloud URL | Must be `yes` before mutating production Supabase via operator CLI |
+| `OLLI_ALLOW_PREVIEW_PRODUCTION_SUPABASE` | Operator-only | Preview env-check override | `1` only with documented risk — default **deny** preview → production Supabase ref |
 | `OLLI_PREDEPLOY_INCLUDE_REMOTE` | Operator-only | Pre-deploy gate | `1` = run Cloud env/link/status checks |
 | `OLLI_APP_PREDEPLOY_INCLUDE_HOST_ENV` | Operator-only | App pre-deploy gate | `1` = run `app:production:env-check` |
 | `OLLI_APP_BASE_URL` | Operator-only | Post-deploy smoke | Deployed origin, e.g. `https://olli.riuda.click` |
@@ -42,6 +45,15 @@
 2. **Server-only** — `SUPABASE_SECRET_KEY` must never be referenced under `src/components`, `src/app` client components, or browser `client.ts`.
 3. **Local-only assumptions** — `supabase status -o env`, fixed container name `supabase_db_olli-local`, dev passwords in `seed-auth-users.mjs`.
 4. **Git** — `.env.local` ignored; `.env.example` placeholders only (audited).
+
+## Deployment tier model (authoritative)
+
+| Tier | How inferred | Runtime validation |
+|------|----------------|-------------------|
+| **development** | Local `next dev`, or `OLLI_DEPLOYMENT_TIER=development` | No hosted fail-closed gate |
+| **test / CI** | GitHub Actions + local Supabase; no production secrets | `test:env` only; Foundation CI uses `supabase status` |
+| **preview** | `VERCEL_ENV=preview` or `OLLI_DEPLOYMENT_TIER=preview` | `validateHostedRuntimeEnv` — Cloud URL, no localhost canonical; **deny** production Supabase ref when `OLLI_PRODUCTION_SUPABASE_PROJECT_REF` set |
+| **production** | `VERCEL_ENV=production` or `OLLI_DEPLOYMENT_TIER=production` | HTTPS canonical origin; required `OLLI_SUPABASE_PROJECT_REF`; Cloud Supabase URL; no `VERCEL_ENV=preview` masquerade |
 
 ## Environment separation
 
@@ -71,14 +83,30 @@ SMTP credentials for Supabase Auth email live **only** in the Supabase Dashboard
 | Gate | Command / check |
 |------|-----------------|
 | Static audit | `npm run test:env` |
-| Build bundle scan | `test:env` scans `.next/static` for `service_role` when build exists |
+| Contract tests | `scripts/env-contract-smoke.mjs` (hosted tier fail-closed rules) |
+| Build bundle scan | `test:env` walks `.next/static` for `service_role` when build exists |
+| Repo pattern scan | `test:env` scans tracked tree for JWT / `sbp_` / postgres URL patterns (current tree; not full history) |
 | Admin module | `src/lib/supabase/admin.ts` must keep `import "server-only"` |
 | Pre-release | Production build on CI with `test:env` after `npm run build` |
 
-## Gaps (T01)
+## Service role usage (audit M8-T05)
+
+| Location | Scope | Notes |
+|----------|-------|-------|
+| `src/lib/supabase/admin.ts` | App server runtime | **server-only**; used by staff/center provisioning Server Actions |
+| `scripts/*-smoke.mjs`, `provision-customer-center.mjs` | Local CI / operator | Accept `supabase status` `SECRET_KEY` alias locally only |
+| `scripts/db:production:*`, `app:production:*` | Operator | Requires explicit Cloud URL + confirmation gates |
+
+User-scoped flows should continue using JWT + RLS; service role is not a substitute in product paths.
+
+## Logging / errors
+
+- Operator scripts print **names** of missing variables, never values (`app:production:env-check`, production gates).
+- `/api/health` exposes tier, git SHA, canonical origin, and public env **status** — not `SUPABASE_SECRET_KEY`.
+- Startup validation throws descriptive errors without dumping `process.env`.
+
+## Gaps (remaining)
 
 | Gap | Remediation task |
 |-----|------------------|
-| `.env.example` omits `OLLI_STAFF_PROVISION_USE_INVITE` | M8-T05 — document in example with production default comment |
-| ~~No staging/production env template file~~ | **Addressed M8-T02** — `.env.production.example`; further hardening in M8-T05 |
 | Remote smokes not wired in CI | M8-T09 — optional workflow job with secrets |

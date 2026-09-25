@@ -13,7 +13,7 @@ All must pass on release commit:
 | Pre-deploy DB gate | `npm run db:production:predeploy-gate` (local); optional `OLLI_PREDEPLOY_INCLUDE_REMOTE=1` |
 | Pre-deploy app gate | `npm run app:production:predeploy-gate`; optional `OLLI_APP_PREDEPLOY_INCLUDE_HOST_ENV=1` |
 | Full local verify | `npm run verify` exit 0 |
-| Secrets audit | `npm run test:env` |
+| Secrets audit | `npm run test:env` (static audit + contract smokes + optional bundle scan) |
 | Types | `npm run test:types:stale` (local against matching schema) |
 | No seed on target DB | Confirm production/staging has never applied `seed.sql` |
 | Auth dashboard | Site URL + redirects + SMTP per [05 — Auth contract](./05-auth-domain-contract.md) and [13 — Auth/SMTP procedure](./13-auth-smtp-operator-procedure.md) |

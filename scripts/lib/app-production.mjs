@@ -45,13 +45,14 @@ export function assertHostedAppRuntimeEnv() {
     throw new Error("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY must not be a service_role JWT");
   }
 
-  try {
+  if (tier === "production") {
     requireExpectedProjectRef(urlRef);
-  } catch (error) {
-    if (tier === "production") {
-      throw error;
+  } else {
+    try {
+      requireExpectedProjectRef(urlRef);
+    } catch (error) {
+      console.log(`INFO: ${error.message}`);
     }
-    console.log(`INFO: ${error.message}`);
   }
 
   const canonical =
@@ -60,14 +61,35 @@ export function assertHostedAppRuntimeEnv() {
     throw new Error("NEXT_PUBLIC_OLLI_CANONICAL_APP_ORIGIN must not be localhost on hosted tiers");
   }
 
+  if (tier === "production" && process.env.VERCEL_ENV === "preview") {
+    throw new Error(
+      "OLLI_DEPLOYMENT_TIER=production cannot be used when VERCEL_ENV=preview (preview must not masquerade as production).",
+    );
+  }
+
   const productionRef = process.env.OLLI_PRODUCTION_SUPABASE_PROJECT_REF?.trim();
   if (tier === "preview" && productionRef && productionRef === parseProjectRefFromSupabaseUrl(url)) {
-    throw new Error(
-      "Preview deployment is pointed at the production Supabase project ref. Use a staging Supabase project for preview hosts.",
+    if (process.env.OLLI_ALLOW_PREVIEW_PRODUCTION_SUPABASE !== "1") {
+      throw new Error(
+        "Preview deployment is pointed at the production Supabase project ref. Use a staging Supabase project for preview hosts.",
+      );
+    }
+    console.log(
+      "WARN: OLLI_ALLOW_PREVIEW_PRODUCTION_SUPABASE=1 — preview is using production Supabase (documented operator override).",
     );
   }
 
   if (tier === "production") {
+    try {
+      const parsed = new URL(canonical);
+      if (parsed.protocol !== "https:") {
+        throw new Error("NEXT_PUBLIC_OLLI_CANONICAL_APP_ORIGIN must use HTTPS on production.");
+      }
+    } catch (error) {
+      throw new Error(
+        error instanceof Error ? error.message : "NEXT_PUBLIC_OLLI_CANONICAL_APP_ORIGIN must be a valid HTTPS URL.",
+      );
+    }
     if (canonical !== OLLI_CANONICAL_PRODUCTION_ORIGIN) {
       console.log(
         `WARN: NEXT_PUBLIC_OLLI_CANONICAL_APP_ORIGIN is "${canonical}" (expected ${OLLI_CANONICAL_PRODUCTION_ORIGIN} on production).`,

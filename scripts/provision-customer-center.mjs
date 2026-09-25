@@ -17,6 +17,7 @@ import {
   adminClientFromEnv,
   orchestrateCustomerCenterProvisioning,
 } from "./lib/center-provisioning-orchestrate.mjs";
+import { assertProductionSupabaseUrl } from "./lib/supabase-production.mjs";
 
 function loadEnvFromSupabaseStatus() {
   try {
@@ -50,8 +51,25 @@ function parseArgs(argv) {
   return out;
 }
 
+function assertProductionOperatorConfirmationForCloud() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  if (!url) return;
+  let ref;
+  try {
+    ref = assertProductionSupabaseUrl(url);
+  } catch {
+    return;
+  }
+  if (process.env.OLLI_CONFIRM_PRODUCTION_OPERATOR_ACTION !== "yes") {
+    throw new Error(
+      `Refusing center provision against Supabase Cloud project ${ref}. Set OLLI_CONFIRM_PRODUCTION_OPERATOR_ACTION=yes after verifying target identity.`,
+    );
+  }
+}
+
 async function main() {
   loadEnvFromSupabaseStatus();
+  assertProductionOperatorConfirmationForCloud();
   const args = parseArgs(process.argv);
 
   if (!args.organizationName || !args.ownerEmail || !args.ownerDisplayName) {
