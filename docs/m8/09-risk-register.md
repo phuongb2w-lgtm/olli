@@ -14,7 +14,7 @@ Legend: **S** schema, **P** product code, **I** infrastructure, **D** docs/runbo
 | **B-02** | ~~No linked Supabase production project documented~~ | No authoritative DB/Auth until RIUDA runs Cloud acceptance | Repo workflow: [11 — Operator procedure](./11-supabase-production-operator-procedure.md); **`npm run db:production:*`** | **M8-T02 done (cloud pending)** | I, D |
 | **B-03** | ~~Center provision creates Auth user without password; no reset UI~~ | Owner cannot log in after provision | **Addressed M8-T04 (repo):** Owner `inviteUserByEmail` + `/forgot-password` / `/update-password`; live SMTP pending | **M8-T04 done (live pending)** | P, D, I |
 | **B-04** | Staff invite requires SMTP + redirect allowlist | Staff never receive credentials if SMTP missing | **Addressed M8-T04 (repo):** `redirectTo` callback; configure Supabase SMTP | **M8-T04 done (live pending)** | I, D |
-| **B-05** | Subscription activate/suspend only in test smokes, no operator CLI doc | Centers stuck in `provisioning` | Operator script/runbook wrapping service_role RPCs | M8-T08 | D, P |
+| **B-05** | ~~Subscription activate/suspend only in test smokes, no operator CLI doc~~ | Centers stuck in `provisioning` if operators use ad-hoc SQL | **Addressed M8-T08 (repo):** [17 — Operator runbook](./17-operator-tooling-runbook.md), `olli-operator.mjs`, `npm run test:operator` | **M8-T08 done (live pending)** | D, P |
 
 ---
 

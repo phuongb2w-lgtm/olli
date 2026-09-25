@@ -110,7 +110,7 @@ Additional release gates: `npm run lint`, `npm run typecheck`, `npm run build` (
 |----------|--------|------------|
 | Schema | `supabase/migrations/*.sql` | Applied via `db push` |
 | Reference data | Migrations (e.g. `20260914140100_reference_data.sql`, M7 `commercial_plan`) | Automatic with migrations |
-| New customer centers | `scripts/provision-customer-center.mjs` | Operator after deploy |
+| New customer centers | `scripts/olli-operator.mjs provision` (or `provision-customer-center.mjs`) | [17 — Operator runbook](./17-operator-tooling-runbook.md) |
 | Local/test fixtures | `supabase/seed.sql`, `scripts/seed-auth-users.mjs` | **Never** |
 
 Brand-new production database after full migration apply: permissions/indicators/plan rows exist; **no** organizations, **no** `@olli.local` Auth users until operator provisioning.

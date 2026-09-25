@@ -16,6 +16,7 @@ All must pass on release commit:
 | Secrets audit | `npm run test:env` (static audit + contract smokes + optional bundle scan) |
 | Browser security headers / CSP | `npm run test:security` (M8-T06 contract smokes) |
 | Application rate limits | `npm run test:rate-limit` (M8-T07 contract smokes) |
+| Operator tooling | `npm run test:operator` (M8-T08 CLI/runbook contract) |
 | Types | `npm run test:types:stale` (local against matching schema) |
 | No seed on target DB | Confirm production/staging has never applied `seed.sql` |
 | Auth dashboard | Site URL + redirects + SMTP per [05 — Auth contract](./05-auth-domain-contract.md) and [13 — Auth/SMTP procedure](./13-auth-smtp-operator-procedure.md) |
@@ -88,7 +89,7 @@ Reuse patterns from `scripts/api-security-smoke.mjs` against production URL with
 
 ### Bad data / operator error
 
-- Subscription: use M7 operator RPCs (`suspend`, `reactivate`) — **not** ad-hoc DELETE.
+- Subscription: use [17 — Operator tooling](./17-operator-tooling-runbook.md) CLI (wraps M7 RPCs) — **not** ad-hoc DELETE.
 - Provisioning: idempotency keys documented in M7-T02; do not duplicate org manually.
 
 ## Regression protection (continuous)

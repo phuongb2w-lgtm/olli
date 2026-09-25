@@ -21,7 +21,9 @@
 | `OLLI_EXPECTED_MIGRATION_COUNT` | Operator-only | Pre-deploy gate | Defaults to current repo migration file count |
 | `OLLI_RELEASE_GIT_SHA` | Operator-only | Pre-deploy gate | Optional pin to release commit |
 | `OLLI_CONFIRM_PRODUCTION_DEPLOY` | Operator-only | **`db:production:migration-deploy` only** | Must be `yes` to apply Cloud migrations |
-| `OLLI_CONFIRM_PRODUCTION_OPERATOR_ACTION` | Operator-only | `provision-customer-center.mjs` against Cloud URL | Must be `yes` before mutating production Supabase via operator CLI |
+| `OLLI_CONFIRM_PRODUCTION_OPERATOR_ACTION` | Operator-only | `olli-operator.mjs` / `provision-customer-center.mjs` mutations against Cloud URL | Must be `yes` before mutating production Supabase via operator CLI |
+| `OLLI_CONFIRM_SUBSCRIPTION_ACTION` | Operator-only | `olli-operator.mjs subscription *` | Must equal `activate`, `suspend`, `reactivate`, or `cancel` |
+| `OLLI_CONFIRM_ORGANIZATION_ID` | Operator-only | Subscription mutations (recommended) | Must match resolved `--organization-id` when set |
 | `OLLI_ALLOW_PREVIEW_PRODUCTION_SUPABASE` | Operator-only | Preview env-check override | `1` only with documented risk — default **deny** preview → production Supabase ref |
 | `OLLI_PREDEPLOY_INCLUDE_REMOTE` | Operator-only | Pre-deploy gate | `1` = run Cloud env/link/status checks |
 | `OLLI_APP_PREDEPLOY_INCLUDE_HOST_ENV` | Operator-only | App pre-deploy gate | `1` = run `app:production:env-check` |

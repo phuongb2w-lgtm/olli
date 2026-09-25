@@ -11,32 +11,13 @@
  *     --owner-name "Owner Display"
  */
 
-import { execSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
+import { orchestrateCustomerCenterProvisioning } from "./lib/center-provisioning-orchestrate.mjs";
 import {
-  adminClientFromEnv,
-  orchestrateCustomerCenterProvisioning,
-} from "./lib/center-provisioning-orchestrate.mjs";
-import { assertProductionSupabaseUrl } from "./lib/supabase-production.mjs";
-
-function loadEnvFromSupabaseStatus() {
-  try {
-    const raw = execSync("npx supabase status -o env", { encoding: "utf8" });
-    const env = {};
-    for (const line of raw.split("\n")) {
-      const match = line.match(/^([A-Z0-9_]+)="?(.*?)"?$/);
-      if (match) env[match[1]] = match[2];
-    }
-    if (env.API_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      process.env.NEXT_PUBLIC_SUPABASE_URL = env.API_URL;
-    }
-    if (env.SECRET_KEY && !process.env.SUPABASE_SECRET_KEY) {
-      process.env.SUPABASE_SECRET_KEY = env.SECRET_KEY;
-    }
-  } catch {
-    // optional when env vars already set
-  }
-}
+  assertProductionOperatorMutationAllowed,
+  loadEnvFromSupabaseStatus,
+  requireOperatorAdminClient,
+} from "./lib/operator-cli.mjs";
 
 function parseArgs(argv) {
   const out = {};
@@ -51,25 +32,9 @@ function parseArgs(argv) {
   return out;
 }
 
-function assertProductionOperatorConfirmationForCloud() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  if (!url) return;
-  let ref;
-  try {
-    ref = assertProductionSupabaseUrl(url);
-  } catch {
-    return;
-  }
-  if (process.env.OLLI_CONFIRM_PRODUCTION_OPERATOR_ACTION !== "yes") {
-    throw new Error(
-      `Refusing center provision against Supabase Cloud project ${ref}. Set OLLI_CONFIRM_PRODUCTION_OPERATOR_ACTION=yes after verifying target identity.`,
-    );
-  }
-}
-
 async function main() {
   loadEnvFromSupabaseStatus();
-  assertProductionOperatorConfirmationForCloud();
+  assertProductionOperatorMutationAllowed();
   const args = parseArgs(process.argv);
 
   if (!args.organizationName || !args.ownerEmail || !args.ownerDisplayName) {
@@ -80,7 +45,7 @@ async function main() {
   }
 
   const idempotencyKey = args.idempotencyKey ?? randomUUID();
-  const admin = adminClientFromEnv();
+  const admin = requireOperatorAdminClient();
 
   const result = await orchestrateCustomerCenterProvisioning(admin, {
     idempotencyKey,
