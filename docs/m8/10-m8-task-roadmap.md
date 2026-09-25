@@ -12,7 +12,7 @@
 | **M8-T06** | Security headers & CSP | **Done (repo):** [15 — Contract](./15-security-headers-csp-contract.md), `test:security`, centralized `browser-security-policy` | `test:security` pass; CSP enforced; production tier has no dev origins |
 | **M8-T07** | Rate limiting & abuse protection | **Done (repo):** [16 — Contract](./16-rate-limit-abuse-contract.md), `test:rate-limit`, Postgres counters | `test:rate-limit` + SQL tests pass; live abuse drill pending |
 | **M8-T08** | Operator tooling & runbooks | **Done (repo):** [17 — Runbook](./17-operator-tooling-runbook.md), `olli-operator.mjs`, `test:operator` | RIUDA can onboard center without Dashboard SQL; **live operator drill pending** |
-| **M8-T09** | Production smoke & CI alignment | Remote smoke suite; optional CI job; **full verify** remains release gate | Staging smokes green; CI policy documented |
+| **M8-T09** | Production smoke & CI alignment | **Done (repo):** [18 — Smoke & CI contract](./18-production-smoke-ci-contract.md), `test:smoke`, CI M8 gate parity, `test:smoke:static` in verify | `test:smoke` + verify green; **live URL/header/rate-limit smokes pending deploy** |
 | **M8-T10** | Backup, restore & migration failure drill | Executed restore on staging; RPO/RTO recorded | Recovery checklist signed |
 | **M8-T11** | Production cutover | Execute [08 — Runbook](./08-release-rollback-runbook.md) on production | P-1–P-6 smokes; first real center provision |
 | **M8-T12** | M8 closeout | Acceptance matrix, README, final SHA, `npm run verify` | M8 CLOSED/PASS |

@@ -17,6 +17,8 @@ All must pass on release commit:
 | Browser security headers / CSP | `npm run test:security` (M8-T06 contract smokes) |
 | Application rate limits | `npm run test:rate-limit` (M8-T07 contract smokes) |
 | Operator tooling | `npm run test:operator` (M8-T08 CLI/runbook contract) |
+| Repository smoke composition | `npm run test:smoke:static` (M8-T09 verify/CI gate contract) |
+| Critical route smoke (optional spot-check) | `npm run test:smoke` ([18 — Smoke & CI](./18-production-smoke-ci-contract.md)) |
 | Types | `npm run test:types:stale` (local against matching schema) |
 | No seed on target DB | Confirm production/staging has never applied `seed.sql` |
 | Auth dashboard | Site URL + redirects + SMTP per [05 — Auth contract](./05-auth-domain-contract.md) and [13 — Auth/SMTP procedure](./13-auth-smtp-operator-procedure.md) |

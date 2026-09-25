@@ -26,6 +26,7 @@ M7 closed with a **commercially ready application** verified entirely against **
 | [15 — Security headers & CSP](./15-security-headers-csp-contract.md) | Browser CSP/header policy (M8-T06) |
 | [16 — Rate limiting & abuse protection](./16-rate-limit-abuse-contract.md) | Postgres-backed limits, abuse tiers (M8-T07) |
 | [17 — Operator tooling & runbooks](./17-operator-tooling-runbook.md) | Center provision + subscription lifecycle CLI (M8-T08) |
+| [18 — Production smoke & CI](./18-production-smoke-ci-contract.md) | Critical smokes, verify/CI composition, live checklists (M8-T09) |
 
 ## Authoritative upstream
 

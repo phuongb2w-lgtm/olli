@@ -43,6 +43,11 @@ jobs:
           npm run test:types:stale
           npm run test:i18n
           npm run test:env
+          npm run test:security
+          npm run test:rate-limit
+          npm run test:operator
+          npm run test:auth-redirect
+          npm run test:smoke:static
 
       - name: Export Supabase env
         run: |

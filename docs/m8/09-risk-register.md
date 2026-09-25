@@ -22,7 +22,7 @@ Legend: **S** schema, **P** product code, **I** infrastructure, **D** docs/runbo
 
 | ID | Current behavior | Production risk | Remediation | Task | Layers |
 |----|------------------|-----------------|-------------|------|--------|
-| **H-01** | `foundation-ci.yml` ≠ full `npm run verify` | Regressions merge undetected | Extend CI or mandatory pre-release verify | M8-T09 | I, D |
+| **H-01** | ~~`foundation-ci.yml` ≠ full `npm run verify`~~ | Regressions merge undetected | **Addressed M8-T09 (repo):** M8 gates + `test:smoke:static` in CI; full verify remains mandatory pre-release | **M8-T09 done (full Playwright parity CI still longer than verify)** | I, D |
 | **H-02** | ~~No health endpoint / external uptime~~ | Outages unnoticed | **`GET /api/health`** (M8-T03); external monitor wiring M8-T07 | M8-T07 | P, I |
 | **H-03** | ~~No CSP / incomplete headers~~ | XSS, clickjacking, MIME sniffing | **Addressed M8-T06 (repo):** enforced CSP + centralized headers ([15](./15-security-headers-csp-contract.md)); live header spot-check pending deploy | **M8-T06 done (live pending)** | P, D |
 | **H-04** | No backup/restore drill | Unknown RTO; migration fear | Staging restore exercise | M8-T10 | D, I |
@@ -40,7 +40,7 @@ Legend: **S** schema, **P** product code, **I** infrastructure, **D** docs/runbo
 | **M-03** | ~~No app-side rate limiting on auth / invite / Owner admin surfaces~~ | Credential stuffing, email amplification | **Addressed M8-T07 (repo):** Postgres-backed limits ([16](./16-rate-limit-abuse-contract.md)); live edge/WAF exercise pending | **M8-T07 done (live pending)** | P, S, D |
 | **M-04** | No dependency audit in verify | CVE drift | Add `npm audit` gate or Dependabot policy | M8-T06 | I |
 | **M-05** | Storage disabled — no file uploads | Future feature surprise | Keep disabled until designed | — | D |
-| **M-06** | Long verify (~30–45 min) | Release friction | Parallel CI jobs; keep full gate pre-release | M8-T09 | I |
+| **M-06** | Long verify (~30–45 min) | Release friction | **Partial M8-T09:** `test:smoke` for focused pre-check; full verify unchanged | M8-T09 | I |
 | **M-07** | ~~Operator must manually set Owner password (documented M7-T02)~~ | Support load | **Addressed M8-T04** — Owner invite email path | **M8-T04** | P |
 
 ---
