@@ -18,6 +18,7 @@ All must pass on release commit:
 | Application rate limits | `npm run test:rate-limit` (M8-T07 contract smokes) |
 | Operator tooling | `npm run test:operator` (M8-T08 CLI/runbook contract) |
 | Repository smoke composition | `npm run test:smoke:static` (M8-T09 verify/CI gate contract) |
+| Backup / restore readiness | `npm run test:recovery` (M8-T10 local synthetic drill + static guards) |
 | Critical route smoke (optional spot-check) | `npm run test:smoke` ([18 — Smoke & CI](./18-production-smoke-ci-contract.md)) |
 | Types | `npm run test:types:stale` (local against matching schema) |
 | No seed on target DB | Confirm production/staging has never applied `seed.sql` |

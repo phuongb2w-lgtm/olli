@@ -17,6 +17,7 @@ export const REQUIRED_CI_SUBSTRINGS = [
   "npm run test:security",
   "npm run test:rate-limit",
   "npm run test:operator",
+  "npm run test:recovery",
   "npm run test:auth-redirect",
   "npm run lint",
   "npm run typecheck",

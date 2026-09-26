@@ -27,6 +27,7 @@ M7 closed with a **commercially ready application** verified entirely against **
 | [16 — Rate limiting & abuse protection](./16-rate-limit-abuse-contract.md) | Postgres-backed limits, abuse tiers (M8-T07) |
 | [17 — Operator tooling & runbooks](./17-operator-tooling-runbook.md) | Center provision + subscription lifecycle CLI (M8-T08) |
 | [18 — Production smoke & CI](./18-production-smoke-ci-contract.md) | Critical smokes, verify/CI composition, live checklists (M8-T09) |
+| [19 — Backup, restore & DR drill](./19-backup-restore-dr-runbook.md) | Recovery inventory, RPO/RTO, local restore rehearsal (M8-T10) |
 
 ## Authoritative upstream
 

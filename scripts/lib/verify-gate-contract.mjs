@@ -16,6 +16,7 @@ export const REQUIRED_VERIFY_SUBSTRINGS = [
   "test:security",
   "test:rate-limit",
   "test:operator",
+  "test:recovery",
   "test:auth-redirect",
   "test:smoke:static",
   "lint",

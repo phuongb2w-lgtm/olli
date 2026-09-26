@@ -49,6 +49,8 @@ venv/
 *.sqlite
 *.sqlite3
 *.db
+*.pgdump
+olli-recovery-*.sql
 
 # Supabase local
 .supabase/
