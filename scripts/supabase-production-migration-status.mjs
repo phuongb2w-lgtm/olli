@@ -22,9 +22,20 @@ function parseMigrationList(output) {
     return { remote };
   } catch {
     for (const line of output.split("\n")) {
-      const match = line.match(/"remote":"(\d+)"/);
-      if (match) remote.add(match[1]);
+      const jsonMatch = line.match(/"remote"\s*:\s*"(\d+)"/);
+      if (jsonMatch) {
+        remote.add(jsonMatch[1]);
+        continue;
+      }
+  
+      const tableMatch = line.match(
+        /^\s*`?\d+`?\s*\|\s*`?(\d+)`?\s*\|/
+      );
+      if (tableMatch) {
+        remote.add(tableMatch[1]);
+      }
     }
+  
     return { remote };
   }
 }
