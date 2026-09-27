@@ -9,7 +9,8 @@
 | [02 — T01 design contract](./02-t01-consultant-workspace-v2-design-contract.md) | UX contract, source-of-truth map, workflows, RBAC, grid recommendation |
 | [03 — Proposed implementation sequence](./03-t01-implementation-sequence.md) | Post-gate task breakdown |
 
-**T01 status:** **CLOSED / PASS** — design gate finalized (documentation only; CW2-T02 not started).
+**T01 status:** **CLOSED / PASS** — design gate finalized (documentation only; CW2-T02 not started).  
+**T01.1:** Center-wide `NNNN` sequence semantics corrected (docs only).
 
 ### Canonical product locks (T01 finalize)
 
@@ -17,4 +18,5 @@
 |-------|------|
 | **Doanh số tháng** | Sum of **Accounting-confirmed payment/cash** attributable to the consultant — **not** approved `consultant_revenue_declaration`. Consultant sales ≠ accounting revenue recognition. No parallel sales/revenue ledger. |
 | **Registration & code** | Potential → declaration (draft/submit) → Accounting confirms **actual payment** → authoritative registration → official `CCYYNNNN` → UX **Ghi danh**. Composed workflow must be idempotent (no double payment, registration, code, or sales). |
-| **Code exhaustion** | Sequence `0001`–`9999` per `(org, consultant_code, birth year)`; at exhaustion **fail closed** — no reuse of visible `CCYYNNNN`, no silent format change. `CCYY0000` remains display-only. |
+| **Student code `NNNN`** | **Organization-wide** center sequence only (`org → 0001…9999`). **Not** scoped by consultant or birth year. Official code = `CC` + `YY` + next center sequence (e.g. `02170037`, then `05150038`, then `02180039`). |
+| **Code exhaustion** | When center reaches **`9999`** allocated sequences: **fail closed** — no rollover, reuse, or format change. `CCYY0000` provisional display remains non-persisted. |

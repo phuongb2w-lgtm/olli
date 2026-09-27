@@ -4,7 +4,8 @@
 **Baseline:** `main` @ `c2d2d3d28fbb7d0e47581792e887139fea6ca2e0`  
 **Migration count:** 59 (`supabase/migrations/`, latest `20260929100000_m8_t07_app_rate_limiting.sql`)  
 **Purpose:** Map Consultant Workspace V2 requirements onto existing Olli M0–M8 architecture. **No implementation in T01.**  
-**T01 gate:** **CLOSED / PASS** (final product decisions locked in [design contract](./02-t01-consultant-workspace-v2-design-contract.md)).
+**T01 gate:** **CLOSED / PASS** (final product decisions locked in [design contract](./02-t01-consultant-workspace-v2-design-contract.md)).  
+**T01.1:** Center-wide `NNNN` sequence semantics (organization scope only).
 
 **Upstream contracts:** [M3 CRM](../m3-crm-admissions-domain-contract.md), [M1 Student/Guardian](../m1/01-student-guardian-product-contract.md), [M2 Finance](../m2-finance-domain-contract.md), [M5 Role workspaces](../m5/01-role-workspace-contracts.md), [M5 Semantic boundaries](../m5/05-semantic-boundaries.md), [M6 Access](../m6/02-t02-access-foundation-implementation.md)
 
@@ -184,15 +185,33 @@ Tiềm năng (provisional display e.g. 02170000)
 | Provisional code not DB identity | Aligns with UUID PK — OK |
 | Immutable after official assignment | Requires RPC guard; today consultants can edit via `student.update` (not granted) but Academic Ops can |
 | `CC` consultant digit | **No** `app_user.consultant_code` (or similar) in schema — Center Manager = `01` rule needs staff numbering table |
-| Concurrency on `NNNN` | **No** allocator — race if two approvals assign codes simultaneously |
+| Concurrency on org-wide `NNNN` | **No** allocator — race if two confirmations assign the same center sequence |
 
-### F.3 Sequence exhaustion (`9999`)
+### F.3 Official sequence `NNNN` (T01.1 — center-wide)
 
-Official sequence per `(organization_id, consultant_code, birth_year)` runs **`0001` … `9999`** only.
+**Correction:** `NNNN` is the student’s official sequential number **within the center (organization) only**. It is **not** scoped by consultant code, birth year, or `(organization, consultant_code, birth_year)`.
 
-When the namespace is exhausted: **FAIL CLOSED** — do not allocate another official code, do not reuse a visible `CCYYNNNN`, do not extend the format. Return a deterministic administrative error for operator resolution.
+Conceptually: `organization → 0001, 0002, 0003, … 9999`.
 
-**Allocator must:** `SELECT … FOR UPDATE` on counter row; assign on Accounting payment-confirmation composition; idempotent per declaration/payment event; enforce hard stop at 9999.
+At allocation time the visible code is composed:
+
+`CCYYNNNN` = consultant code at allocation + birth-year two digits at allocation + **next organization-wide sequence**.
+
+Examples after sequence `0036` is consumed:
+
+| Next seq | Consultant | Birth year | Official code |
+|----------|------------|------------|---------------|
+| 0037 | 02 | 2017 | `02170037` |
+| 0038 | 05 | 2015 | `05150038` |
+| 0039 | 02 | 2018 | `02180039` |
+
+**Allocator (future CW2-T03):** organization-scoped counter (e.g. `student_sequence_counter(organization_id, next_sequence)` or equivalent), `SELECT … FOR UPDATE`, transactional; concurrent Accounting confirmations in the same center must receive distinct sequences (never two `0037`).
+
+### F.4 Sequence exhaustion (`9999`)
+
+When the **center** would exceed **`9999`** organization-wide allocations: **FAIL CLOSED** — do not allocate another official code, do not reuse a visible `CCYYNNNN`, do not extend the format. Return a deterministic administrative error. Expanded namespace deferred to a future product version if needed.
+
+**Allocator must:** assign on Accounting payment-confirmation composition; idempotent per declaration/payment event; enforce hard stop at org sequence 9999.
 
 ---
 

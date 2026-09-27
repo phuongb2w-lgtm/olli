@@ -6,7 +6,7 @@
 | Task | Title | Primary deliverables | Acceptance (summary) |
 |------|--------|----------------------|----------------------|
 | **CW2-T02** | Domain & schema foundations | Consultant code profile; portfolio sequence; declaration extensions (`draft`, student/enrollment/course FKs); **payment→consultant attribution** bridge; grid preference/hidden-row tables; RLS + SQL tests | Migrations only; db tests green; no UI |
-| **CW2-T03** | Student code allocator | `assign_official_student_code()` with row lock; immutability trigger; **fail closed at 9999**; idempotent on Accounting payment confirm | Concurrency tests; exhaustion error; no duplicate visible codes |
+| **CW2-T03** | Student code allocator | Org-scoped **`student_sequence_counter`** (or equivalent); compose `CC+YY+NNNN`; row lock per org; immutability trigger; **fail closed at center sequence 9999**; idempotent on Accounting payment confirm | Parallel confirm → distinct `NNNN`; exhaustion error; no duplicate official codes |
 | **CW2-T04** | Consultant grid read model | `list_consultant_workspace_grid` RPC + TS mapper; status + tuition label derivations | Consultant scope enforced; 4-status mapping fixtures |
 | **CW2-T05** | Workspace shell & month header | `/crm/workspace` page; month nav; **`sum_consultant_attributed_payments`** (or equivalent read model over M2 payment/allocation); feature flag or nav swap | E2E: header excludes declarations-only; includes confirmed payment |
 | **CW2-T06** | Grid UX (TanStack) | Virtualized grid; keyboard nav; column prefs; hide/restore row | Playwright: edit cell, tab order, hide row |

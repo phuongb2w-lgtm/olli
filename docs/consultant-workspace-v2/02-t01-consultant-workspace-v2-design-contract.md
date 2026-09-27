@@ -104,15 +104,15 @@ workspace_sequence: bigint  -- STT source
 
 `CCYYNNNN` (8 chars):
 
-- `CC`: consultant staff code (`01` = primary owner/center manager; `02`–`99` consultants).
-- `YY`: last two digits of birth year (from `date_of_birth`; if missing, use `00` and flag data quality — **product: block official assignment until DOB set**).
-- `NNNN`: official sequence `0001`–`9999`.
+- `CC`: consultant staff code **at official allocation** (`01` = primary owner/center manager; `02`–`99` consultants). Frozen in the code after allocation even if assignment changes later.
+- `YY`: last two digits of birth year **at official allocation** (from `date_of_birth`; if missing, use `00` and flag data quality — **block official assignment until DOB set**). Frozen after allocation; do not silently regenerate official code for DOB corrections without a future explicit admin workflow.
+- `NNNN`: **center-wide** official student sequence for the organization — `0001`–`9999`, monotonic per org. **Independent of `CC` and `YY` for allocation purposes** (they are concatenated into the visible code after the next org sequence is taken).
 
 ### 4.2 Provisional (Tiềm năng)
 
-- Display `NNNN = 0000`.
+- Display `NNNN = 0000` (official center sequence **not yet allocated**).
 - **Do not persist** provisional codes in `student.student_code`.
-- Multiple rows may show identical provisional codes.
+- Multiple rows may show identical provisional codes (e.g. several `02170000`).
 
 ### 4.3 Official assignment event (locked)
 
@@ -126,7 +126,7 @@ Tiềm năng (display 02170000)
   → awaiting Accounting
   → confirm payment (M2 posted cash)
   → registration authoritative
-  → allocate official code (e.g. 02170037)
+  → allocate next org-wide sequence (e.g. 0037) → official code 02170037
   → UX Ghi danh
 ```
 
@@ -134,15 +134,25 @@ Tiềm năng (display 02170000)
 
 1. **`record_payment()` + allocations** exactly once (Accounting).
 2. **Registration** authoritative (compose future RPC; may wrap `convert_lead()` — do not alter `convert_lead()` until implementation task).
-3. Allocate `NNNN` via org-scoped counter (`0001`–`9999`, serialized `FOR UPDATE`).
-4. Set `student.student_code` once (immutable trigger guard).
+3. Allocate next **`NNNN`** from **organization-only** counter (`0001`–`9999`, serialized `FOR UPDATE` on org row).
+4. Compose immutable `student_code = CC + YY + NNNN` and persist once (immutable trigger guard).
 5. M2 terms/charges as required by existing finance rules.
+
+**Allocation examples** (center already at sequence `0036`):
+
+| Next `NNNN` | CC | YY | Official code |
+|-------------|----|----|---------------|
+| 0037 | 02 | 17 | `02170037` |
+| 0038 | 05 | 15 | `05150038` |
+| 0039 | 02 | 18 | `02180039` |
 
 **Must not occur on retry/concurrency:** double payment, double registration, two codes for one student, one code for two students, double consultant sales attribution.
 
 ### 4.4 Immutability
 
-After official assignment, deny updates to `student_code` except super-audit RPC (out of scope V2).
+After official assignment, the entire **`CCYYNNNN`** string is immutable (e.g. `02170037` unchanged through lifecycle, class changes, consultant reassignment, or consultant account suspension). Deny updates to `student_code` except a future explicit administrative correction workflow (out of scope V2).
+
+`CC` = consultant attribution **at allocation**; `YY` = birth-year component **at allocation**; `NNNN` = center-wide sequence **at allocation**.
 
 ### 4.5 Consultant codes
 
@@ -150,14 +160,19 @@ New table or columns, e.g. `staff_operational_profile (app_user_id, consultant_c
 
 ### 4.6 Exhaustion (fail closed)
 
-When the next sequence would exceed **`9999`** for a given `(organization, consultant_code, birth_year)`:
+When the **organization** has allocated **`9999`** official center sequences and the next allocation would exceed that:
 
 - **Do not** allocate another official code.
-- **Do not** reuse or recycle a visible `CCYYNNNN`.
-- **Do not** change the 8-character format.
+- **Do not** roll over to `0001`, reuse an old sequence, or change the 8-character format.
 - Return a **deterministic administrative error** (`student_code_namespace_exhausted` or equivalent) for operator resolution.
 
+A future product version may define an expanded namespace if customer scale requires it.
+
 Provisional **`CCYY0000`** may repeat; it is not an official code and is never stored in `student.student_code`.
+
+### 4.7 CW2-T03 allocator requirement (documentation)
+
+Implement a **concurrency-safe, transactional** organization-scoped counter (conceptually `student_sequence_counter(organization_id, next_sequence)` or safest equivalent). Two simultaneous Accounting confirmations in the same center must receive different values (e.g. A → `0037`, B → `0038`, never both `0037`). Exact schema/RPC belongs to CW2-T03 — not implemented in T01/T01.1.
 
 ---
 
