@@ -8,9 +8,11 @@
 | [01 — T01 audit](./01-t01-consultant-workspace-v2-audit.md) | Existing architecture, gaps, conflicts, risks |
 | [02 — T01 design contract](./02-t01-consultant-workspace-v2-design-contract.md) | UX contract, source-of-truth map, workflows, RBAC, grid recommendation |
 | [03 — Proposed implementation sequence](./03-t01-implementation-sequence.md) | Post-gate task breakdown |
+| [04 — CW2-T02 implementation](./04-cw2-t02-domain-schema-foundations.md) | Schema foundations closeout |
 
-**T01 status:** **CLOSED / PASS** — design gate finalized (documentation only; CW2-T02 not started).  
-**T01.1:** Center-wide `NNNN` sequence semantics corrected (docs only).
+**T01 status:** **CLOSED / PASS** — design gate finalized (documentation only).  
+**T01.1:** **CLOSED / PASS** — center-wide `NNNN` sequence semantics corrected (docs only).  
+**T02 status:** **CLOSED / PASS** — domain/schema foundations (migrations 60–61, SQL tests, docs). CW2-T03 **not started**.
 
 ### Canonical product locks (T01 finalize)
 

@@ -33,6 +33,7 @@ export type Database = {
       app_user: {
         Row: {
           auth_user_id: string | null
+          consultant_operational_code: string | null
           created_at: string
           created_by: string | null
           display_name: string
@@ -47,6 +48,7 @@ export type Database = {
         }
         Insert: {
           auth_user_id?: string | null
+          consultant_operational_code?: string | null
           created_at?: string
           created_by?: string | null
           display_name: string
@@ -61,6 +63,7 @@ export type Database = {
         }
         Update: {
           auth_user_id?: string | null
+          consultant_operational_code?: string | null
           created_at?: string
           created_by?: string | null
           display_name?: string
@@ -1179,56 +1182,331 @@ export type Database = {
         }
         Relationships: []
       }
+      consultant_custom_field_definition: {
+        Row: {
+          created_at: string
+          data_type: string
+          field_key: string
+          id: string
+          label: string
+          organization_id: string
+          owner_app_user_id: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data_type?: string
+          field_key: string
+          id?: string
+          label: string
+          organization_id: string
+          owner_app_user_id: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data_type?: string
+          field_key?: string
+          id?: string
+          label?: string
+          organization_id?: string
+          owner_app_user_id?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultant_custom_field_defin_organization_id_owner_app_us_fkey"
+            columns: ["organization_id", "owner_app_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_custom_field_definition_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consultant_custom_field_value: {
+        Row: {
+          created_at: string
+          field_definition_id: string
+          id: string
+          organization_id: string
+          subject_id: string
+          subject_type: string
+          updated_at: string
+          value_text: string
+        }
+        Insert: {
+          created_at?: string
+          field_definition_id: string
+          id?: string
+          organization_id: string
+          subject_id: string
+          subject_type: string
+          updated_at?: string
+          value_text: string
+        }
+        Update: {
+          created_at?: string
+          field_definition_id?: string
+          id?: string
+          organization_id?: string
+          subject_id?: string
+          subject_type?: string
+          updated_at?: string
+          value_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultant_custom_field_value_organization_id_field_defini_fkey"
+            columns: ["organization_id", "field_definition_id"]
+            isOneToOne: false
+            referencedRelation: "consultant_custom_field_definition"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_custom_field_value_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consultant_grid_hidden_row: {
+        Row: {
+          app_user_id: string
+          hidden_at: string
+          organization_id: string
+          subject_id: string
+          subject_type: string
+        }
+        Insert: {
+          app_user_id: string
+          hidden_at?: string
+          organization_id: string
+          subject_id: string
+          subject_type: string
+        }
+        Update: {
+          app_user_id?: string
+          hidden_at?: string
+          organization_id?: string
+          subject_id?: string
+          subject_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultant_grid_hidden_row_organization_id_app_user_id_fkey"
+            columns: ["organization_id", "app_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_grid_hidden_row_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consultant_portfolio_entry: {
+        Row: {
+          consultant_user_id: string
+          created_at: string
+          id: string
+          lead_id: string | null
+          organization_id: string
+          portfolio_entered_at: string
+          student_id: string | null
+          updated_at: string
+          workspace_sequence: number
+        }
+        Insert: {
+          consultant_user_id: string
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          organization_id: string
+          portfolio_entered_at?: string
+          student_id?: string | null
+          updated_at?: string
+          workspace_sequence: number
+        }
+        Update: {
+          consultant_user_id?: string
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          organization_id?: string
+          portfolio_entered_at?: string
+          student_id?: string | null
+          updated_at?: string
+          workspace_sequence?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultant_portfolio_entry_organization_id_consultant_user_fkey"
+            columns: ["organization_id", "consultant_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_portfolio_entry_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultant_portfolio_entry_organization_id_lead_id_fkey"
+            columns: ["organization_id", "lead_id"]
+            isOneToOne: false
+            referencedRelation: "lead"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_portfolio_entry_organization_id_student_id_fkey"
+            columns: ["organization_id", "student_id"]
+            isOneToOne: false
+            referencedRelation: "student"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      consultant_portfolio_sequence: {
+        Row: {
+          consultant_user_id: string
+          created_at: string
+          last_workspace_sequence: number
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          consultant_user_id: string
+          created_at?: string
+          last_workspace_sequence?: number
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          consultant_user_id?: string
+          created_at?: string
+          last_workspace_sequence?: number
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultant_portfolio_sequence_organization_id_consultant_u_fkey"
+            columns: ["organization_id", "consultant_user_id"]
+            isOneToOne: true
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_portfolio_sequence_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consultant_revenue_declaration: {
         Row: {
           approved_payment_id: string | null
+          consultant_operational_code_snapshot: string | null
           consultant_user_id: string
+          course_id: string | null
           created_at: string
           currency_code: string
           declaration_date: string
           declared_amount: number
           declared_at: string
           description: string | null
+          enrollment_financial_terms_id: string | null
+          enrollment_id: string | null
           id: string
+          idempotency_key: string | null
+          lead_id: string | null
           organization_id: string
+          promotion_context: string | null
           review_notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: Database["public"]["Enums"]["consultant_revenue_declaration_status"]
+          student_id: string | null
+          submitted_at: string | null
+          total_obligation_amount: number | null
           updated_at: string
         }
         Insert: {
           approved_payment_id?: string | null
+          consultant_operational_code_snapshot?: string | null
           consultant_user_id: string
+          course_id?: string | null
           created_at?: string
           currency_code?: string
           declaration_date: string
           declared_amount: number
           declared_at?: string
           description?: string | null
+          enrollment_financial_terms_id?: string | null
+          enrollment_id?: string | null
           id?: string
+          idempotency_key?: string | null
+          lead_id?: string | null
           organization_id: string
+          promotion_context?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["consultant_revenue_declaration_status"]
+          student_id?: string | null
+          submitted_at?: string | null
+          total_obligation_amount?: number | null
           updated_at?: string
         }
         Update: {
           approved_payment_id?: string | null
+          consultant_operational_code_snapshot?: string | null
           consultant_user_id?: string
+          course_id?: string | null
           created_at?: string
           currency_code?: string
           declaration_date?: string
           declared_amount?: number
           declared_at?: string
           description?: string | null
+          enrollment_financial_terms_id?: string | null
+          enrollment_id?: string | null
           id?: string
+          idempotency_key?: string | null
+          lead_id?: string | null
           organization_id?: string
+          promotion_context?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["consultant_revenue_declaration_status"]
+          student_id?: string | null
+          submitted_at?: string | null
+          total_obligation_amount?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -1254,10 +1532,45 @@ export type Database = {
             referencedColumns: ["organization_id", "id"]
           },
           {
+            foreignKeyName: "consultant_revenue_declaration_org_course_fk"
+            columns: ["organization_id", "course_id"]
+            isOneToOne: false
+            referencedRelation: "course"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_revenue_declaration_org_enrollment_fk"
+            columns: ["organization_id", "enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_revenue_declaration_org_lead_fk"
+            columns: ["organization_id", "lead_id"]
+            isOneToOne: false
+            referencedRelation: "lead"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
             foreignKeyName: "consultant_revenue_declaration_org_reviewer_fk"
             columns: ["organization_id", "reviewed_by"]
             isOneToOne: false
             referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_revenue_declaration_org_student_fk"
+            columns: ["organization_id", "student_id"]
+            isOneToOne: false
+            referencedRelation: "student"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_revenue_declaration_org_terms_fk"
+            columns: ["organization_id", "enrollment_financial_terms_id"]
+            isOneToOne: false
+            referencedRelation: "enrollment_financial_terms"
             referencedColumns: ["organization_id", "id"]
           },
           {
@@ -1272,6 +1585,45 @@ export type Database = {
             columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "app_user"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consultant_workspace_preference: {
+        Row: {
+          app_user_id: string
+          created_at: string
+          grid_preferences: Json
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          app_user_id: string
+          created_at?: string
+          grid_preferences?: Json
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          app_user_id?: string
+          created_at?: string
+          grid_preferences?: Json
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultant_workspace_preferenc_organization_id_app_user_id_fkey"
+            columns: ["organization_id", "app_user_id"]
+            isOneToOne: true
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_workspace_preference_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
             referencedColumns: ["id"]
           },
         ]
@@ -3927,6 +4279,35 @@ export type Database = {
           },
         ]
       }
+      organization_student_sequence: {
+        Row: {
+          created_at: string
+          last_allocated_sequence: number
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          last_allocated_sequence?: number
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          last_allocated_sequence?: number
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_student_sequence_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_subscription: {
         Row: {
           activated_at: string | null
@@ -4189,6 +4570,74 @@ export type Database = {
             foreignKeyName: "payment_allocation_batch_organization_id_payment_id_fkey"
             columns: ["organization_id", "payment_id"]
             isOneToOne: false
+            referencedRelation: "payment"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      payment_consultant_attribution: {
+        Row: {
+          attributed_amount: number
+          attribution_recorded_at: string
+          consultant_operational_code: string
+          consultant_revenue_declaration_id: string | null
+          consultant_user_id: string
+          created_at: string
+          currency_code: string
+          id: string
+          organization_id: string
+          payment_id: string
+        }
+        Insert: {
+          attributed_amount: number
+          attribution_recorded_at?: string
+          consultant_operational_code: string
+          consultant_revenue_declaration_id?: string | null
+          consultant_user_id: string
+          created_at?: string
+          currency_code?: string
+          id?: string
+          organization_id: string
+          payment_id: string
+        }
+        Update: {
+          attributed_amount?: number
+          attribution_recorded_at?: string
+          consultant_operational_code?: string
+          consultant_revenue_declaration_id?: string | null
+          consultant_user_id?: string
+          created_at?: string
+          currency_code?: string
+          id?: string
+          organization_id?: string
+          payment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_consultant_attributio_consultant_revenue_declarati_fkey"
+            columns: ["consultant_revenue_declaration_id"]
+            isOneToOne: false
+            referencedRelation: "consultant_revenue_declaration"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_consultant_attributio_organization_id_consultant_u_fkey"
+            columns: ["organization_id", "consultant_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "payment_consultant_attribution_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_consultant_attribution_organization_id_payment_id_fkey"
+            columns: ["organization_id", "payment_id"]
+            isOneToOne: true
             referencedRelation: "payment"
             referencedColumns: ["organization_id", "id"]
           },
@@ -6061,6 +6510,32 @@ export type Database = {
         Returns: undefined
       }
       _current_linked_teacher_id: { Args: never; Returns: string }
+      _cw2_apply_consultant_workspace_permissions: {
+        Args: { p_role_id: string }
+        Returns: undefined
+      }
+      _cw2_custom_field_key_reserved: {
+        Args: { p_key: string }
+        Returns: boolean
+      }
+      _cw2_next_consultant_operational_code: {
+        Args: { p_organization_id: string }
+        Returns: string
+      }
+      _cw2_t02_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _cw2_t02_as_postgres: { Args: never; Returns: undefined }
+      _cw2_t02_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _cw2_t02_seed_auth_user: {
+        Args: { p_auth: string; p_email: string }
+        Returns: undefined
+      }
+      _cw2_validate_consultant_operational_code: {
+        Args: { p_code: string }
+        Returns: boolean
+      }
       _insert_payment_allocations: {
         Args: { p_allocations: Json; p_batch_id?: string; p_payment_id: string }
         Returns: Json
@@ -6291,6 +6766,7 @@ export type Database = {
         }
         Returns: {
           auth_user_id: string | null
+          consultant_operational_code: string | null
           created_at: string
           created_by: string | null
           display_name: string
@@ -6673,6 +7149,10 @@ export type Database = {
       assign_canonical_staff_role: {
         Args: { p_canonical_code: string; p_target_user_id: string }
         Returns: Json
+      }
+      assign_consultant_operational_code: {
+        Args: { p_target_app_user_id: string }
+        Returns: string
       }
       assign_lead: {
         Args: {
@@ -7316,6 +7796,10 @@ export type Database = {
         Args: { p_organization_id: string }
         Returns: undefined
       }
+      initialize_organization_cw2_foundation: {
+        Args: { p_organization_id: string }
+        Returns: undefined
+      }
       installment_schedule_amount: {
         Args: {
           p_installment_count: number
@@ -7872,19 +8356,29 @@ export type Database = {
         }
         Returns: {
           approved_payment_id: string | null
+          consultant_operational_code_snapshot: string | null
           consultant_user_id: string
+          course_id: string | null
           created_at: string
           currency_code: string
           declaration_date: string
           declared_amount: number
           declared_at: string
           description: string | null
+          enrollment_financial_terms_id: string | null
+          enrollment_id: string | null
           id: string
+          idempotency_key: string | null
+          lead_id: string | null
           organization_id: string
+          promotion_context: string | null
           review_notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: Database["public"]["Enums"]["consultant_revenue_declaration_status"]
+          student_id: string | null
+          submitted_at: string | null
+          total_obligation_amount: number | null
           updated_at: string
         }
         SetofOptions: {
@@ -8368,6 +8862,7 @@ export type Database = {
     Enums: {
       academic_review_status: "draft" | "submitted" | "confirmed" | "returned"
       consultant_revenue_declaration_status:
+        | "draft"
         | "pending"
         | "approved"
         | "rejected"
@@ -8588,6 +9083,7 @@ export const Constants = {
     Enums: {
       academic_review_status: ["draft", "submitted", "confirmed", "returned"],
       consultant_revenue_declaration_status: [
+        "draft",
         "pending",
         "approved",
         "rejected",

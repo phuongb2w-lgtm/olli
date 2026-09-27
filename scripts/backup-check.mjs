@@ -7,7 +7,7 @@ import { execSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { assertMigrationInventory } from "./lib/migration-inventory.mjs";
+import { assertMigrationInventory, migrationCount } from "./lib/migration-inventory.mjs";
 import { LOCAL_DB_CONTAINER, assertLocalRecoveryTarget } from "./lib/recovery-target.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -63,7 +63,7 @@ function checkRecoveryScripts() {
 
 function checkMigrationInventory() {
   const { count } = assertMigrationInventory();
-  const expected = Number(process.env.OLLI_EXPECTED_MIGRATION_COUNT ?? "59");
+  const expected = Number(process.env.OLLI_EXPECTED_MIGRATION_COUNT ?? migrationCount());
   if (count !== expected) {
     fail(`migration count ${count} != expected ${expected}`);
   }

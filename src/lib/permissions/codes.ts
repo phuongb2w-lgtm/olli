@@ -64,6 +64,9 @@ export const PERMISSION_CODES = [
   "report.executive.follow_up.manage",
   "consultant_revenue.declare",
   "consultant_revenue.review",
+  "consultant_workspace.read",
+  "consultant_workspace.update",
+  "consultant_custom_field.manage",
 ] as const;
 
 export type PermissionCode = (typeof PERMISSION_CODES)[number];
