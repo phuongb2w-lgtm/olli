@@ -10,10 +10,11 @@
 | [03 — Proposed implementation sequence](./03-t01-implementation-sequence.md) | Post-gate task breakdown |
 | [04 — CW2-T02 implementation](./04-cw2-t02-domain-schema-foundations.md) | Schema foundations closeout |
 | [05 — CW2-T02.1 bootstrap](./05-cw2-t02-1-student-sequence-bootstrap.md) | Legacy student / sequence bootstrap audit |
+| [06 — CW2-T02.2 OA classification](./06-cw2-t02-2-operations-analytics-classification.md) | OA-5/OA-6 verify failure classification (harness) |
 
 **T01 status:** **CLOSED / PASS** — design gate finalized (documentation only).  
 **T01.1:** **CLOSED / PASS** — center-wide `NNNN` sequence semantics corrected (docs only).  
-**T02 status:** **CLOSED / PASS** after T02.1 acceptance (migrations 60–62, SQL tests, full verify). CW2-T03 **not started**.
+**T02 / T02.1 / T02.2:** **CLOSED / PASS** after full verify (see doc 04–06). CW2-T03 **not started**.
 
 ### Canonical product locks (T01 finalize)
 

@@ -226,81 +226,104 @@ async function main() {
 
   // 5: reschedule moves workload to new date
   {
-    await admin.rpc("reschedule_teaching_session", {
+    const { error: rescheduleErr } = await admin.rpc("reschedule_teaching_session", {
       p_session_id: session.id,
       p_scheduled_start_at: "2039-01-04T02:00:00.000Z",
       p_scheduled_end_at: "2039-01-04T03:00:00.000Z",
       p_reason: "OA smoke reschedule",
     });
-    const { data: oldDay } = await admin.rpc("list_teacher_workload", {
+    const { data: oldDay, error: oldDayErr } = await admin.rpc("list_teacher_workload", {
       p_date_from: "2039-01-03",
       p_date_to: "2039-01-03",
+      p_class_id: classRow.id,
       p_teacher_id: teacherA.id,
     });
-    const { data: newDay } = await admin.rpc("list_teacher_workload", {
+    const { data: newDay, error: newDayErr } = await admin.rpc("list_teacher_workload", {
       p_date_from: "2039-01-04",
       p_date_to: "2039-01-04",
+      p_class_id: classRow.id,
       p_teacher_id: teacherA.id,
     });
     const oldRow = (oldDay ?? []).find((r) => r.teacher_id === teacherA.id);
     const newRow = (newDay ?? []).find((r) => r.teacher_id === teacherA.id);
-    record(
-      5,
-      "reschedule effect on workload",
+    const workloadOk =
       (oldRow?.materialized_session_count ?? 0) === 0 &&
-        (newRow?.materialized_session_count ?? 0) === 1,
-    );
+      (newRow?.materialized_session_count ?? 0) === 1;
+    const detail =
+      rescheduleErr?.message ??
+      oldDayErr?.message ??
+      newDayErr?.message ??
+      (!workloadOk
+        ? `old=${oldRow?.materialized_session_count ?? "?"}, new=${newRow?.materialized_session_count ?? "?"}`
+        : "");
+    record(5, "reschedule effect on workload", !rescheduleErr && !oldDayErr && !newDayErr && workloadOk, detail);
   }
 
   // 6: substitution moves teacher workload
   {
-    await admin.rpc("substitute_session_teacher", {
+    const { error: substituteErr } = await admin.rpc("substitute_session_teacher", {
       p_session_id: session.id,
       p_new_teacher_id: teacherB.id,
       p_reason: "OA smoke substitute",
     });
-    const { data } = await admin.rpc("list_teacher_workload", {
+    const { data, error } = await admin.rpc("list_teacher_workload", {
       p_date_from: "2039-01-04",
       p_date_to: "2039-01-04",
+      p_class_id: classRow.id,
       p_teacher_id: teacherB.id,
     });
     const row = (data ?? [])[0];
-    record(6, "substitution effect on workload", row?.materialized_session_count === 1);
+    record(
+      6,
+      "substitution effect on workload",
+      !substituteErr && !error && row?.materialized_session_count === 1,
+      substituteErr?.message ?? error?.message,
+    );
   }
 
   // 7: room change moves room usage
   {
-    await admin.rpc("change_session_room", {
+    const { error: roomChangeErr } = await admin.rpc("change_session_room", {
       p_session_id: session.id,
       p_new_room_id: roomB.id,
       p_reason: "OA smoke room change",
     });
-    const { data: roomBData } = await admin.rpc("list_room_usage", {
+    const { data: roomBData, error: roomUsageErr } = await admin.rpc("list_room_usage", {
       p_date_from: "2039-01-04",
       p_date_to: "2039-01-04",
       p_room_id: roomB.id,
     });
     const row = (roomBData ?? [])[0];
-    record(7, "room change effect on usage", row?.materialized_session_count === 1);
+    record(
+      7,
+      "room change effect on usage",
+      !roomChangeErr && !roomUsageErr && row?.materialized_session_count === 1,
+      roomChangeErr?.message ?? roomUsageErr?.message,
+    );
   }
 
   // 8: cancel removes booked workload
   {
-    await admin.rpc("cancel_teaching_session", {
+    const { error: cancelErr } = await admin.rpc("cancel_teaching_session", {
       p_session_id: session.id,
       p_reason: "OA smoke cancel",
     });
-    const { data } = await admin.rpc("list_teacher_workload", {
+    const { data, error } = await admin.rpc("list_teacher_workload", {
       p_date_from: "2039-01-04",
       p_date_to: "2039-01-04",
+      p_class_id: classRow.id,
       p_teacher_id: teacherB.id,
     });
     const row = (data ?? [])[0];
-    record(
-      8,
-      "cancel effect on workload",
-      row?.materialized_scheduled_minutes === 0 && row?.cancelled_session_count === 1,
-    );
+    const cancelOk =
+      row?.materialized_scheduled_minutes === 0 && row?.cancelled_session_count === 1;
+    const detail =
+      cancelErr?.message ??
+      error?.message ??
+      (!cancelOk
+        ? `minutes=${row?.materialized_scheduled_minutes ?? "?"}, cancelled=${row?.cancelled_session_count ?? "?"}`
+        : "");
+    record(8, "cancel effect on workload", !cancelErr && !error && cancelOk, detail);
   }
 
   // 9: permission denial
