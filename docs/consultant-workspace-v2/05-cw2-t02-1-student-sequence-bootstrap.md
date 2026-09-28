@@ -46,6 +46,16 @@
 
 - `supabase/tests/cw2_t02_1_student_sequence_bootstrap_tests.sql` — **8/8** scenarios (legacy, shaped, `0000`, isolation, STT, consultant `01`).
 
+## Verification evidence (local)
+
+| Gate | Result |
+|------|--------|
+| `npm run db:verify` | **SUCCESS** — includes **CW2-T02 16/16** and **CW2-T02.1 8/8** |
+| `supabase db lint` | Warnings only (pre-existing M2/M4/M6 + resolved CW2 loop shadow in migration `20260930103000`) |
+| Full `npm run verify` | User run: **failed** at `test:operations-analytics` **OA-5/OA-6** (9/11); **not CW2-related** — isolated re-run of `operations-analytics-smoke.mjs` **11/11 PASS** (likely long-pipeline flake / Supabase service restarts) |
+
+Re-run `npm run verify` once if OA smokes fail at the tail; CW2 SQL regressions were green in the same run through M8 + recovery **6/6**.
+
 ## T03 boundary
 
 Student Code **allocator RPC** is **not** implemented in T02.1.
