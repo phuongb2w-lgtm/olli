@@ -19,7 +19,8 @@
 
 ## Backfill
 
-- All organizations receive `organization_student_sequence` row with `last_allocated_sequence = 0`.
+- All organizations receive `organization_student_sequence`.
+- **T02.1:** `last_allocated_sequence` defaults to **`0`** or **`MAX(NNNN)`** from existing **CW2-shaped** `student_code` values only (see [T02.1 bootstrap](./05-cw2-t02-1-student-sequence-bootstrap.md)). Legacy codes (e.g. `HV001`) do **not** advance the counter.
 - Primary owner receives code `01` when null (`initialize_organization_cw2_foundation`, including after `set_primary_owner_for_organization`).
 - Active canonical **consultant** role members receive next available `02`–`99` by `created_at` (existing codes preserved).
 - No historical `student.student_code` values fabricated.
