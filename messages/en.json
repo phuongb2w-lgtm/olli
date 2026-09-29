@@ -2373,6 +2373,42 @@
       "retry": "Retry",
       "loadingMore": "Loading…"
     },
+    "detail": {
+      "title": "Portfolio details",
+      "denied": "You cannot open this portfolio entry.",
+      "notFound": "This portfolio entry was not found.",
+      "backToWorkspace": "Back to consultant workspace",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "sttLabel": "No. {stt}",
+      "hiddenRowHint": "Hidden in grid",
+      "dateOfBirth": "Date of birth",
+      "provisionalCode": "provisional",
+      "guardianFamilyName": "Guardian family name",
+      "guardianGivenName": "Guardian given name",
+      "course": "Course",
+      "class": "Class",
+      "enrollmentStatus": "Enrollment status",
+      "confirmedPaid": "Confirmed paid",
+      "financeReadOnly": "Finance is read-only. Use payment declaration to notify Accounting.",
+      "sections": {
+        "identity": "Identity",
+        "guardian": "Guardian / contact",
+        "learning": "Learning",
+        "finance": "Finance summary",
+        "consultantInfo": "Consultant information"
+      },
+      "errors": {
+        "permission_denied": "You do not have permission to save these changes.",
+        "not_found": "This portfolio entry was not found.",
+        "conflict": "Someone else updated this record. Reload and try again.",
+        "invalid_name": "Enter both family and given names.",
+        "invalid_custom_field": "One or more custom fields could not be saved.",
+        "unknown": "We could not save your changes. Please try again."
+      }
+    },
     "monthlySales": {
       "title": "Monthly sales",
       "monthLabel": "Month {month}",

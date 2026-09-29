@@ -11,17 +11,10 @@ export function formatPortfolioNamePart(value: string | null, locale: Locale): s
   return trimmed;
 }
 
-export function detailsHref(row: {
-  subject_type: "lead" | "student";
-  lead_id: string | null;
-  student_id: string | null;
-  student_details_subject_id: string | null;
-}): string | null {
-  if (row.subject_type === "student" && row.student_details_subject_id) {
-    return `/students/${row.student_details_subject_id}/enrollments`;
+export function detailsHref(row: { portfolio_entry_id: string }, returnQuery?: string): string {
+  const base = `/consultant/portfolio/${row.portfolio_entry_id}`;
+  if (returnQuery) {
+    return `${base}?return=${encodeURIComponent(returnQuery)}`;
   }
-  if (row.lead_id) {
-    return `/crm/leads/${row.lead_id}`;
-  }
-  return null;
+  return base;
 }

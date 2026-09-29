@@ -18,10 +18,11 @@
 | [11 — CW2-T06 portfolio UI](./11-cw2-t06-consultant-portfolio-ui.md) | Excel-like grid, TanStack, T05 integration |
 | [12 — CW2-T07 declaration drawer](./12-cw2-t07-payment-declaration-drawer.md) | Draft/submit drawer, T04 RPC reuse, capabilities |
 | [13 — CW2-T08 monthly sales header](./13-cw2-t08-monthly-sales-header.md) | Authoritative monthly sales header + workspace integration |
+| [14 — CW2-T09 portfolio detail](./14-cw2-t09-student-details-controlled-editing.md) | Details route + controlled edit + T07 integration |
 
 **T01 status:** **CLOSED / PASS** — design gate finalized (documentation only).  
 **T01.1:** **CLOSED / PASS** — center-wide `NNNN` sequence semantics corrected (docs only).  
-**T02–T06:** see docs 04–11. **CW2-T07:** see doc 12. **CW2-T08:** see doc 13.
+**T02–T06:** see docs 04–11. **CW2-T07:** see doc 12. **CW2-T08:** see doc 13. **CW2-T09:** see doc 14.
 
 ### Canonical product locks (T01 finalize)
 

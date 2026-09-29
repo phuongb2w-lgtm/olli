@@ -6548,6 +6548,26 @@ export type Database = {
         Args: { p_target_consultant: string }
         Returns: undefined
       }
+      _cw2_assert_portfolio_entry_access: {
+        Args: { p_portfolio_entry_id: string }
+        Returns: {
+          consultant_user_id: string
+          created_at: string
+          id: string
+          lead_id: string | null
+          organization_id: string
+          portfolio_entered_at: string
+          student_id: string | null
+          updated_at: string
+          workspace_sequence: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "consultant_portfolio_entry"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       _cw2_compute_organization_student_sequence_floor: {
         Args: { p_organization_id: string }
         Returns: number
@@ -6758,6 +6778,10 @@ export type Database = {
         Returns: undefined
       }
       _cw2_t08_sales: { Args: { p_month: string }; Returns: Json }
+      _cw2_t09_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _cw2_validate_consultant_operational_code: {
         Args: { p_code: string }
         Returns: boolean
@@ -7925,6 +7949,10 @@ export type Database = {
         Args: { p_period_month?: string }
         Returns: Json
       }
+      get_consultant_portfolio_entry_detail: {
+        Args: { p_portfolio_entry_id: string }
+        Returns: Json
+      }
       get_crm_activity_metrics: {
         Args: { p_end_date: string; p_start_date: string }
         Returns: Json
@@ -8744,6 +8772,23 @@ export type Database = {
           p_total_obligation_amount?: number
         }
         Returns: string
+      }
+      save_consultant_portfolio_custom_fields: {
+        Args: { p_portfolio_entry_id: string; p_values: Json }
+        Returns: Json
+      }
+      save_consultant_portfolio_profile: {
+        Args: {
+          p_date_of_birth?: string
+          p_expected_subject_updated_at?: string
+          p_family_name: string
+          p_given_name: string
+          p_guardian_family_name?: string
+          p_guardian_given_name?: string
+          p_guardian_phone?: string
+          p_portfolio_entry_id: string
+        }
+        Returns: Json
       }
       save_executive_exception_follow_up: {
         Args: {

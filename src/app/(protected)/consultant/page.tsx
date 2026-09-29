@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { ConsultantPortfolioWorkspace } from "@/components/consultant-workspace/consultant-portfolio-workspace";
 import { loadConsultantGridPreferencesAction } from "@/app/actions/consultant-workspace";
@@ -35,9 +36,11 @@ export default async function ConsultantWorkspacePage() {
   }
 
   return (
-    <ConsultantPortfolioWorkspace
-      initialPreferences={initialPreferences}
-      courseOptions={courseOptions}
-    />
+    <Suspense fallback={<p className="text-sm text-slate-600">{t("states.loadingMore")}</p>}>
+      <ConsultantPortfolioWorkspace
+        initialPreferences={initialPreferences}
+        courseOptions={courseOptions}
+      />
+    </Suspense>
   );
 }

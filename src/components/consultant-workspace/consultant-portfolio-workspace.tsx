@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import {
   hideConsultantGridRowAction,
@@ -105,6 +106,11 @@ function collectCustomFieldKeys(rows: ConsultantWorkspacePortfolioRow[]): string
 export function ConsultantPortfolioWorkspace({ initialPreferences, courseOptions }: Props) {
   const t = useTranslations("consultantWorkspace");
   const locale = useLocale() as Locale;
+  const searchParams = useSearchParams();
+  const consultantReturnQuery = useMemo(() => {
+    const q = searchParams.toString();
+    return q ? `/consultant?${q}` : "/consultant";
+  }, [searchParams]);
   const mergedPrefs = useMemo(() => mergeGridPreferences(initialPreferences), [initialPreferences]);
 
   const [query, setQuery] = useState<QueryState>(DEFAULT_QUERY);
@@ -294,8 +300,7 @@ export function ConsultantPortfolioWorkspace({ initialPreferences, courseOptions
         id: "details",
         header: () => t("columns.details"),
         cell: ({ row }) => {
-          const href = detailsHref(row.original);
-          if (!href) return "—";
+          const href = detailsHref(row.original, consultantReturnQuery);
           return (
             <Link
               href={href}
@@ -370,7 +375,7 @@ export function ConsultantPortfolioWorkspace({ initialPreferences, courseOptions
     }));
 
     return [...base, ...customCols];
-  }, [t, locale, customFieldKeys, appliedQuery, loadPage, startTransition]);
+  }, [t, locale, customFieldKeys, appliedQuery, loadPage, startTransition, consultantReturnQuery]);
 
   const table = useReactTable({
     data: rows,

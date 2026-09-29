@@ -2373,6 +2373,42 @@
       "retry": "Thử lại",
       "loadingMore": "Đang tải…"
     },
+    "detail": {
+      "title": "Chi tiết hồ sơ",
+      "denied": "Bạn không thể mở mục danh mục này.",
+      "notFound": "Không tìm thấy mục danh mục này.",
+      "backToWorkspace": "Quay lại không gian tư vấn",
+      "edit": "Chỉnh sửa",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "saving": "Đang lưu…",
+      "sttLabel": "STT {stt}",
+      "hiddenRowHint": "Đang ẩn trên lưới",
+      "dateOfBirth": "Ngày sinh",
+      "provisionalCode": "tạm thời",
+      "guardianFamilyName": "Họ phụ huynh",
+      "guardianGivenName": "Tên phụ huynh",
+      "course": "Khóa học",
+      "class": "Lớp",
+      "enrollmentStatus": "Trạng thái ghi danh",
+      "confirmedPaid": "Đã xác nhận",
+      "financeReadOnly": "Số liệu tài chính chỉ xem. Dùng khai báo khoản nộp để thông báo Kế toán.",
+      "sections": {
+        "identity": "Thông tin định danh",
+        "guardian": "Phụ huynh / liên hệ",
+        "learning": "Học tập",
+        "finance": "Tóm tắt học phí",
+        "consultantInfo": "Thông tin tư vấn viên"
+      },
+      "errors": {
+        "permission_denied": "Bạn không có quyền lưu thay đổi này.",
+        "not_found": "Không tìm thấy mục danh mục.",
+        "conflict": "Hồ sơ đã được cập nhật. Tải lại và thử lại.",
+        "invalid_name": "Nhập đầy đủ họ và tên.",
+        "invalid_custom_field": "Không lưu được một hoặc nhiều trường tùy chỉnh.",
+        "unknown": "Không lưu được. Vui lòng thử lại."
+      }
+    },
     "monthlySales": {
       "title": "Doanh số của tháng",
       "monthLabel": "Tháng {month}",
