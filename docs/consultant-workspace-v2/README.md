@@ -15,10 +15,11 @@
 | [08 — CW2-T04 confirmation](./08-cw2-t04-accounting-confirmation-composition.md) | Draft/submit + Accounting confirmation composition |
 | [09 — CW2-T04.1 accountant scope](./09-cw2-t04-1-accountant-confirm-lead-convert-scope.md) | Accountant lead-first confirm without general `lead.convert` |
 | [10 — CW2-T05 read model](./10-cw2-t05-consultant-workspace-read-model.md) | Portfolio grid RPC, filters, finance/status derivation |
+| [11 — CW2-T06 portfolio UI](./11-cw2-t06-consultant-portfolio-ui.md) | Excel-like grid, TanStack, T05 integration |
 
 **T01 status:** **CLOSED / PASS** — design gate finalized (documentation only).  
 **T01.1:** **CLOSED / PASS** — center-wide `NNNN` sequence semantics corrected (docs only).  
-**T02–T05:** see docs 04–10. **CW2-T06 UI not started**.
+**T02–T06:** see docs 04–11. **CW2-T07 not started**.
 
 ### Canonical product locks (T01 finalize)
 

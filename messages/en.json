@@ -83,6 +83,7 @@
     "organization": "Organization",
     "account": "Account",
     "overview": "Overview",
+    "consultantPortfolio": "My portfolio",
     "admissions": "Admissions",
     "students": "Students",
     "classes": "Classes",
@@ -744,6 +745,7 @@
     "title": "Admissions",
     "subtitle": "Lead pipeline, trials, and conversion reporting",
     "nav": {
+      "portfolio": "Portfolio",
       "myWork": "My work",
       "leads": "Leads",
       "reports": "Reports",
@@ -2260,5 +2262,80 @@
     "counselor_sales_salary": "Counselor / sales salary",
     "sales_commission": "Sales commission",
     "other_marketing_sales": "Other marketing & sales"
+  },
+  "consultantWorkspace": {
+    "title": "Consultant portfolio",
+    "subtitle": "Spreadsheet-style view of leads and students you manage.",
+    "denied": "You do not have permission to open the consultant portfolio workspace.",
+    "columns": {
+      "manage": "Columns",
+      "stt": "No.",
+      "familyName": "Family & middle name",
+      "givenName": "Given name",
+      "studentCode": "Student code",
+      "status": "Status",
+      "guardian": "Guardian",
+      "phone": "Phone",
+      "tuition": "Tuition",
+      "details": "Details",
+      "saveEdit": "Save / edit"
+    },
+    "studentCode": {
+      "provisionalHint": "Provisional display code — not yet official"
+    },
+    "lifecycle": {
+      "tiem_nang": "Prospect",
+      "ghi_danh": "Registered",
+      "dang_hoc": "Active learning",
+      "tot_nghiep": "Graduated"
+    },
+    "paymentState": {
+      "dong_phi": "Unpaid",
+      "cho_xac_nhan": "Pending confirmation",
+      "coc_phi": "Deposit",
+      "mot_phan": "Partial",
+      "full_phi": "Paid in full"
+    },
+    "declaration": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "returned": "Returned"
+    },
+    "tuition": {
+      "paid": "Paid",
+      "outstanding": "Due",
+      "declarationHint": "Payment declaration available (drawer in a later release)"
+    },
+    "filters": {
+      "search": "Search name",
+      "studentCode": "Student code",
+      "guardianPhone": "Guardian phone",
+      "lifecycleStatus": "Lifecycle",
+      "paymentState": "Tuition state",
+      "declarationStatus": "Declaration",
+      "course": "Course",
+      "all": "All",
+      "showHidden": "Hidden rows",
+      "showActive": "Active portfolio"
+    },
+    "actions": {
+      "details": "Details",
+      "edit": "Edit",
+      "hide": "Hide",
+      "restore": "Restore",
+      "loadMore": "Load more"
+    },
+    "edit": {
+      "deferred": "Inline editing will arrive in a later task"
+    },
+    "states": {
+      "empty": "Your portfolio is empty. New leads and students will appear here when they enter your workspace.",
+      "filteredEmpty": "No rows match the current filters.",
+      "error": "We could not load your portfolio. Please try again.",
+      "retry": "Retry",
+      "loadingMore": "Loading…"
+    }
   }
 }

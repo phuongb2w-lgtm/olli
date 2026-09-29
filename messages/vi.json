@@ -83,6 +83,7 @@
     "organization": "Tổ chức",
     "account": "Tài khoản",
     "overview": "Tổng quan",
+    "consultantPortfolio": "Danh mục của tôi",
     "admissions": "Tuyển sinh",
     "students": "Học viên",
     "classes": "Lớp học",
@@ -744,6 +745,7 @@
     "title": "Tuyển sinh",
     "subtitle": "Quy trình lead, học thử và báo cáo chuyển đổi",
     "nav": {
+      "portfolio": "Danh mục",
       "myWork": "Công việc của tôi",
       "leads": "Lead",
       "reports": "Báo cáo",
@@ -2260,5 +2262,80 @@
     "counselor_sales_salary": "Lương tư vấn / kinh doanh",
     "sales_commission": "Hoa hồng bán hàng",
     "other_marketing_sales": "Marketing & kinh doanh khác"
+  },
+  "consultantWorkspace": {
+    "title": "Danh mục tư vấn",
+    "subtitle": "Giao diện bảng tính cho lead và học viên bạn đang quản lý.",
+    "denied": "Bạn không có quyền mở không gian danh mục tư vấn.",
+    "columns": {
+      "manage": "Cột",
+      "stt": "STT",
+      "familyName": "Họ và tên đệm",
+      "givenName": "Tên",
+      "studentCode": "Mã học viên",
+      "status": "Trạng thái",
+      "guardian": "Phụ huynh",
+      "phone": "SĐT",
+      "tuition": "Học phí",
+      "details": "Chi tiết",
+      "saveEdit": "Lưu/Sửa"
+    },
+    "studentCode": {
+      "provisionalHint": "Mã hiển thị tạm — chưa phải mã chính thức"
+    },
+    "lifecycle": {
+      "tiem_nang": "Tiềm năng",
+      "ghi_danh": "Ghi danh",
+      "dang_hoc": "Đang học",
+      "tot_nghiep": "Tốt nghiệp"
+    },
+    "paymentState": {
+      "dong_phi": "Đóng phí",
+      "cho_xac_nhan": "Chờ xác nhận",
+      "coc_phi": "Cọc phí",
+      "mot_phan": "Một phần",
+      "full_phi": "Full phí"
+    },
+    "declaration": {
+      "draft": "Nháp",
+      "pending": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "rejected": "Từ chối",
+      "returned": "Trả lại"
+    },
+    "tuition": {
+      "paid": "Đã thu",
+      "outstanding": "Còn",
+      "declarationHint": "Có thể khai báo thanh toán (ngăn kéo ở bản phát hành sau)"
+    },
+    "filters": {
+      "search": "Tìm theo tên",
+      "studentCode": "Mã học viên",
+      "guardianPhone": "SĐT phụ huynh",
+      "lifecycleStatus": "Trạng thái",
+      "paymentState": "Trạng thái học phí",
+      "declarationStatus": "Khai báo",
+      "course": "Khóa học",
+      "all": "Tất cả",
+      "showHidden": "Dòng đã ẩn",
+      "showActive": "Danh mục đang hiển thị"
+    },
+    "actions": {
+      "details": "Chi tiết",
+      "edit": "Sửa",
+      "hide": "Ẩn",
+      "restore": "Khôi phục",
+      "loadMore": "Tải thêm"
+    },
+    "edit": {
+      "deferred": "Sửa trực tiếp sẽ có ở tác vụ sau"
+    },
+    "states": {
+      "empty": "Danh mục trống. Lead và học viên sẽ xuất hiện khi vào phạm vi quản lý của bạn.",
+      "filteredEmpty": "Không có dòng phù hợp bộ lọc.",
+      "error": "Không tải được danh mục. Vui lòng thử lại.",
+      "retry": "Thử lại",
+      "loadingMore": "Đang tải…"
+    }
   }
 }

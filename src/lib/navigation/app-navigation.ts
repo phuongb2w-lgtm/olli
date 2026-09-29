@@ -3,6 +3,7 @@ import type { PermissionCode } from "@/lib/permissions/codes";
 export type NavItemKey =
   | "overview"
   | "executive"
+  | "consultantPortfolio"
   | "admissions"
   | "students"
   | "classes"
@@ -28,6 +29,11 @@ export type NavItemDefinition = {
 export const APP_NAV_ITEMS: NavItemDefinition[] = [
   { key: "overview", href: "/", anyOf: ["organization.read"] },
   { key: "executive", href: "/executive", anyOf: ["report.executive.read"] },
+  {
+    key: "consultantPortfolio",
+    href: "/consultant",
+    anyOf: ["consultant_workspace.read"],
+  },
   { key: "admissions", href: "/crm/leads", anyOf: ["lead.read"] },
   { key: "students", href: "/students", anyOf: ["student.read"] },
   { key: "classes", href: "/classes", anyOf: ["enrollment.read"] },
