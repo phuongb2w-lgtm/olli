@@ -6600,6 +6600,15 @@ export type Database = {
         Args: never
         Returns: boolean
       }
+      _cw2_portfolio_declaration_capabilities: {
+        Args: {
+          p_declaration_status: string
+          p_enrollment_financial_terms_id: string
+          p_has_student: boolean
+          p_outstanding: number
+        }
+        Returns: Json
+      }
       _cw2_portfolio_finance_snapshot: {
         Args: { p_enrollment_id: string; p_org: string }
         Returns: Json
@@ -6725,6 +6734,10 @@ export type Database = {
       _cw2_t05_student_with_finance: {
         Args: { p_consultant_auth: string; p_org: string }
         Returns: Record<string, unknown>
+      }
+      _cw2_t07_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
       }
       _cw2_validate_consultant_operational_code: {
         Args: { p_code: string }
@@ -7926,6 +7939,10 @@ export type Database = {
         Args: { p_end_date: string; p_start_date: string }
         Returns: Json
       }
+      get_cw2_payment_declaration_drawer: {
+        Args: { p_declaration_id: string }
+        Returns: Json
+      }
       get_enrollment_financial_summary: {
         Args: { p_enrollment_id: string }
         Returns: Json
@@ -8423,6 +8440,10 @@ export type Database = {
         }
         Returns: Json
       }
+      refresh_cw2_payment_declaration_finance: {
+        Args: { p_enrollment_financial_terms_id: string }
+        Returns: Json
+      }
       remove_staff_from_center: {
         Args: { p_target_user_id: string }
         Returns: Json
@@ -8695,6 +8716,7 @@ export type Database = {
           p_guardian_id?: string
           p_idempotency_key?: string
           p_lead_id?: string
+          p_promotion_context?: string
           p_student_id?: string
           p_total_obligation_amount?: number
         }

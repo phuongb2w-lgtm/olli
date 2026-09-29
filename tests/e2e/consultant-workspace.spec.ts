@@ -43,6 +43,8 @@ const mockRow = {
   capabilities: {
     can_edit_contact: false,
     can_open_payment_declaration: false,
+    can_create_payment_declaration: false,
+    can_edit_payment_declaration: false,
     can_submit_declaration: true,
     can_add_payment: false,
     can_open_student_details: false,
@@ -67,7 +69,9 @@ const mockStudentRow = {
   tuition_paid: 5000000,
   capabilities: {
     can_edit_contact: true,
-    can_open_payment_declaration: true,
+    can_open_payment_declaration: false,
+    can_create_payment_declaration: false,
+    can_edit_payment_declaration: false,
     can_submit_declaration: false,
     can_add_payment: false,
     can_open_student_details: true,

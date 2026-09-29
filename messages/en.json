@@ -2296,17 +2296,53 @@
       "mot_phan": "Partial",
       "full_phi": "Paid in full"
     },
+    "tuition": {
+      "paid": "Paid",
+      "outstanding": "Due",
+      "declarationHint": "Payment declaration available (drawer in a later release)"
+    },
     "declaration": {
       "draft": "Draft",
       "pending": "Pending",
       "approved": "Approved",
       "rejected": "Rejected",
-      "returned": "Returned"
-    },
-    "tuition": {
-      "paid": "Paid",
-      "outstanding": "Due",
-      "declarationHint": "Payment declaration available (drawer in a later release)"
+      "returned": "Returned",
+      "openAction": "Declare payment",
+      "title": "Payment declaration",
+      "refreshFinance": "Refresh amounts",
+      "close": "Close",
+      "closeOverlay": "Close drawer",
+      "student": "Student",
+      "studentCode": "Student code",
+      "provisional": "provisional",
+      "course": "Course",
+      "totalDue": "Total due",
+      "confirmedPaid": "Confirmed paid",
+      "outstanding": "Outstanding",
+      "amountThisTime": "Amount this time",
+      "promotion": "Promotion / discount (context)",
+      "promotionHint": "Consultant context only — does not change authoritative tuition terms.",
+      "note": "Note",
+      "saveDraft": "Save draft",
+      "submit": "Submit for confirmation",
+      "saving": "Saving…",
+      "submitting": "Submitting…",
+      "pendingReadOnly": "Pending Accounting confirmation — read only.",
+      "returnedEditable": "Returned by Accounting — you may update and resubmit.",
+      "fullySettled": "Tuition is fully settled for this obligation.",
+      "missingGuardian": "A primary guardian is required before you can submit.",
+      "errors": {
+        "permission_denied": "You do not have permission to manage payment declarations.",
+        "exceeds_outstanding": "Amount exceeds the current outstanding balance.",
+        "already_settled": "There is no outstanding obligation for these terms.",
+        "already_pending": "A pending declaration already exists for this obligation.",
+        "context_incomplete": "Enrollment financial context is incomplete.",
+        "not_editable": "This declaration cannot be edited.",
+        "not_submittable": "This declaration cannot be submitted.",
+        "invalid_amount": "Enter a valid amount greater than zero.",
+        "not_found": "Declaration was not found.",
+        "unknown": "We could not save the declaration. Please try again."
+      }
     },
     "filters": {
       "search": "Search name",

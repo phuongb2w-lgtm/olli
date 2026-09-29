@@ -2296,17 +2296,53 @@
       "mot_phan": "Một phần",
       "full_phi": "Full phí"
     },
+    "tuition": {
+      "paid": "Đã thu",
+      "outstanding": "Còn",
+      "declarationHint": "Có thể khai báo thanh toán (ngăn kéo ở bản phát hành sau)"
+    },
     "declaration": {
       "draft": "Nháp",
       "pending": "Chờ duyệt",
       "approved": "Đã duyệt",
       "rejected": "Từ chối",
-      "returned": "Trả lại"
-    },
-    "tuition": {
-      "paid": "Đã thu",
-      "outstanding": "Còn",
-      "declarationHint": "Có thể khai báo thanh toán (ngăn kéo ở bản phát hành sau)"
+      "returned": "Trả lại",
+      "openAction": "Khai báo khoản nộp",
+      "title": "Khai báo thanh toán",
+      "refreshFinance": "Làm mới số liệu",
+      "close": "Đóng",
+      "closeOverlay": "Đóng ngăn kéo",
+      "student": "Học viên",
+      "studentCode": "Mã học viên",
+      "provisional": "tạm",
+      "course": "Khóa học",
+      "totalDue": "Tổng phải nộp",
+      "confirmedPaid": "Đã xác nhận",
+      "outstanding": "Còn thiếu",
+      "amountThisTime": "Số tiền nộp lần này",
+      "promotion": "Ưu đãi / khuyến mãi (ngữ cảnh)",
+      "promotionHint": "Chỉ là ngữ cảnh tư vấn — không thay đổi học phí chính thức.",
+      "note": "Ghi chú",
+      "saveDraft": "Lưu nháp",
+      "submit": "Gửi xác nhận",
+      "saving": "Đang lưu…",
+      "submitting": "Đang gửi…",
+      "pendingReadOnly": "Đang chờ Kế toán xác nhận — chỉ xem.",
+      "returnedEditable": "Kế toán đã trả lại — bạn có thể sửa và gửi lại.",
+      "fullySettled": "Học phí đã hoàn tất cho nghĩa vụ này.",
+      "missingGuardian": "Cần phụ huynh chính trước khi gửi xác nhận.",
+      "errors": {
+        "permission_denied": "Bạn không có quyền khai báo thanh toán.",
+        "exceeds_outstanding": "Số tiền vượt số còn thiếu hiện tại.",
+        "already_settled": "Không còn nghĩa vụ học phí cho kỳ này.",
+        "already_pending": "Đã có khai báo đang chờ xác nhận.",
+        "context_incomplete": "Thiếu ngữ cảnh tài chính ghi danh.",
+        "not_editable": "Không thể sửa khai báo này.",
+        "not_submittable": "Không thể gửi khai báo này.",
+        "invalid_amount": "Nhập số tiền hợp lệ lớn hơn 0.",
+        "not_found": "Không tìm thấy khai báo.",
+        "unknown": "Không lưu được khai báo. Vui lòng thử lại."
+      }
     },
     "filters": {
       "search": "Tìm theo tên",

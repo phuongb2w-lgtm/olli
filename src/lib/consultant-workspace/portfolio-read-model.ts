@@ -16,6 +16,8 @@ export type ConsultantWorkspaceTuitionPaymentState =
 export type ConsultantWorkspacePortfolioCapabilities = {
   can_edit_contact: boolean;
   can_open_payment_declaration: boolean;
+  can_create_payment_declaration: boolean;
+  can_edit_payment_declaration: boolean;
   can_submit_declaration: boolean;
   can_add_payment: boolean;
   can_open_student_details: boolean;

@@ -31,6 +31,7 @@ import type {
 } from "@/lib/consultant-workspace/portfolio-read-model";
 import { formatMoneyVnd } from "@/lib/formatting";
 import type { Locale } from "@/i18n/config";
+import { PaymentDeclarationDrawer } from "@/components/consultant-workspace/payment-declaration-drawer";
 
 type CourseOption = { id: string; name: string };
 
@@ -118,6 +119,10 @@ export function ConsultantPortfolioWorkspace({ initialPreferences, courseOptions
   );
   const [focusedCell, setFocusedCell] = useState<{ row: number; col: number } | null>(null);
   const [pending, startTransition] = useTransition();
+  const [declarationRow, setDeclarationRow] = useState<ConsultantWorkspacePortfolioRow | null>(
+    null,
+  );
+  const declarationTriggerRef = useRef<HTMLButtonElement>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -269,8 +274,16 @@ export function ConsultantPortfolioWorkspace({ initialPreferences, courseOptions
                 {formatMoneyVnd(r.tuition_paid, locale)} · {t("tuition.outstanding")}{" "}
                 {formatMoneyVnd(r.tuition_outstanding, locale)}
               </p>
-              {r.capabilities.can_submit_declaration || r.capabilities.can_open_payment_declaration ? (
-                <p className="text-slate-500">{t("tuition.declarationHint")}</p>
+              {r.capabilities.can_open_payment_declaration ? (
+                <button
+                  type="button"
+                  ref={declarationRow?.portfolio_entry_id === r.portfolio_entry_id ? declarationTriggerRef : undefined}
+                  className="mt-1 text-left text-xs font-medium text-slate-900 underline"
+                  data-testid="declare-payment-action"
+                  onClick={() => setDeclarationRow(r)}
+                >
+                  {t("declaration.openAction")}
+                </button>
               ) : null}
             </div>
           );
@@ -751,6 +764,16 @@ export function ConsultantPortfolioWorkspace({ initialPreferences, courseOptions
         >
           {loadState === "loading" ? t("states.loadingMore") : t("actions.loadMore")}
         </button>
+      ) : null}
+
+      {declarationRow ? (
+        <PaymentDeclarationDrawer
+          key={declarationRow.portfolio_entry_id}
+          row={declarationRow}
+          triggerRef={declarationTriggerRef}
+          onClose={() => setDeclarationRow(null)}
+          onSuccess={() => void loadPage(appliedQuery, false, null)}
+        />
       ) : null}
     </div>
   );
