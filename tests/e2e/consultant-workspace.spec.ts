@@ -204,7 +204,7 @@ test.describe("CW2-T06 portfolio grid (mocked RPC)", () => {
 
   test("12. EN locale labels", async ({ page }) => {
     await page.getByRole("combobox", { name: /language|ngôn ngữ/i }).selectOption("en");
-    await expect(page.getByRole("heading", { level: 2, name: /consultant portfolio/i })).toBeVisible({
+    await expect(page.getByRole("heading", { level: 3, name: /consultant portfolio/i })).toBeVisible({
       timeout: 15_000,
     });
   });
@@ -226,7 +226,7 @@ test.describe("CW2-T06 VI locale", () => {
     await signIn(page, consultantEmail);
     await page.goto("/consultant");
     await page.getByRole("combobox", { name: /language|ngôn ngữ/i }).selectOption("vi");
-    await expect(page.getByRole("heading", { level: 2, name: /danh mục tư vấn/i })).toBeVisible({
+    await expect(page.getByRole("heading", { level: 3, name: /danh mục tư vấn/i })).toBeVisible({
       timeout: 15_000,
     });
   });

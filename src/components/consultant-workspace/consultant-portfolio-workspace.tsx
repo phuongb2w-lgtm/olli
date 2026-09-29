@@ -9,7 +9,7 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   hideConsultantGridRowAction,
@@ -31,6 +31,7 @@ import type {
 } from "@/lib/consultant-workspace/portfolio-read-model";
 import { formatMoneyVnd } from "@/lib/formatting";
 import type { Locale } from "@/i18n/config";
+import { ConsultantMonthlySalesHeader } from "@/components/consultant-workspace/consultant-monthly-sales-header";
 import { PaymentDeclarationDrawer } from "@/components/consultant-workspace/payment-declaration-drawer";
 
 type CourseOption = { id: string; name: string };
@@ -430,9 +431,21 @@ export function ConsultantPortfolioWorkspace({ initialPreferences, courseOptions
 
   return (
     <div className="space-y-4" data-testid="consultant-workspace">
+      <Suspense
+        fallback={
+          <div
+            className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-600"
+            data-testid="consultant-monthly-sales-header-loading"
+          >
+            {t("monthlySales.loadingAmount")}
+          </div>
+        }
+      >
+        <ConsultantMonthlySalesHeader />
+      </Suspense>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">{t("title")}</h2>
+          <h3 className="text-lg font-semibold text-slate-900">{t("title")}</h3>
           <p className="text-sm text-slate-600">{t("subtitle")}</p>
         </div>
         <div className="flex flex-wrap gap-2">

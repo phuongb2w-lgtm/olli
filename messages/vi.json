@@ -2372,6 +2372,22 @@
       "error": "Không tải được danh mục. Vui lòng thử lại.",
       "retry": "Thử lại",
       "loadingMore": "Đang tải…"
+    },
+    "monthlySales": {
+      "title": "Doanh số của tháng",
+      "monthLabel": "Tháng {month}",
+      "previousMonth": "Tháng trước",
+      "nextMonth": "Tháng sau",
+      "currentMonth": "Tháng hiện tại",
+      "loadingAmount": "Đang tải…",
+      "paymentCount": "{count} khoản thanh toán đã xác nhận",
+      "emptyMonth": "Chưa có doanh số trong tháng này",
+      "error": "Không thể tải doanh số",
+      "retry": "Thử lại",
+      "comparisonUp": "↑ {percent} so với tháng trước",
+      "comparisonDown": "↓ {percent} so với tháng trước",
+      "comparisonNew": "Mới so với tháng trước",
+      "comparisonFlat": "Không đổi so với tháng trước"
     }
   }
 }

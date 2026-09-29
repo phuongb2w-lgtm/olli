@@ -2372,6 +2372,22 @@
       "error": "We could not load your portfolio. Please try again.",
       "retry": "Retry",
       "loadingMore": "Loading…"
+    },
+    "monthlySales": {
+      "title": "Monthly sales",
+      "monthLabel": "Month {month}",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "currentMonth": "Current month",
+      "loadingAmount": "Loading…",
+      "paymentCount": "{count, plural, one {# confirmed payment} other {# confirmed payments}}",
+      "emptyMonth": "No sales recorded this month yet.",
+      "error": "Monthly sales could not be loaded.",
+      "retry": "Retry",
+      "comparisonUp": "Up {percent} vs previous month",
+      "comparisonDown": "Down {percent} vs previous month",
+      "comparisonNew": "New activity vs previous month",
+      "comparisonFlat": "Unchanged vs previous month"
     }
   }
 }

@@ -6739,6 +6739,25 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _cw2_t08_confirm_amount: {
+        Args: {
+          p_amount: number
+          p_consultant_auth: string
+          p_enrollment_id: string
+          p_guardian_id: string
+          p_idem: string
+          p_paid?: string
+          p_reviewer_auth: string
+          p_student_id: string
+          p_terms_id: string
+        }
+        Returns: string
+      }
+      _cw2_t08_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _cw2_t08_sales: { Args: { p_month: string }; Returns: Json }
       _cw2_validate_consultant_operational_code: {
         Args: { p_code: string }
         Returns: boolean
@@ -7900,6 +7919,10 @@ export type Database = {
       }
       get_consultant_declaration_summary: {
         Args: { p_end_date: string; p_start_date: string }
+        Returns: Json
+      }
+      get_consultant_monthly_sales: {
+        Args: { p_period_month?: string }
         Returns: Json
       }
       get_crm_activity_metrics: {
