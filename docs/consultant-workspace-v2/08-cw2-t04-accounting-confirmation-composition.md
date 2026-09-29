@@ -1,7 +1,7 @@
 # CW2-T04 — Accounting confirmation composition
 
-**Migrations:** `20260930105000_cw2_t04_accounting_confirmation_composition.sql`, `20260930105100_cw2_t04_convert_lead_confirm_gate.sql`  
-**Tests:** `supabase/tests/cw2_t04_accounting_confirmation_tests.sql` (42 scenarios)
+**Migrations:** `20260930105000_cw2_t04_accounting_confirmation_composition.sql`, `20260930105100_cw2_t04_convert_lead_confirm_gate.sql`, `20260930105200_cw2_t04_1_accountant_confirm_convert_scope.sql`  
+**Tests:** `supabase/tests/cw2_t04_accounting_confirmation_tests.sql` (42 scenarios), `supabase/tests/cw2_t04_1_accountant_lead_first_tests.sql` (18 scenarios — T04.1)
 
 ## Lifecycle
 
@@ -23,10 +23,10 @@ Legacy M5 `declare_consultant_revenue()` rows remain `workflow_kind = legacy_m5`
 
 **`confirm_consultant_payment_declaration(declaration_id, paid_at?, method?, idempotency_key?)`**
 
-Requires **`payment.record`** and **`consultant_revenue.review`**. Single transaction (SECURITY DEFINER for attribution insert):
+Requires **`payment.record`** and **`consultant_revenue.review`** (canonical **Accountant** role). Center Manager is not required. See [T04.1 lead-convert scope](./09-cw2-t04-1-accountant-confirm-lead-convert-scope.md). Single transaction (SECURITY DEFINER for attribution insert):
 
 1. Validate CW2 pending declaration + finance state (`_cw2_validate_declaration_finance_state`).
-2. Optional **`convert_lead`** when `student_id` null (session `cw2.declaration_confirm`; see migration 051 permission gate).
+2. Optional **`convert_lead`** when `student_id` null (session `cw2.declaration_confirm`; migrations 051/052 confirm-scoped gate — Accountant does **not** get general `lead.convert`).
 3. **`record_payment`** with M2 allocations (idempotent key default `cw2-decl-confirm:{id}`).
 4. **`payment_consultant_attribution`** (amount = payment cash; `attribution_recorded_at` = **`payment.paid_at`**).
 5. **`allocate_official_student_code`** (T03) when no official code; legacy occupied codes skip allocation without failing payment.

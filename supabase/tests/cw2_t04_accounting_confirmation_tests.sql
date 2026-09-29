@@ -29,7 +29,7 @@ RETURNS void LANGUAGE plpgsql AS $$
 BEGIN RESET ROLE; SET LOCAL ROLE postgres; END;
 $$;
 
--- Shared fixture: org + consultant + reviewer (center admin) + enrollment/terms/charges
+-- Shared fixture: org + consultant + reviewer (canonical accountant) + enrollment/terms/charges
 CREATE OR REPLACE FUNCTION _cw2_t04_fixture(
   OUT org_id uuid,
   OUT consultant_auth uuid,
@@ -70,7 +70,7 @@ BEGIN
   SELECT org_id, (SELECT id FROM app_user WHERE auth_user_id = reviewer_auth AND organization_id = org_id),
     r.id, CURRENT_DATE, 'active'
   FROM role r
-  WHERE r.organization_id = org_id AND r.canonical_code = 'center_manager';
+  WHERE r.organization_id = org_id AND r.canonical_code = 'accountant';
   PERFORM _cw2_t04_as_auth(reviewer_auth);
   PERFORM public.assign_consultant_operational_code(consultant_user);
   PERFORM _cw2_t04_as_postgres();

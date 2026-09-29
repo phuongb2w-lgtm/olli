@@ -13,6 +13,7 @@
 | [06 — CW2-T02.2 OA classification](./06-cw2-t02-2-operations-analytics-classification.md) | OA-5/OA-6 verify failure classification (harness) |
 | [07 — CW2-T03 allocator](./07-cw2-t03-official-student-code-allocator.md) | Official `CCYYNNNN` allocation primitive |
 | [08 — CW2-T04 confirmation](./08-cw2-t04-accounting-confirmation-composition.md) | Draft/submit + Accounting confirmation composition |
+| [09 — CW2-T04.1 accountant scope](./09-cw2-t04-1-accountant-confirm-lead-convert-scope.md) | Accountant lead-first confirm without general `lead.convert` |
 
 **T01 status:** **CLOSED / PASS** — design gate finalized (documentation only).  
 **T01.1:** **CLOSED / PASS** — center-wide `NNNN` sequence semantics corrected (docs only).  
