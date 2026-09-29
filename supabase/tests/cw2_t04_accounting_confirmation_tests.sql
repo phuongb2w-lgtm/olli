@@ -350,6 +350,8 @@ BEGIN
   PERFORM public.submit_consultant_payment_declaration(v_d2);
   PERFORM _cw2_t04_as_auth(f.reviewer_auth);
   PERFORM public.confirm_consultant_payment_declaration(v_d2);
+  -- Verification read: accountant lacks student.read; use postgres for org-scoped truth.
+  PERFORM _cw2_t04_as_postgres();
   n1 := public._cw2_extract_official_sequence_nnnn((SELECT student_code FROM student WHERE id = f.student_id));
   n2 := public._cw2_extract_official_sequence_nnnn((SELECT student_code FROM student WHERE id = v_s2));
   PERFORM _cw2_t04_record(31, 'two registrations distinct NNNN', n1 IS NOT NULL AND n2 IS NOT NULL AND n1 <> n2);
@@ -421,6 +423,7 @@ DO $$
 DECLARE f record; v_decl uuid; r public.consultant_payment_confirmation_result;
 BEGIN
   SELECT * INTO f FROM _cw2_t04_fixture();
+  PERFORM _cw2_t04_as_postgres();
   UPDATE student SET student_code = 'HV777' WHERE id = f.student_id;
   PERFORM _cw2_t04_as_auth(f.consultant_auth);
   v_decl := public.save_consultant_payment_declaration_draft(
@@ -430,6 +433,7 @@ BEGIN
   PERFORM public.submit_consultant_payment_declaration(v_decl);
   PERFORM _cw2_t04_as_auth(f.reviewer_auth);
   r := public.confirm_consultant_payment_declaration(v_decl);
+  PERFORM _cw2_t04_as_postgres();
   PERFORM _cw2_t04_record(37, 'legacy code preserved payment ok', (
     SELECT student_code FROM student WHERE id = f.student_id
   ) = 'HV777' AND r.payment_id IS NOT NULL);

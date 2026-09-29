@@ -1,6 +1,6 @@
 # CW2-T04.1 — Accountant confirmation & lead conversion scope
 
-**Migrations:** `20260930105200_cw2_t04_1_accountant_confirm_convert_scope.sql` (tightens migration 051 gate)  
+**Migrations:** `20260930105200_cw2_t04_1_accountant_confirm_convert_scope.sql`, `20260930105300_cw2_t04_1_confirm_scoped_lead_readiness.sql`  
 **Tests:** `supabase/tests/cw2_t04_1_accountant_lead_first_tests.sql` (18 scenarios)  
 **Regression:** T04 suite uses canonical **`accountant`** reviewer (not `center_manager`).
 
@@ -28,6 +28,8 @@ When a submitted pending `cw2_payment` declaration has `lead_id` and no `student
 The Accountant does **not** receive general-purpose **`lead.convert`**. Arbitrary `convert_lead()` calls outside an active valid CW2 confirmation still fail with `permission_denied`.
 
 Draft, rejected, returned, and `legacy_m5` declarations do not satisfy the gate.
+
+Identity readiness for conversion on this path uses **`_cw2_confirm_scoped_lead_identity_readiness()`** (SECURITY DEFINER, same declaration proof) so Accountants are not required to hold general **`lead.read`** for CRM browsing.
 
 ## Safety
 

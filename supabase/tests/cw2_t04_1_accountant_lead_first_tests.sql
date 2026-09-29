@@ -136,20 +136,18 @@ BEGIN
   INSERT INTO lead (organization_id, status) VALUES (p_org, 'qualified') RETURNING id INTO lead_id;
   INSERT INTO lead_candidate (organization_id, lead_id, given_name, family_name, date_of_birth, is_primary_candidate)
     VALUES (p_org, lead_id, 'LeadFirst', 'Prospect', '2016-03-15', true) RETURNING id INTO v_cand;
+  INSERT INTO guardian (organization_id, given_name, family_name, phone, email, status)
+    VALUES (p_org, 'LF', 'Guardian', '0900000041', 'lf-guardian@test.local', 'active') RETURNING id INTO guardian_id;
   INSERT INTO lead_contact (organization_id, lead_id, given_name, family_name, phone, is_primary_contact, is_billing_contact)
     VALUES (p_org, lead_id, 'LF', 'Guardian', '0900000041', true, true) RETURNING id INTO v_contact;
 
   PERFORM _cw2_t041_as_auth(p_consultant_auth);
   PERFORM public.resolve_lead_candidate_identity(v_cand, 'use_existing', prospect_student_id);
-  PERFORM public.resolve_lead_contact_identity(v_contact, 'create_new');
-
-  SELECT g.id INTO guardian_id
-  FROM lead_contact_identity_resolution r
-  JOIN guardian g ON g.id = r.guardian_id
-  WHERE r.lead_contact_id = v_contact AND r.organization_id = p_org;
+  PERFORM public.resolve_lead_contact_identity(v_contact, 'use_existing', guardian_id);
 
   PERFORM _cw2_t041_as_postgres();
-  INSERT INTO course (organization_id, code, name) VALUES (p_org, 'T41L', 'T041 Lead Course') RETURNING id INTO v_course;
+  INSERT INTO course (organization_id, code, name)
+    VALUES (p_org, 'T41L' || substr(replace(gen_random_uuid()::text, '-', ''), 1, 4), 'T041 Lead Course') RETURNING id INTO v_course;
   INSERT INTO class (organization_id, course_id, name, status) VALUES (p_org, v_course, 'T041 Lead Class', 'active') RETURNING id INTO v_class;
   INSERT INTO student_guardian (organization_id, student_id, guardian_id, is_primary_contact, is_billing_contact)
     VALUES (p_org, prospect_student_id, guardian_id, true, true);
@@ -203,6 +201,7 @@ BEGIN
   PERFORM public.submit_consultant_payment_declaration(v_decl);
   PERFORM _cw2_t041_as_auth(f.accountant_auth);
   r := public.confirm_consultant_payment_declaration(v_decl);
+  PERFORM _cw2_t041_as_postgres();
   SELECT count(*) INTO v_students FROM student s
   WHERE s.organization_id = f.org_id AND s.given_name = 'LeadFirst' AND s.family_name = 'Prospect';
   SELECT count(*) INTO v_conv FROM lead_conversion WHERE lead_id = lf.lead_id AND organization_id = f.org_id;

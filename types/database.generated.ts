@@ -1430,6 +1430,8 @@ export type Database = {
       consultant_revenue_declaration: {
         Row: {
           approved_payment_id: string | null
+          class_id: string | null
+          confirmation_idempotency_key: string | null
           consultant_operational_code_snapshot: string | null
           consultant_user_id: string
           course_id: string | null
@@ -1441,6 +1443,7 @@ export type Database = {
           description: string | null
           enrollment_financial_terms_id: string | null
           enrollment_id: string | null
+          guardian_id: string | null
           id: string
           idempotency_key: string | null
           lead_id: string | null
@@ -1454,9 +1457,12 @@ export type Database = {
           submitted_at: string | null
           total_obligation_amount: number | null
           updated_at: string
+          workflow_kind: string
         }
         Insert: {
           approved_payment_id?: string | null
+          class_id?: string | null
+          confirmation_idempotency_key?: string | null
           consultant_operational_code_snapshot?: string | null
           consultant_user_id: string
           course_id?: string | null
@@ -1468,6 +1474,7 @@ export type Database = {
           description?: string | null
           enrollment_financial_terms_id?: string | null
           enrollment_id?: string | null
+          guardian_id?: string | null
           id?: string
           idempotency_key?: string | null
           lead_id?: string | null
@@ -1481,9 +1488,12 @@ export type Database = {
           submitted_at?: string | null
           total_obligation_amount?: number | null
           updated_at?: string
+          workflow_kind?: string
         }
         Update: {
           approved_payment_id?: string | null
+          class_id?: string | null
+          confirmation_idempotency_key?: string | null
           consultant_operational_code_snapshot?: string | null
           consultant_user_id?: string
           course_id?: string | null
@@ -1495,6 +1505,7 @@ export type Database = {
           description?: string | null
           enrollment_financial_terms_id?: string | null
           enrollment_id?: string | null
+          guardian_id?: string | null
           id?: string
           idempotency_key?: string | null
           lead_id?: string | null
@@ -1508,6 +1519,7 @@ export type Database = {
           submitted_at?: string | null
           total_obligation_amount?: number | null
           updated_at?: string
+          workflow_kind?: string
         }
         Relationships: [
           {
@@ -1523,6 +1535,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "app_user"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultant_revenue_declaration_org_class_fk"
+            columns: ["organization_id", "class_id"]
+            isOneToOne: false
+            referencedRelation: "class"
+            referencedColumns: ["organization_id", "id"]
           },
           {
             foreignKeyName: "consultant_revenue_declaration_org_consultant_fk"
@@ -1543,6 +1562,13 @@ export type Database = {
             columns: ["organization_id", "enrollment_id"]
             isOneToOne: false
             referencedRelation: "enrollment"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "consultant_revenue_declaration_org_guardian_fk"
+            columns: ["organization_id", "guardian_id"]
+            isOneToOne: false
+            referencedRelation: "guardian"
             referencedColumns: ["organization_id", "id"]
           },
           {
@@ -6510,16 +6536,54 @@ export type Database = {
         Returns: undefined
       }
       _current_linked_teacher_id: { Args: never; Returns: string }
+      _cw2_advance_organization_student_sequence: {
+        Args: { p_organization_id: string }
+        Returns: number
+      }
       _cw2_apply_consultant_workspace_permissions: {
         Args: { p_role_id: string }
         Returns: undefined
+      }
+      _cw2_compute_organization_student_sequence_floor: {
+        Args: { p_organization_id: string }
+        Returns: number
+      }
+      _cw2_confirm_scoped_lead_identity_readiness: {
+        Args: { p_lead_id: string }
+        Returns: Json
       }
       _cw2_custom_field_key_reserved: {
         Args: { p_key: string }
         Returns: boolean
       }
+      _cw2_declaration_is_cw2_payment: {
+        Args: {
+          p_row: Database["public"]["Tables"]["consultant_revenue_declaration"]["Row"]
+        }
+        Returns: boolean
+      }
+      _cw2_extract_official_sequence_nnnn: {
+        Args: { p_student_code: string }
+        Returns: number
+      }
+      _cw2_is_official_student_code: {
+        Args: { p_student_code: string }
+        Returns: boolean
+      }
       _cw2_next_consultant_operational_code: {
         Args: { p_organization_id: string }
+        Returns: string
+      }
+      _cw2_official_student_code_write_allowed: {
+        Args: never
+        Returns: boolean
+      }
+      _cw2_refresh_organization_student_sequence_floor: {
+        Args: { p_organization_id: string }
+        Returns: number
+      }
+      _cw2_student_organization_id: {
+        Args: { p_student_id: string }
         Returns: string
       }
       _cw2_t02_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
@@ -6532,9 +6596,46 @@ export type Database = {
         Args: { p_auth: string; p_email: string }
         Returns: undefined
       }
+      _cw2_t021_as_postgres: { Args: never; Returns: undefined }
+      _cw2_t021_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _cw2_t03_as_auth: { Args: { p_auth_id: string }; Returns: undefined }
+      _cw2_t03_as_postgres: { Args: never; Returns: undefined }
+      _cw2_t03_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _cw2_t04_as_auth: { Args: { p_auth: string }; Returns: undefined }
+      _cw2_t04_as_postgres: { Args: never; Returns: undefined }
+      _cw2_t04_fixture: { Args: never; Returns: Record<string, unknown> }
+      _cw2_t04_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _cw2_t041_as_auth: { Args: { p_auth: string }; Returns: undefined }
+      _cw2_t041_as_postgres: { Args: never; Returns: undefined }
+      _cw2_t041_lead_first_bundle: {
+        Args: { p_consultant_auth: string; p_org: string }
+        Returns: Record<string, unknown>
+      }
+      _cw2_t041_org_fixture: { Args: never; Returns: Record<string, unknown> }
+      _cw2_t041_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _cw2_t041_student_first_bundle: {
+        Args: { p_org: string }
+        Returns: Record<string, unknown>
+      }
       _cw2_validate_consultant_operational_code: {
         Args: { p_code: string }
         Returns: boolean
+      }
+      _cw2_validate_declaration_finance_state: {
+        Args: { p_amount: number; p_terms_id: string }
+        Returns: Json
       }
       _insert_payment_allocations: {
         Args: { p_allocations: Json; p_batch_id?: string; p_payment_id: string }
@@ -7092,6 +7193,16 @@ export type Database = {
         }
         Returns: string
       }
+      allocate_official_student_code: {
+        Args: { p_consultant_app_user_id: string; p_student_id: string }
+        Returns: Database["public"]["CompositeTypes"]["official_student_code_allocation_result"]
+        SetofOptions: {
+          from: "*"
+          to: "official_student_code_allocation_result"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       allocate_payment: {
         Args: {
           p_allocations: Json
@@ -7349,6 +7460,21 @@ export type Database = {
           p_notes?: string
         }
         Returns: string
+      }
+      confirm_consultant_payment_declaration: {
+        Args: {
+          p_declaration_id: string
+          p_idempotency_key?: string
+          p_method_code?: string
+          p_paid_at?: string
+        }
+        Returns: Database["public"]["CompositeTypes"]["consultant_payment_confirmation_result"]
+        SetofOptions: {
+          from: "*"
+          to: "consultant_payment_confirmation_result"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       consume_app_rate_limit: {
         Args: {
@@ -8356,6 +8482,8 @@ export type Database = {
         }
         Returns: {
           approved_payment_id: string | null
+          class_id: string | null
+          confirmation_idempotency_key: string | null
           consultant_operational_code_snapshot: string | null
           consultant_user_id: string
           course_id: string | null
@@ -8367,6 +8495,7 @@ export type Database = {
           description: string | null
           enrollment_financial_terms_id: string | null
           enrollment_id: string | null
+          guardian_id: string | null
           id: string
           idempotency_key: string | null
           lead_id: string | null
@@ -8380,6 +8509,7 @@ export type Database = {
           submitted_at: string | null
           total_obligation_amount: number | null
           updated_at: string
+          workflow_kind: string
         }
         SetofOptions: {
           from: "*"
@@ -8430,6 +8560,24 @@ export type Database = {
       run_class_cost_allocation: {
         Args: { p_period_month: string }
         Returns: Json
+      }
+      save_consultant_payment_declaration_draft: {
+        Args: {
+          p_class_id?: string
+          p_course_id?: string
+          p_declaration_date?: string
+          p_declaration_id?: string
+          p_declared_amount?: number
+          p_description?: string
+          p_enrollment_financial_terms_id?: string
+          p_enrollment_id?: string
+          p_guardian_id?: string
+          p_idempotency_key?: string
+          p_lead_id?: string
+          p_student_id?: string
+          p_total_obligation_amount?: number
+        }
+        Returns: string
       }
       save_executive_exception_follow_up: {
         Args: {
@@ -8556,6 +8704,46 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      submit_consultant_payment_declaration: {
+        Args: { p_declaration_id: string }
+        Returns: {
+          approved_payment_id: string | null
+          class_id: string | null
+          confirmation_idempotency_key: string | null
+          consultant_operational_code_snapshot: string | null
+          consultant_user_id: string
+          course_id: string | null
+          created_at: string
+          currency_code: string
+          declaration_date: string
+          declared_amount: number
+          declared_at: string
+          description: string | null
+          enrollment_financial_terms_id: string | null
+          enrollment_id: string | null
+          guardian_id: string | null
+          id: string
+          idempotency_key: string | null
+          lead_id: string | null
+          organization_id: string
+          promotion_context: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["consultant_revenue_declaration_status"]
+          student_id: string | null
+          submitted_at: string | null
+          total_obligation_amount: number | null
+          updated_at: string
+          workflow_kind: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "consultant_revenue_declaration"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       submit_session_attendance: {
         Args: { p_session_id: string }
         Returns: number
@@ -8620,6 +8808,14 @@ export type Database = {
         Returns: number
       }
       sum_canonical_receivables: { Args: never; Returns: Json }
+      sum_consultant_attributed_cash: {
+        Args: {
+          p_consultant_user_id: string
+          p_end_date: string
+          p_start_date: string
+        }
+        Returns: number
+      }
       sum_organization_service_obligation: { Args: never; Returns: number }
       sum_pending_consultant_declarations: {
         Args: { p_end_date: string; p_start_date: string }
@@ -8874,6 +9070,23 @@ export type Database = {
         | "dismissed"
     }
     CompositeTypes: {
+      consultant_payment_confirmation_result: {
+        declaration_id: string | null
+        payment_id: string | null
+        student_id: string | null
+        enrollment_id: string | null
+        official_student_code: string | null
+        idempotent_replay: boolean | null
+      }
+      official_student_code_allocation_result: {
+        student_id: string | null
+        organization_id: string | null
+        official_student_code: string | null
+        consultant_operational_code: string | null
+        birth_year_suffix: string | null
+        center_sequence_nnnn: number | null
+        idempotent_replay: boolean | null
+      }
       operational_calendar_entry: {
         entry_type: string | null
         occurrence_date: string | null
