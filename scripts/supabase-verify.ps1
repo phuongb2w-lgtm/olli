@@ -241,6 +241,9 @@ Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\cw2_t04_acc
 Write-Host "==> CW2-T04.1 accountant lead-first confirmation tests (18)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\cw2_t04_1_accountant_lead_first_tests.sql")
 
+Write-Host "==> CW2-T05 consultant workspace read model tests (42)..."
+Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\cw2_t05_consultant_workspace_read_model_tests.sql")
+
 Write-Host "==> Generating TypeScript types..."
 New-Item -ItemType Directory -Force -Path (Join-Path $ProjectRoot "types") | Out-Null
 npx supabase gen types typescript --local | Set-Content -Path (Join-Path $ProjectRoot "types\database.generated.ts") -Encoding utf8

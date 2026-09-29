@@ -6544,6 +6544,10 @@ export type Database = {
         Args: { p_role_id: string }
         Returns: undefined
       }
+      _cw2_assert_consultant_workspace_list_access: {
+        Args: { p_target_consultant: string }
+        Returns: undefined
+      }
       _cw2_compute_organization_student_sequence_floor: {
         Args: { p_organization_id: string }
         Returns: number
@@ -6562,6 +6566,24 @@ export type Database = {
         }
         Returns: boolean
       }
+      _cw2_derive_tuition_payment_state: {
+        Args: {
+          p_allocated: number
+          p_declaration_status: string
+          p_has_deposit_structure: boolean
+          p_outstanding: number
+        }
+        Returns: string
+      }
+      _cw2_derive_workspace_lifecycle_status: {
+        Args: {
+          p_has_active_enrollment: boolean
+          p_has_official_code: boolean
+          p_student_id: string
+          p_student_status: string
+        }
+        Returns: string
+      }
       _cw2_extract_official_sequence_nnnn: {
         Args: { p_student_code: string }
         Returns: number
@@ -6577,6 +6599,40 @@ export type Database = {
       _cw2_official_student_code_write_allowed: {
         Args: never
         Returns: boolean
+      }
+      _cw2_portfolio_finance_snapshot: {
+        Args: { p_enrollment_id: string; p_org: string }
+        Returns: Json
+      }
+      _cw2_portfolio_pick_declaration: {
+        Args: {
+          p_consultant: string
+          p_enrollment_id: string
+          p_lead_id: string
+          p_org: string
+          p_student_id: string
+          p_terms_id: string
+        }
+        Returns: {
+          id: string
+          status: Database["public"]["Enums"]["consultant_revenue_declaration_status"]
+          workflow_kind: string
+        }[]
+      }
+      _cw2_portfolio_pick_enrollment: {
+        Args: { p_org: string; p_student_id: string }
+        Returns: {
+          class_id: string
+          class_name: string
+          course_id: string
+          course_name: string
+          enrollment_financial_terms_id: string
+          enrollment_id: string
+        }[]
+      }
+      _cw2_provisional_student_code_display: {
+        Args: { p_consultant_code: string; p_date_of_birth: string }
+        Returns: string
       }
       _cw2_refresh_organization_student_sequence_floor: {
         Args: { p_organization_id: string }
@@ -6627,6 +6683,47 @@ export type Database = {
       }
       _cw2_t041_student_first_bundle: {
         Args: { p_org: string }
+        Returns: Record<string, unknown>
+      }
+      _cw2_t05_accountant_for_org: {
+        Args: { p_org: string }
+        Returns: Record<string, unknown>
+      }
+      _cw2_t05_add_portfolio_entry: {
+        Args: {
+          p_consultant_user: string
+          p_lead_id?: string
+          p_org: string
+          p_seq: number
+          p_student_id?: string
+        }
+        Returns: string
+      }
+      _cw2_t05_as_auth: { Args: { p_auth: string }; Returns: undefined }
+      _cw2_t05_as_postgres: { Args: never; Returns: undefined }
+      _cw2_t05_confirm_partial: {
+        Args: {
+          p_amount: number
+          p_consultant_auth: string
+          p_enrollment_id: string
+          p_guardian_id: string
+          p_org: string
+          p_student_id: string
+          p_terms_id: string
+        }
+        Returns: undefined
+      }
+      _cw2_t05_org: { Args: never; Returns: Record<string, unknown> }
+      _cw2_t05_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _cw2_t05_seed_auth_user: {
+        Args: { p_auth: string; p_email: string }
+        Returns: undefined
+      }
+      _cw2_t05_student_with_finance: {
+        Args: { p_consultant_auth: string; p_org: string }
         Returns: Record<string, unknown>
       }
       _cw2_validate_consultant_operational_code: {
@@ -7996,6 +8093,30 @@ export type Database = {
       list_consultant_work_queue: {
         Args: { p_limit?: number }
         Returns: Json[]
+      }
+      list_consultant_workspace_grid: {
+        Args: {
+          p_cursor_portfolio_entry_id?: string
+          p_cursor_workspace_sequence?: number
+          p_filters?: Json
+          p_include_hidden?: boolean
+          p_limit?: number
+          p_sort_direction?: string
+          p_sort_field?: string
+        }
+        Returns: Json
+      }
+      list_consultant_workspace_portfolio: {
+        Args: {
+          p_cursor_portfolio_entry_id?: string
+          p_cursor_workspace_sequence?: number
+          p_filters?: Json
+          p_include_hidden?: boolean
+          p_limit?: number
+          p_sort_direction?: string
+          p_sort_field?: string
+        }
+        Returns: Json
       }
       list_crm_admissions_exceptions: {
         Args: { p_end_date: string; p_start_date: string }
