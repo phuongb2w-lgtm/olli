@@ -31,8 +31,22 @@ Invoke-SupabaseDbReset
 Write-Host "==> Ensure Supabase stack is up after reset..."
 npx supabase start --ignore-health-check
 
-Write-Host "==> Wait for Auth/GoTrue after reset..."
-Start-Sleep -Seconds 30
+function Wait-LocalSupabaseAuthReady {
+  Write-Host "==> Wait for Kong-routed Auth admin API after reset..."
+  node (Join-Path $ProjectRoot "scripts\wait-local-supabase-auth-ready.mjs")
+  if ($LASTEXITCODE -eq 0) { return }
+  Write-Host "==> Auth admin still unavailable; restarting Kong and Auth containers once..."
+  docker restart supabase_kong_olli-local supabase_auth_olli-local | Out-Null
+  if ($LASTEXITCODE -ne 0) {
+    throw "docker restart supabase_kong_olli-local / supabase_auth_olli-local failed"
+  }
+  node (Join-Path $ProjectRoot "scripts\wait-local-supabase-auth-ready.mjs")
+  if ($LASTEXITCODE -ne 0) {
+    throw "Auth admin API not ready after reset (Kong-routed admin probe failed)"
+  }
+}
+
+Wait-LocalSupabaseAuthReady
 
 function Invoke-SupabaseSqlFile {
   param([string]$Path)
@@ -43,19 +57,18 @@ function Invoke-SupabaseSqlFile {
 
 Write-Host "==> Create Auth users via GoTrue admin API..."
 $seedOk = $false
-for ($seedAttempt = 1; $seedAttempt -le 4; $seedAttempt++) {
+for ($seedAttempt = 1; $seedAttempt -le 3; $seedAttempt++) {
   node (Join-Path $ProjectRoot "scripts\seed-auth-users.mjs")
   if ($LASTEXITCODE -eq 0) {
     $seedOk = $true
     break
   }
-  if ($seedAttempt -lt 4) {
-    Write-Host "==> seed-auth-users failed; waiting before retry ($seedAttempt/4)..."
-    Start-Sleep -Seconds (15 * $seedAttempt)
-    npx supabase start --ignore-health-check | Out-Null
+  if ($seedAttempt -lt 3) {
+    Write-Host "==> seed-auth-users failed; re-check Auth readiness ($seedAttempt/3)..."
+    Wait-LocalSupabaseAuthReady
   }
 }
-if (-not $seedOk) { throw "seed-auth-users.mjs failed after 4 attempts" }
+if (-not $seedOk) { throw "seed-auth-users.mjs failed after 3 attempts" }
 
 Write-Host "==> Apply dev seed fixtures..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\seed.sql")

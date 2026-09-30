@@ -5,7 +5,11 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
-import { execSync } from "node:child_process";
+import {
+  loadSupabaseStatusEnv,
+  sleep,
+  waitForKongAuthAdminReady,
+} from "./lib/local-supabase-auth-ready.mjs";
 
 const users = [
   { id: "a1111111-1111-4111-8111-111111111111", email: "org-a-admin@olli.local" },
@@ -30,33 +34,10 @@ const users = [
 
 const password = "testpass123";
 
-function loadEnv() {
-  const raw = execSync("npx supabase status -o env", { encoding: "utf8" });
-  const env = {};
-  for (const line of raw.split("\n")) {
-    const match = line.match(/^([A-Z0-9_]+)="?(.*?)"?$/);
-    if (match) env[match[1]] = match[2];
-  }
-  return env;
-}
-
 function isTransientAuthError(message) {
-  return /database error|connection|timeout|503|502|unavailable|starting/i.test(message ?? "");
-}
-
-async function sleep(ms) {
-  await new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function waitForAuthAdmin(admin, maxAttempts = 60) {
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    const { error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1 });
-    if (!error) return;
-    if (attempt === maxAttempts) {
-      throw new Error(`Auth admin API not ready: ${error.message}`);
-    }
-    await sleep(2000);
-  }
+  return /database error|connection|timeout|503|502|unavailable|starting|fetch failed|ECONNREFUSED|ECONNRESET|socket/i.test(
+    message ?? "",
+  );
 }
 
 async function ensureUser(admin, user) {
@@ -98,12 +79,12 @@ async function ensureUser(admin, user) {
 }
 
 async function main() {
-  const env = loadEnv();
+  const env = loadSupabaseStatusEnv();
+  await waitForKongAuthAdminReady({ env, logEvery: 10 });
+
   const admin = createClient(env.API_URL, env.SECRET_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-
-  await waitForAuthAdmin(admin);
 
   for (const user of users) {
     await ensureUser(admin, user);

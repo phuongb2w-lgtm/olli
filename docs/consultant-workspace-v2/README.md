@@ -19,6 +19,7 @@
 | [12 — CW2-T07 declaration drawer](./12-cw2-t07-payment-declaration-drawer.md) | Draft/submit drawer, T04 RPC reuse, capabilities |
 | [13 — CW2-T08 monthly sales header](./13-cw2-t08-monthly-sales-header.md) | Authoritative monthly sales header + workspace integration |
 | [14 — CW2-T09 portfolio detail](./14-cw2-t09-student-details-controlled-editing.md) | Details route + controlled edit + T07 integration |
+| [15 — CW2-T09.1 Auth readiness](./15-cw2-t09-1-auth-readiness-stabilization.md) | Post–db-reset Kong/GoTrue admin readiness for verify |
 
 **T01 status:** **CLOSED / PASS** — design gate finalized (documentation only).  
 **T01.1:** **CLOSED / PASS** — center-wide `NNNN` sequence semantics corrected (docs only).  
