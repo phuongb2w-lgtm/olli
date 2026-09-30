@@ -167,13 +167,14 @@ test.describe("CW2-T06 portfolio grid (mocked RPC)", () => {
   });
 
   test("8. details links for lead and student", async ({ page }) => {
+    const returnQuery = encodeURIComponent("/consultant");
     await expect(page.getByTestId("portfolio-details-link").first()).toHaveAttribute(
       "href",
-      `/crm/leads/${mockRow.lead_id}`,
+      `/consultant/portfolio/${mockRow.portfolio_entry_id}?return=${returnQuery}`,
     );
     await expect(page.getByTestId("portfolio-details-link").nth(1)).toHaveAttribute(
       "href",
-      `/students/${mockStudentRow.student_details_subject_id}/enrollments`,
+      `/consultant/portfolio/${mockStudentRow.portfolio_entry_id}?return=${returnQuery}`,
     );
   });
 
