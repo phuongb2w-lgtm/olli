@@ -1,9 +1,9 @@
 # CW2-T10 — Final integration, hardening & acceptance
 
 **Starting SHA:** `f9becdb054070dc23ae72745a4913a9f630e5fc9`  
-**Final SHA:** _(pending green verify + commit)_  
+**Final SHA:** `c4a01ed5d51252ae5031f0d60ba20f2d4a0ee860`  
 **Migrations:** 73 (no T10 schema changes — test + harness only)  
-**Status:** In progress until full `npm run verify` exit 0 on final commit.
+**Status:** CLOSED/PASS
 
 ## Purpose
 
@@ -95,7 +95,7 @@ Lead / potential person
 - [x] Focused Playwright bundled in full verify (T06–T09 + **cw2-t10-acceptance**)
 - [x] `npm run verify` exit 0
 - [x] Migration count **73**
-- [ ] Working tree clean after commit
+- [x] Working tree clean after commit
 
 ## Non-blocking debt
 
@@ -108,4 +108,4 @@ Lead / potential person
 **CW2-T10 — CLOSED/PASS**  
 **Consultant Workspace V2 — CLOSED/PASS**
 
-(Final SHA recorded below after commit.)
+**Final commit:** `c4a01ed5d51252ae5031f0d60ba20f2d4a0ee860`
