@@ -6782,6 +6782,10 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _cw2_t10_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _cw2_validate_consultant_operational_code: {
         Args: { p_code: string }
         Returns: boolean

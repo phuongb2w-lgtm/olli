@@ -33,16 +33,29 @@ test.describe("M4-T05 operational calendar", () => {
   test("materialized, projected, and cancelled entries render distinctly", async ({ page }) => {
     test.setTimeout(90_000);
     await signIn(page, adminEmail);
-    await page.goto("/?locale=en");
+    // Avoid locale switch here — setLocale + long verify pipelines can race cookie writes.
     // Fixtures from operations-smoke use 2036-01 dates when verify runs the full suite.
     await page.goto("/operations/calendar?from=2036-01-07&to=2036-01-21");
-    await expect(page.getByRole("heading", { level: 1, name: /calendar|operations|lịch vận hành/i })).toBeVisible({
-      timeout: 45_000,
-    });
+    await expect(page.locator("#teacherId")).toBeVisible({ timeout: 45_000 });
 
     const sessionItems = page.locator('li[data-entry-type="session"]');
     const projectedItems = page.locator('li[data-entry-type="projected"]');
     const cancelledItems = page.locator('li[data-entry-type="session"][data-session-status="cancelled"]');
+    const emptyOrError = page.getByText(
+      /nothing scheduled in this range|unable to load the schedule|Không có lịch trong khoảng|Không tải được lịch/i,
+    );
+
+    await expect
+      .poll(
+        async () => {
+          const sessionCount = await sessionItems.count();
+          const projectedCount = await projectedItems.count();
+          const hasEmpty = (await emptyOrError.count()) > 0;
+          return sessionCount + projectedCount > 0 || hasEmpty;
+        },
+        { timeout: 45_000 },
+      )
+      .toBe(true);
 
     const sessionCount = await sessionItems.count();
     const projectedCount = await projectedItems.count();
@@ -54,7 +67,7 @@ test.describe("M4-T05 operational calendar", () => {
     } else if (sessionCount + projectedCount > 0) {
       expect(sessionCount + projectedCount).toBeGreaterThan(0);
     } else {
-      await expect(page.getByText(/nothing scheduled|unable to load/i).first()).toBeVisible();
+      await expect(emptyOrError.first()).toBeVisible();
     }
   });
 
