@@ -374,6 +374,135 @@ BEGIN
   PERFORM _cw2_t02_record(16, 'consultant has workspace.read', v_ok);
 END $$;
 
+-- 17: legacy migration backfill SQL fails PostgreSQL DISTINCT/ORDER BY rule (42P10)
+DO $$
+DECLARE
+  v_org uuid := 'f0000000-0000-4000-8000-000000000099';
+  v_role uuid;
+  v_u1 uuid := 'f0000001-0000-4000-8000-000000000001';
+  v_legacy_ran boolean := false;
+BEGIN
+  PERFORM _cw2_t02_as_postgres();
+
+  INSERT INTO public.organization (id, name, default_locale, timezone, currency_code, status)
+  VALUES (v_org, 'CW2 migration backfill regression org', 'en', 'Asia/Ho_Chi_Minh', 'VND', 'active')
+  ON CONFLICT (id) DO NOTHING;
+
+  DELETE FROM public.user_role WHERE organization_id = v_org;
+  DELETE FROM public.app_user WHERE organization_id = v_org;
+
+  SELECT r.id INTO v_role
+  FROM public.role r
+  WHERE r.organization_id = v_org
+    AND r.is_canonical_template
+    AND r.canonical_code = 'consultant';
+
+  INSERT INTO public.app_user (id, organization_id, email, display_name, status, created_at)
+  VALUES (v_u1, v_org, 'cw2-backfill-a@olli.local', 'Backfill A', 'active', '2020-01-01'::timestamptz);
+
+  UPDATE public.app_user SET consultant_operational_code = NULL WHERE id = v_u1 AND organization_id = v_org;
+
+  INSERT INTO public.user_role (organization_id, user_id, role_id, status)
+  VALUES (v_org, v_u1, v_role, 'active');
+
+  BEGIN
+    PERFORM x.id
+    FROM (
+      SELECT DISTINCT u.id
+      FROM public.app_user u
+      JOIN public.user_role ur ON ur.user_id = u.id AND ur.organization_id = u.organization_id
+      JOIN public.role r ON r.id = ur.role_id
+      WHERE u.organization_id = v_org
+        AND u.consultant_operational_code IS NULL
+        AND ur.status = 'active'
+        AND r.is_canonical_template
+        AND r.canonical_code = 'consultant'
+      ORDER BY u.created_at, u.id
+      LIMIT 1
+    ) x;
+    v_legacy_ran := true;
+  EXCEPTION
+    WHEN invalid_column_reference THEN
+      v_legacy_ran := false;
+  END;
+  PERFORM _cw2_t02_record(17, 'legacy DISTINCT/ORDER BY backfill SQL rejected (42P10)', NOT v_legacy_ran);
+END $$;
+
+-- 18: corrected migration backfill selection (EXISTS dedupe, created_at then id order)
+DO $$
+DECLARE
+  v_org uuid := 'f0000000-0000-4000-8000-000000000099';
+  v_role uuid;
+  v_u1 uuid := 'f0000001-0000-4000-8000-000000000001';
+  v_u2 uuid := 'f0000002-0000-4000-8000-000000000002';
+  v_count integer;
+  v_first uuid;
+BEGIN
+  PERFORM _cw2_t02_as_postgres();
+
+  SELECT r.id INTO v_role
+  FROM public.role r
+  WHERE r.organization_id = v_org
+    AND r.is_canonical_template
+    AND r.canonical_code = 'consultant';
+
+  DELETE FROM public.user_role WHERE organization_id = v_org;
+  DELETE FROM public.app_user WHERE organization_id = v_org;
+
+  INSERT INTO public.app_user (id, organization_id, email, display_name, status, created_at)
+  VALUES
+    (v_u1, v_org, 'cw2-backfill-a@olli.local', 'Backfill A', 'active', '2020-01-01'::timestamptz),
+    (v_u2, v_org, 'cw2-backfill-b@olli.local', 'Backfill B', 'active', '2020-01-02'::timestamptz);
+
+  UPDATE public.app_user SET consultant_operational_code = NULL WHERE id IN (v_u1, v_u2) AND organization_id = v_org;
+
+  INSERT INTO public.user_role (organization_id, user_id, role_id, status)
+  VALUES
+    (v_org, v_u1, v_role, 'active'),
+    (v_org, v_u2, v_role, 'active');
+
+  SELECT count(*) INTO v_count
+  FROM (
+    SELECT u.id
+    FROM public.app_user u
+    WHERE u.organization_id = v_org
+      AND u.consultant_operational_code IS NULL
+      AND EXISTS (
+        SELECT 1
+        FROM public.user_role ur
+        JOIN public.role r ON r.id = ur.role_id
+        WHERE ur.user_id = u.id
+          AND ur.organization_id = u.organization_id
+          AND ur.status = 'active'
+          AND r.is_canonical_template
+          AND r.canonical_code = 'consultant'
+      )
+  ) q;
+
+  SELECT u.id INTO v_first
+  FROM public.app_user u
+  WHERE u.organization_id = v_org
+    AND u.consultant_operational_code IS NULL
+    AND EXISTS (
+      SELECT 1
+      FROM public.user_role ur
+      JOIN public.role r ON r.id = ur.role_id
+      WHERE ur.user_id = u.id
+        AND ur.organization_id = u.organization_id
+        AND ur.status = 'active'
+        AND r.is_canonical_template
+        AND r.canonical_code = 'consultant'
+    )
+  ORDER BY u.created_at, u.id
+  LIMIT 1;
+
+  PERFORM _cw2_t02_record(
+    18,
+    'migration backfill selection one row per consultant ordered by created_at',
+    v_count = 2 AND v_first = v_u1
+  );
+END $$;
+
 -- Summary
 DO $$
 DECLARE

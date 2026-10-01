@@ -239,7 +239,7 @@ Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m7_t07_comm
 Write-Host "==> M8-T07 rate limit tests (14)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\m8_t07_rate_limit_tests.sql")
 
-Write-Host "==> CW2-T02 domain foundation tests (16)..."
+Write-Host "==> CW2-T02 domain foundation tests (18)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\cw2_t02_domain_foundation_tests.sql")
 
 Write-Host "==> CW2-T02.1 student sequence bootstrap tests (8)..."

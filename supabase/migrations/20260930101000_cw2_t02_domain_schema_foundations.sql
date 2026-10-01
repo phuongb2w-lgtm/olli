@@ -717,15 +717,20 @@ DECLARE
 BEGIN
   FOR org_record IN SELECT id FROM public.organization LOOP
     FOR user_record IN
-      SELECT DISTINCT u.id
+      SELECT u.id
       FROM public.app_user u
-      JOIN public.user_role ur ON ur.user_id = u.id AND ur.organization_id = u.organization_id
-      JOIN public.role r ON r.id = ur.role_id
       WHERE u.organization_id = org_record.id
         AND u.consultant_operational_code IS NULL
-        AND ur.status = 'active'
-        AND r.is_canonical_template
-        AND r.canonical_code = 'consultant'
+        AND EXISTS (
+          SELECT 1
+          FROM public.user_role ur
+          JOIN public.role r ON r.id = ur.role_id
+          WHERE ur.user_id = u.id
+            AND ur.organization_id = u.organization_id
+            AND ur.status = 'active'
+            AND r.is_canonical_template
+            AND r.canonical_code = 'consultant'
+        )
       ORDER BY u.created_at, u.id
     LOOP
       v_code := public._cw2_next_consultant_operational_code(org_record.id);
