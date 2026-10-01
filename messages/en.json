@@ -2297,8 +2297,10 @@
       "full_phi": "Paid in full"
     },
     "tuition": {
-      "paid": "Paid",
+      "paid": "Confirmed paid",
       "outstanding": "Due",
+      "outstandingDue": "Remaining due",
+      "pendingConfirmation": "Pending confirmation",
       "declarationHint": "Payment declaration available (drawer in a later release)"
     },
     "declaration": {
@@ -2319,6 +2321,9 @@
       "totalDue": "Total due",
       "confirmedPaid": "Confirmed paid",
       "outstanding": "Outstanding",
+      "outstandingDue": "Remaining due",
+      "pendingConfirmation": "Pending confirmation",
+      "pendingDeclarationNote": "Prior declarations may be awaiting Accounting confirmation. You can submit another payment declaration while an obligation remains.",
       "amountThisTime": "Amount this time",
       "promotion": "Promotion / discount (context)",
       "promotionHint": "Consultant context only — does not change authoritative tuition terms.",

@@ -29,11 +29,11 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
   const [pending, startTransition] = useTransition();
 
   const readOnly =
-    row.declaration_status === "pending" ||
-    row.declaration_status === "approved" ||
-    row.declaration_status === "rejected";
+    row.declaration_status === "approved" || row.declaration_status === "rejected";
 
-  const [declarationId, setDeclarationId] = useState<string | null>(row.declaration_id);
+  const [declarationId, setDeclarationId] = useState<string | null>(
+    row.declaration_status === "pending" ? null : row.declaration_id,
+  );
   const [amountInput, setAmountInput] = useState("");
   const [promotion, setPromotion] = useState("");
   const [note, setNote] = useState("");
@@ -42,6 +42,7 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
     total: row.tuition_total_net,
     paid: row.tuition_paid,
     outstanding: row.tuition_outstanding,
+    pending: row.tuition_pending_declaration ?? 0,
   });
 
   const refreshFinance = useCallback(async () => {
@@ -52,13 +53,16 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
         total: Number(result.finance.tuition_total_net ?? row.tuition_total_net),
         paid: Number(result.finance.tuition_paid ?? row.tuition_paid),
         outstanding: Number(result.finance.tuition_outstanding ?? row.tuition_outstanding),
+        pending: Number(
+          result.finance.tuition_pending_declaration ?? row.tuition_pending_declaration ?? 0,
+        ),
       });
     }
   }, [row]);
 
   useEffect(() => {
     let cancelled = false;
-    if (row.declaration_id) {
+    if (row.declaration_id && row.declaration_status !== "pending") {
       void loadDeclarationDrawerAction(row.declaration_id).then((res) => {
         if (cancelled || !res.ok) return;
         const decl = res.data.declaration;
@@ -74,7 +78,7 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
     return () => {
       cancelled = true;
     };
-  }, [row.declaration_id, locale]);
+  }, [row.declaration_id, row.declaration_status, locale]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -165,8 +169,8 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
             <h2 id={titleId} className="text-lg font-semibold text-slate-900">
               {t("title")}
             </h2>
-            {row.declaration_status === "pending" ? (
-              <p className="text-sm text-amber-700">{t("pendingReadOnly")}</p>
+            {(row.tuition_pending_declaration ?? 0) > 0 ? (
+              <p className="text-sm text-amber-700">{t("pendingDeclarationNote")}</p>
             ) : null}
             {row.declaration_status === "returned" ? (
               <p className="text-sm text-amber-700">{t("returnedEditable")}</p>
@@ -211,8 +215,14 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
             <dt className="text-slate-600">{t("confirmedPaid")}</dt>
             <dd data-testid="drawer-paid">{formatMoneyVnd(finance.paid, locale)}</dd>
           </div>
+          {finance.pending > 0 ? (
+            <div>
+              <dt className="text-slate-600">{t("pendingConfirmation")}</dt>
+              <dd data-testid="drawer-pending">{formatMoneyVnd(finance.pending, locale)}</dd>
+            </div>
+          ) : null}
           <div>
-            <dt className="text-slate-600">{t("outstanding")}</dt>
+            <dt className="text-slate-600">{t("outstandingDue")}</dt>
             <dd data-testid="drawer-outstanding">{formatMoneyVnd(finance.outstanding, locale)}</dd>
           </div>
         </dl>

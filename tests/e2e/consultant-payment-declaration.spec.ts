@@ -3,9 +3,21 @@ import { signIn } from "./sign-in";
 
 /** Grid keyboard focus ring can intercept Playwright clicks on row 0; DOM click still fires handlers. */
 async function openEligibleDeclarationDrawer(page: Page) {
-  await page.getByTestId("declare-payment-action").nth(0).evaluate((el) => {
+  const action = page.getByTestId("declare-payment-action").first();
+  await action.scrollIntoViewIfNeeded();
+  await action.evaluate((el) => {
     (el as HTMLButtonElement).click();
   });
+  await expect(page.getByTestId("payment-declaration-drawer")).toBeVisible();
+}
+
+async function openPendingRowDeclarationDrawer(page: Page) {
+  const action = page.getByTestId("portfolio-row").nth(2).getByTestId("declare-payment-action");
+  await action.scrollIntoViewIfNeeded();
+  await action.evaluate((el) => {
+    (el as HTMLButtonElement).click();
+  });
+  await expect(page.getByTestId("payment-declaration-drawer")).toBeVisible();
 }
 
 const consultantEmail = "m6-t04-consultant@olli.local";
@@ -36,6 +48,7 @@ const eligibleRow = {
   tuition_total_net: 10_000_000,
   tuition_paid: 3_000_000,
   tuition_outstanding: 7_000_000,
+  tuition_pending_declaration: 0,
   tuition_payment_state: "mot_phan",
   tuition_payment_state_label: "Partial",
   declaration_id: null,
@@ -78,11 +91,15 @@ const pendingRow = {
   declaration_id: "a6700000-0000-4000-8000-000000000101",
   declaration_status: "pending",
   declaration_workflow_kind: "cw2_payment",
-  tuition_payment_state: "cho_xac_nhan",
-  tuition_payment_state_label: "Pending confirmation",
+  tuition_paid: 5_000_000,
+  tuition_outstanding: 5_000_000,
+  tuition_pending_declaration: 2_000_000,
+  tuition_payment_state: "mot_phan",
+  tuition_payment_state_label: "Partial",
   capabilities: {
     ...eligibleRow.capabilities,
-    can_create_payment_declaration: false,
+    can_open_payment_declaration: true,
+    can_create_payment_declaration: true,
     can_edit_payment_declaration: false,
     can_submit_declaration: false,
   },
@@ -112,8 +129,11 @@ test.describe("CW2-T07 payment declaration drawer", () => {
     await expect(rows.nth(1).getByTestId("declare-payment-action")).toHaveCount(0);
   });
 
-  test("pending row shows pending tuition state", async ({ page }) => {
-    await expect(page.getByTestId("portfolio-tuition").nth(2)).toContainText(/pending|chờ/i);
+  test("pending row shows pending total separately from confirmed paid", async ({ page }) => {
+    const tuition = page.getByTestId("portfolio-tuition").nth(2);
+    await expect(tuition).toContainText(/pending confirmation|chờ xác nhận/i);
+    await expect(tuition).toContainText(/2\.000\.000|2,000,000/);
+    await expect(tuition).toContainText(/5\.000\.000|5,000,000/);
   });
 
   test("drawer opens with financial context", async ({ page }) => {
@@ -141,11 +161,16 @@ test.describe("CW2-T07 payment declaration drawer", () => {
     await expect(page.getByTestId("drawer-error")).toBeVisible();
   });
 
-  test("pending declaration drawer is read-only", async ({ page }) => {
-    await page.getByTestId("declare-payment-action").nth(1).click();
-    await expect(page.getByText(/read only|chỉ xem/i)).toBeVisible();
-    await expect(page.getByTestId("drawer-save-draft")).toBeDisabled();
-    await expect(page.getByTestId("drawer-submit")).toBeDisabled();
+  test("pending row opens editable declaration for another payment", async ({ page }) => {
+    await openPendingRowDeclarationDrawer(page);
+    const drawer = page.getByTestId("payment-declaration-drawer");
+    await expect(drawer).toBeVisible();
+    await expect(drawer.getByTestId("drawer-pending")).toContainText(/2\.000\.000|2,000,000/);
+    await expect(drawer.getByTestId("drawer-paid")).toContainText(/5\.000\.000|5,000,000/);
+    await expect(drawer.getByTestId("drawer-outstanding")).toContainText(/5\.000\.000|5,000,000/);
+    await expect(drawer.getByTestId("drawer-amount")).toBeEnabled();
+    await expect(drawer.getByTestId("drawer-submit")).toBeEnabled();
+    await expect(page.getByText(/read only|chỉ xem/i)).toHaveCount(0);
   });
 
   test("EN declare payment label", async ({ page }) => {

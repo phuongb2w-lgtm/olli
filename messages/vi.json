@@ -2299,6 +2299,8 @@
     "tuition": {
       "paid": "Đã thu",
       "outstanding": "Còn",
+      "outstandingDue": "Còn phải đóng",
+      "pendingConfirmation": "Chờ xác nhận",
       "declarationHint": "Có thể khai báo thanh toán (ngăn kéo ở bản phát hành sau)"
     },
     "declaration": {
@@ -2317,8 +2319,11 @@
       "provisional": "tạm",
       "course": "Khóa học",
       "totalDue": "Tổng phải nộp",
-      "confirmedPaid": "Đã xác nhận",
+      "confirmedPaid": "Đã thu",
       "outstanding": "Còn thiếu",
+      "outstandingDue": "Còn phải đóng",
+      "pendingConfirmation": "Chờ xác nhận",
+      "pendingDeclarationNote": "Có khai báo đang chờ Kế toán xác nhận. Bạn vẫn có thể nộp thêm khai báo khi còn nghĩa vụ phải đóng.",
       "amountThisTime": "Số tiền nộp lần này",
       "promotion": "Ưu đãi / khuyến mãi (ngữ cảnh)",
       "promotionHint": "Chỉ là ngữ cảnh tư vấn — không thay đổi học phí chính thức.",

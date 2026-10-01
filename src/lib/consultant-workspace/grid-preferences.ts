@@ -36,7 +36,7 @@ export const PROTECTED_VISIBILITY_COLUMNS = new Set<ConsultantGridColumnId>([
 
 export const DEFAULT_COLUMN_WIDTHS: Record<string, number> = {
   stt: 72,
-  family_name: 140,
+  family_name: 172,
   given_name: 120,
   student_code: 120,
   lifecycle_status: 120,

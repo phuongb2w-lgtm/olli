@@ -445,8 +445,15 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
               <p className="font-medium">{r.tuition_payment_state_label}</p>
               <p className="text-slate-600">
                 {formatMoneyVnd(r.tuition_total_net, locale)} · {t("tuition.paid")}{" "}
-                {formatMoneyVnd(r.tuition_paid, locale)} · {t("tuition.outstanding")}{" "}
-                {formatMoneyVnd(r.tuition_outstanding, locale)}
+                {formatMoneyVnd(r.tuition_paid, locale)}
+                {(r.tuition_pending_declaration ?? 0) > 0 ? (
+                  <>
+                    {" "}
+                    · {t("tuition.pendingConfirmation")}{" "}
+                    {formatMoneyVnd(r.tuition_pending_declaration ?? 0, locale)}
+                  </>
+                ) : null}{" "}
+                · {t("tuition.outstandingDue")} {formatMoneyVnd(r.tuition_outstanding, locale)}
               </p>
               {r.capabilities.can_open_payment_declaration ? (
                 <button

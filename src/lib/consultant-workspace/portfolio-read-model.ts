@@ -57,6 +57,7 @@ export type ConsultantWorkspacePortfolioRow = {
   tuition_total_net: number;
   tuition_paid: number;
   tuition_outstanding: number;
+  tuition_pending_declaration?: number;
   tuition_payment_state: ConsultantWorkspaceTuitionPaymentState;
   tuition_payment_state_label: string;
   declaration_id: string | null;

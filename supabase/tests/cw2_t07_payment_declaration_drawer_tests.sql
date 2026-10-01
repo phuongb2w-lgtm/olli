@@ -73,7 +73,7 @@ END $$;
 
 -- 10–12: validation exceeds outstanding / settled / pending duplicate
 DO $$
-DECLARE f record; v_decl uuid; ok_exceed boolean := false; ok_settled boolean := false; ok_pending boolean := false;
+DECLARE f record; v_decl uuid; v_decl2 uuid; ok_exceed boolean := false; ok_settled boolean := false;
 BEGIN
   SELECT * INTO f FROM _cw2_t04_fixture();
   PERFORM _cw2_t04_as_auth(f.consultant_auth);
@@ -88,14 +88,12 @@ BEGIN
     f.enrollment_id, f.terms_id, f.guardian_id, 10000000, 't07-pending-dup', NULL
   );
   PERFORM public.submit_consultant_payment_declaration(v_decl);
-  BEGIN
-    PERFORM public.save_consultant_payment_declaration_draft(
-      NULL, CURRENT_DATE, 500000, 'y', NULL, f.student_id, NULL, NULL,
-      f.enrollment_id, f.terms_id, f.guardian_id, 10000000, 't07-pending-dup-2', NULL
-    );
-  EXCEPTION WHEN OTHERS THEN ok_pending := SQLERRM LIKE '%declaration_already_pending%'; END;
+  v_decl2 := public.save_consultant_payment_declaration_draft(
+    NULL, CURRENT_DATE, 500000, 'y', NULL, f.student_id, NULL, NULL,
+    f.enrollment_id, f.terms_id, f.guardian_id, 10000000, 't07-pending-dup-2', NULL
+  );
   PERFORM _cw2_t07_record(10, 'amount exceeds outstanding rejected', ok_exceed);
-  PERFORM _cw2_t07_record(11, 'pending blocks new declaration on terms', ok_pending);
+  PERFORM _cw2_t07_record(11, 'multiple pending declarations allowed while obligation remains', v_decl2 IS NOT NULL);
   SELECT * INTO f FROM _cw2_t04_fixture();
   PERFORM _cw2_t04_as_auth(f.consultant_auth);
   v_decl := public.save_consultant_payment_declaration_draft(
@@ -189,7 +187,7 @@ BEGIN
   caps := public._cw2_portfolio_declaration_capabilities(gen_random_uuid(), 5000000, NULL, true);
   PERFORM _cw2_t07_record(19, 'can_add_payment always false for consultant path', (caps->>'can_add_payment')::boolean = false);
   caps := public._cw2_portfolio_declaration_capabilities(gen_random_uuid(), 5000000, 'pending', true);
-  PERFORM _cw2_t07_record(20, 'can_create false when pending', (caps->>'can_create_payment_declaration')::boolean = false);
+  PERFORM _cw2_t07_record(20, 'can_create true when pending and outstanding remains', (caps->>'can_create_payment_declaration')::boolean = true);
   caps := public._cw2_portfolio_declaration_capabilities(gen_random_uuid(), 0, NULL, true);
   PERFORM _cw2_t07_record(21, 'can_create false when no outstanding', (caps->>'can_create_payment_declaration')::boolean = false);
 END $$;

@@ -478,7 +478,7 @@ BEGIN
   PERFORM _cw2_t05_record(15, 'finance outstanding', (r->'rows'->0->>'tuition_outstanding')::bigint = 7000000);
 END $$;
 
--- 16: pending cw2 declaration => cho_xac_nhan
+-- 16: pending cw2 declaration — tuition state from confirmed payments only; pending total separate
 DO $$
 DECLARE f record; b record; r jsonb; v_decl uuid;
 BEGIN
@@ -493,8 +493,10 @@ BEGIN
   PERFORM public.submit_consultant_payment_declaration(v_decl);
   r := public.list_consultant_workspace_portfolio();
   PERFORM _cw2_t05_record(
-    16, 'pending cw2 cho_xac_nhan',
-    (r->'rows'->0->>'tuition_payment_state') = 'cho_xac_nhan'
+    16, 'pending cw2 pending amount separate',
+    (r->'rows'->0->>'tuition_payment_state') = 'dong_phi'
+    AND (r->'rows'->0->>'tuition_pending_declaration')::bigint = 2000000
+    AND (r->'rows'->0->>'tuition_outstanding')::bigint = 10000000
     AND (r->'rows'->0->>'declaration_status') = 'pending'
   );
 END $$;
