@@ -125,7 +125,9 @@ Investigate (read-only):
 npm run db:production:drift-check
 ```
 
-Uses `supabase db diff --linked` (migration shadow vs remote). Non-empty diff → **stop**; reconcile with a **new reviewed migration** or restore from backup — do not treat Dashboard SQL as the normal path.
+Uses `supabase db diff --linked --schema public` (migration shadow vs remote **`public` only** — application contract in `supabase/config.toml`). Unscoped `db diff --linked` also compares Supabase-managed `storage`/`auth` objects and can false-alarm after a successful push.
+
+Non-empty **public** diff → **stop**; reconcile with a **new reviewed migration** or restore from backup — do not treat Dashboard SQL as the normal path.
 
 ## 8. Post-deploy production smoke (non-destructive)
 

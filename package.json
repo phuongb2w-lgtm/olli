@@ -22,6 +22,7 @@
     "db:production:migration-dry-run": "node scripts/supabase-production-migration-deploy.mjs --dry-run",
     "db:production:migration-deploy": "node scripts/supabase-production-migration-deploy.mjs",
     "db:production:drift-check": "node scripts/supabase-production-drift-check.mjs",
+    "test:drift-check:local-contract": "node scripts/drift-check-local-contract.mjs",
     "db:production:smoke": "node scripts/supabase-production-smoke.mjs",
     "db:production:predeploy-gate": "node scripts/supabase-production-predeploy-gate.mjs",
     "app:production:env-check": "node scripts/app-production-env-check.mjs",
