@@ -81,6 +81,8 @@ export type ConsultantWorkspacePortfolioFilters = {
   declaration_status?: string;
   course_id?: string;
   name_search?: string;
+  family_name?: string;
+  given_name?: string;
   student_code?: string;
   guardian_phone?: string;
 };

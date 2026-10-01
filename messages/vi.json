@@ -2359,6 +2359,7 @@
     "actions": {
       "details": "Chi tiết",
       "edit": "Sửa",
+      "save": "Lưu",
       "hide": "Ẩn",
       "restore": "Khôi phục",
       "loadMore": "Tải thêm"

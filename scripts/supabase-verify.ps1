@@ -265,6 +265,7 @@ Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\cw2_t08_con
 
 Write-Host "==> CW2-T09 portfolio detail tests (30)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\cw2_t09_portfolio_detail_tests.sql")
+Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\cw2_consultant_workspace_intake_tests.sql")
 
 Write-Host "==> CW2-T10 milestone acceptance tests (18)..."
 Invoke-SupabaseSqlFile -Path (Join-Path $ProjectRoot "supabase\tests\cw2_t10_milestone_acceptance_tests.sql")

@@ -51,13 +51,17 @@ BEGIN
   PERFORM _cw2_t09_record(7, 'detail read-only no side effects', j IS NOT NULL);
 END $$;
 
--- 8–12 profile save + code immutability
+-- 8–12 profile save + code immutability (lead/provisional editable)
 DO $$
-DECLARE f record; fin record; v_pe uuid; j jsonb; v_code text; ok_code boolean := false;
+DECLARE f record; fin record; v_pe uuid; v_lead uuid; j jsonb; v_code text; ok_code boolean := false;
 BEGIN
   SELECT * INTO f FROM _cw2_t05_org();
   SELECT * INTO fin FROM _cw2_t05_student_with_finance(f.org_id, f.consultant_a_auth);
-  v_pe := _cw2_t05_add_portfolio_entry(f.org_id, f.consultant_a_user, 12, NULL, fin.student_id);
+  PERFORM _cw2_t05_as_postgres();
+  INSERT INTO lead (organization_id, status) VALUES (f.org_id, 'new') RETURNING id INTO v_lead;
+  INSERT INTO lead_candidate (organization_id, lead_id, given_name, family_name, date_of_birth, is_primary_candidate, status)
+    VALUES (f.org_id, v_lead, 'An', 'Nguyen', '2017-01-01', true, 'active');
+  v_pe := _cw2_t05_add_portfolio_entry(f.org_id, f.consultant_a_user, 12, v_lead, NULL);
   PERFORM _cw2_t05_as_auth(f.consultant_a_auth);
   j := public.save_consultant_portfolio_profile(
     v_pe, 'Tran', 'Updated', '2015-08-08', 'Tran', 'Guardian', '0905111222', NULL
@@ -70,12 +74,12 @@ BEGIN
   PERFORM _cw2_t09_record(9, 'student code mutation rejected', ok_code OR NOT public._cw2_is_official_student_code(v_code));
   PERFORM _cw2_t09_record(10, 'student code displayed in detail', j ? 'student_code_display');
   PERFORM _cw2_t09_record(11, 'save does not change STT', (j->>'workspace_sequence')::bigint = 12);
-  PERFORM _cw2_t09_record(12, 'DOB update applied', (j->>'date_of_birth') = '2015-08-08');
+  PERFORM _cw2_t09_record(12, 'DOB update applied on lead row', (j->>'date_of_birth') = '2015-08-08');
 END $$;
 
--- 13–15 official code + DOB
+-- 13–15 official code locked for consultant core edits
 DO $$
-DECLARE f record; fin record; v_pe uuid; j jsonb; v_code text;
+DECLARE f record; fin record; v_pe uuid; j jsonb; v_code text; ok_locked boolean := false;
 BEGIN
   SELECT * INTO f FROM _cw2_t05_org();
   SELECT * INTO fin FROM _cw2_t05_student_with_finance(f.org_id, f.consultant_a_auth);
@@ -84,13 +88,14 @@ BEGIN
   v_pe := _cw2_t05_add_portfolio_entry(f.org_id, f.consultant_a_user, 14, NULL, fin.student_id);
   SELECT student_code INTO v_code FROM student WHERE id = fin.student_id;
   PERFORM _cw2_t05_as_auth(f.consultant_a_auth);
-  j := public.save_consultant_portfolio_profile(v_pe, 'Nguyen', 'Chi', '2015-09-09', NULL, NULL, NULL, NULL);
+  BEGIN
+    PERFORM public.save_consultant_portfolio_profile(v_pe, 'Nguyen', 'Chi', '2015-09-09', NULL, NULL, NULL, NULL);
+  EXCEPTION WHEN OTHERS THEN ok_locked := SQLERRM LIKE '%profile_locked%'; END;
   PERFORM _cw2_t05_as_postgres();
-  PERFORM _cw2_t09_record(13, 'DOB correction preserves official code', (
-    (SELECT student_code FROM student WHERE id = fin.student_id) = v_code
-    AND (j->>'student_code_official') = v_code
-    AND (j->>'date_of_birth') = '2015-09-09'
-  ));
+  PERFORM _cw2_t09_record(13, 'official student profile locked', ok_locked AND (
+    SELECT student_code FROM student WHERE id = fin.student_id
+  ) = v_code);
+  j := public.get_consultant_portfolio_entry_detail(v_pe);
   PERFORM _cw2_t09_record(14, 'detail marks official code locked', (j->'editable'->>'official_student_code_locked')::boolean);
   PERFORM _cw2_t09_record(15, 'finance summary present', j ? 'tuition_outstanding');
 END $$;
@@ -131,13 +136,16 @@ BEGIN
   END;
 END $$;
 
--- 21–25 side-effect free edits
+-- 21–25 side-effect free edits (provisional lead row)
 DO $$
-DECLARE f record; fin record; v_pe uuid; pay_cnt integer; stt bigint; j jsonb;
+DECLARE f record; v_pe uuid; v_lead uuid; pay_cnt integer; stt bigint; j jsonb;
 BEGIN
   SELECT * INTO f FROM _cw2_t05_org();
-  SELECT * INTO fin FROM _cw2_t05_student_with_finance(f.org_id, f.consultant_a_auth);
-  v_pe := _cw2_t05_add_portfolio_entry(f.org_id, f.consultant_a_user, 16, NULL, fin.student_id);
+  PERFORM _cw2_t05_as_postgres();
+  INSERT INTO lead (organization_id, status) VALUES (f.org_id, 'new') RETURNING id INTO v_lead;
+  INSERT INTO lead_candidate (organization_id, lead_id, given_name, family_name, is_primary_candidate, status)
+    VALUES (f.org_id, v_lead, 'A', 'B', true, 'active');
+  v_pe := _cw2_t05_add_portfolio_entry(f.org_id, f.consultant_a_user, 16, v_lead, NULL);
   SELECT count(*) INTO pay_cnt FROM payment WHERE organization_id = f.org_id;
   SELECT workspace_sequence INTO stt FROM consultant_portfolio_entry WHERE id = v_pe;
   PERFORM _cw2_t05_as_auth(f.consultant_a_auth);

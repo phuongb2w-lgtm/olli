@@ -28,8 +28,10 @@ export async function fetchConsultantPortfolioEntryDetail(
 
 function mapSaveError(message: string): string {
   if (message.includes("permission_denied")) return "permission_denied";
+  if (message.includes("profile_locked")) return "profile_locked";
   if (message.includes("portfolio_entry_not_found")) return "not_found";
   if (message.includes("profile_conflict")) return "conflict";
+  if (message.includes("profile_locked")) return "profile_locked";
   if (message.includes("invalid_profile_name")) return "invalid_name";
   if (message.includes("invalid_custom_field")) return "invalid_custom_field";
   return "unknown";
@@ -61,6 +63,40 @@ export async function saveConsultantPortfolioProfile(
 
   if (error || !data) {
     return { ok: false, errorCode: mapSaveError(error?.message ?? "") };
+  }
+
+  return {
+    ok: true,
+    detail: parseConsultantPortfolioDetail(data as Record<string, unknown>),
+  };
+}
+
+export async function createConsultantWorkspacePortfolioIntake(
+  supabase: SupabaseClient<Database>,
+  input: {
+    familyName: string;
+    givenName: string;
+    dateOfBirth?: string | null;
+    guardianFamilyName?: string | null;
+    guardianGivenName?: string | null;
+    guardianPhone?: string | null;
+    customFieldValues?: { field_key: string; value: string }[];
+  },
+): Promise<{ ok: true; detail: ConsultantPortfolioDetail } | { ok: false; errorCode: string }> {
+  const { data, error } = await supabase.rpc("create_consultant_workspace_portfolio_intake", {
+    p_family_name: input.familyName.trim(),
+    p_given_name: input.givenName.trim(),
+    p_date_of_birth: input.dateOfBirth || undefined,
+    p_guardian_family_name: input.guardianFamilyName?.trim() || undefined,
+    p_guardian_given_name: input.guardianGivenName?.trim() || undefined,
+    p_guardian_phone: input.guardianPhone?.trim() || undefined,
+    p_custom_field_values: input.customFieldValues ?? [],
+  });
+
+  if (error || !data) {
+    if (error?.message.includes("invalid_profile_name")) return { ok: false, errorCode: "invalid_name" };
+    if (error?.message.includes("permission_denied")) return { ok: false, errorCode: "permission_denied" };
+    return { ok: false, errorCode: "unknown" };
   }
 
   return {

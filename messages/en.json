@@ -2359,6 +2359,7 @@
     "actions": {
       "details": "Details",
       "edit": "Edit",
+      "save": "Save",
       "hide": "Hide",
       "restore": "Restore",
       "loadMore": "Load more"

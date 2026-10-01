@@ -6608,6 +6608,10 @@ export type Database = {
         Args: { p_student_code: string }
         Returns: number
       }
+      _cw2_intake_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _cw2_is_official_student_code: {
         Args: { p_student_code: string }
         Returns: boolean
@@ -6616,8 +6620,16 @@ export type Database = {
         Args: { p_organization_id: string }
         Returns: string
       }
+      _cw2_next_consultant_workspace_sequence: {
+        Args: { p_consultant_user_id: string; p_organization_id: string }
+        Returns: number
+      }
       _cw2_official_student_code_write_allowed: {
         Args: never
+        Returns: boolean
+      }
+      _cw2_portfolio_can_edit_contact: {
+        Args: { p_student_code_raw: string }
         Returns: boolean
       }
       _cw2_portfolio_declaration_capabilities: {
@@ -6626,6 +6638,7 @@ export type Database = {
           p_enrollment_financial_terms_id: string
           p_has_student: boolean
           p_outstanding: number
+          p_student_code_raw?: string
         }
         Returns: Json
       }
@@ -7718,6 +7731,18 @@ export type Database = {
           p_teacher_id: string
         }
         Returns: string
+      }
+      create_consultant_workspace_portfolio_intake: {
+        Args: {
+          p_custom_field_values?: Json
+          p_date_of_birth?: string
+          p_family_name: string
+          p_given_name: string
+          p_guardian_family_name?: string
+          p_guardian_given_name?: string
+          p_guardian_phone?: string
+        }
+        Returns: Json
       }
       create_cost_allocation_rule: {
         Args: {

@@ -196,9 +196,9 @@ BEGIN
   ));
 END $$;
 
--- 17 Scenario 9: DOB correction preserves official code (mirrors CW2-T09 SQL 13)
+-- 17 Scenario 9: official student profile locked; code immutable (mirrors CW2-T09 SQL 13)
 DO $$
-DECLARE f record; fin record; v_pe uuid; j jsonb; v_code text; v_cc char(2);
+DECLARE f record; fin record; v_pe uuid; v_code text; v_cc char(2); ok_locked boolean := false;
 BEGIN
   SELECT * INTO f FROM _cw2_t05_org();
   SELECT * INTO fin FROM _cw2_t05_student_with_finance(f.org_id, f.consultant_a_auth);
@@ -209,12 +209,14 @@ BEGIN
   v_pe := _cw2_t05_add_portfolio_entry(f.org_id, f.consultant_a_user, 117, NULL, fin.student_id);
   SELECT student_code INTO v_code FROM student WHERE id = fin.student_id;
   PERFORM _cw2_t05_as_auth(f.consultant_a_auth);
-  j := public.save_consultant_portfolio_profile(v_pe, 'Nguyen', 'Chi', '2015-09-09', NULL, NULL, NULL, NULL);
+  BEGIN
+    PERFORM public.save_consultant_portfolio_profile(v_pe, 'Nguyen', 'Chi', '2015-09-09', NULL, NULL, NULL, NULL);
+  EXCEPTION WHEN OTHERS THEN ok_locked := SQLERRM LIKE '%profile_locked%'; END;
   PERFORM _cw2_t05_as_postgres();
-  PERFORM _cw2_t10_record(17, 'S9 DOB correction does not regenerate official code', (
-    v_code IS NOT NULL
+  PERFORM _cw2_t10_record(17, 'S9 official student profile locked; code unchanged', (
+    ok_locked
+    AND v_code IS NOT NULL
     AND public._cw2_is_official_student_code(v_code)
-    AND (j->>'date_of_birth') = '2015-09-09'
     AND (SELECT student_code FROM student WHERE id = fin.student_id) = v_code
   ));
 END $$;

@@ -177,8 +177,8 @@ test.describe("CW2-T08 consultant monthly sales header", () => {
 
   test("grid filter survives month navigation", async ({ page }) => {
     await page.goto("/consultant?month=2026-09");
-    await page.getByTestId("filter-name-search").fill("Sales");
+    await page.getByTestId("filter-family-name").fill("Sales");
     await page.getByTestId("month-sales-prev").click();
-    await expect(page.getByTestId("filter-name-search")).toHaveValue("Sales");
+    await expect(page.getByTestId("filter-family-name")).toHaveValue("Sales");
   });
 });

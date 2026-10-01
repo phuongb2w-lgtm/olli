@@ -129,6 +129,29 @@ export async function saveConsultantGridPreferencesAction(
   return { ok: true };
 }
 
+export async function createConsultantWorkspacePortfolioIntakeAction(input: {
+  familyName: string;
+  givenName: string;
+  guardianFamilyName?: string | null;
+  guardianGivenName?: string | null;
+  guardianPhone?: string | null;
+  customFieldValues?: { field_key: string; value: string }[];
+}): Promise<{ ok: true } | { ok: false; errorCode: string }> {
+  if (!(await can("consultant_workspace.update"))) {
+    return { ok: false, errorCode: "permission_denied" };
+  }
+
+  const supabase = await createClient();
+  const { createConsultantWorkspacePortfolioIntake } = await import(
+    "@/lib/consultant-workspace/fetch-portfolio-detail"
+  );
+  const result = await createConsultantWorkspacePortfolioIntake(supabase, input);
+  if (!result.ok) return result;
+
+  revalidatePath("/consultant");
+  return { ok: true };
+}
+
 export async function loadConsultantGridPreferencesAction(): Promise<ConsultantGridPreferences | null> {
   if (!(await can("consultant_workspace.read"))) {
     return null;
