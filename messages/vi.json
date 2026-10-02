@@ -1994,7 +1994,15 @@
       "consultant": "Tư vấn viên",
       "paymentLink": "Liên kết thanh toán",
       "linkedPayment": "Đã liên kết thanh toán",
-      "unlinkedApproved": "Đã duyệt, chưa có thanh toán"
+      "unlinkedApproved": "Đã duyệt, chưa có thanh toán",
+      "studentCode": "Mã học viên",
+      "totalCharged": "Tổng phải thu",
+      "totalPaid": "Đã thu",
+      "studentAccountsTitle": "Công nợ theo học viên",
+      "studentAccountsHint": "Mọi học viên có ghi danh hoặc khoản thu, kể cả học viên đã đóng đủ. Cột cá nhân chỉ bạn nhìn thấy.",
+      "noStudentAccounts": "Chưa có học viên nào có ghi danh hoặc khoản thu.",
+      "chargeReceivablesTitle": "Khoản thu còn nợ",
+      "studentAccountsActions": "Thao tác"
     },
     "consultantRevenueReview": {
       "title": "Duyệt khai báo",
@@ -2515,5 +2523,58 @@
       "comparisonNew": "Mới so với tháng trước",
       "comparisonFlat": "Không đổi so với tháng trước"
     }
+  },
+  "personalCustomFields": {
+    "addColumn": "+ Thêm cột",
+    "dialogTitle": "Thêm cột",
+    "columnName": "Tên cột",
+    "dataType": "Kiểu dữ liệu",
+    "scopePersonalHint": "Phạm vi cá nhân: chỉ bạn thấy và sửa cột cùng giá trị.",
+    "submit": "Thêm",
+    "cancel": "Hủy",
+    "studentPanelTitle": "Ghi chú cá nhân của tôi",
+    "empty": "Chưa có cột cá nhân. Bấm + Thêm cột để tạo.",
+    "saveValues": "Lưu ghi chú",
+    "editRow": "Sửa",
+    "desktopGridHint": "Cột cá nhân chỉnh sửa được trên bảng khi màn hình đủ rộng.",
+    "saved": "Đã lưu.",
+    "types": {
+      "text": "Văn bản",
+      "number": "Số",
+      "date": "Ngày",
+      "boolean": "Có/Không"
+    },
+    "errors": {
+      "labelRequired": "Nhập tên cột.",
+      "permission_denied": "Bạn không có quyền quản lý cột cá nhân.",
+      "invalid_data_type": "Kiểu dữ liệu không hỗ trợ.",
+      "key_reserved": "Tên cột bị giữ hệ thống.",
+      "unknown": "Không tạo được cột.",
+      "saveFailed": "Không lưu được giá trị.",
+      "invalid_label": "Tên cột phải từ 1–80 ký tự.",
+      "updateFailed": "Không thể cập nhật cột."
+    },
+    "manageColumns": "Cột cá nhân của bạn:",
+    "archiveDialogTitle": "Lưu trữ cột",
+    "archiveSubmit": "Lưu trữ",
+    "moveLeftLabel": "Chuyển {label} sang trái",
+    "moveRightLabel": "Chuyển {label} sang phải",
+    "widthLabel": "Độ rộng cột {label} (px)",
+    "filterNumberPlaceholder": "VD: >=10",
+    "filterAny": "Tất cả",
+    "booleanYes": "Có",
+    "booleanNo": "Không",
+    "prefsSaving": "Đang lưu bố cục…",
+    "prefsSaved": "Đã lưu bố cục",
+    "resizeColumn": "Đổi độ rộng {label}",
+    "renameColumn": "Đổi tên",
+    "archiveColumn": "Lưu trữ",
+    "archiveConfirm": "Lưu trữ cột \"{label}\"? Giá trị vẫn được giữ; cột sẽ bị gỡ khỏi không gian làm việc của bạn.",
+    "renameDialogTitle": "Đổi tên cột",
+    "renameSubmit": "Lưu tên",
+    "moveLeft": "←",
+    "moveRight": "→",
+    "widthPx": "Rộng",
+    "filterPlaceholder": "Lọc…"
   }
 }

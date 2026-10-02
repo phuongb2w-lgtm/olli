@@ -34,11 +34,22 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { formatPortfolioNamePart, detailsHref } from "@/lib/consultant-workspace/display-format";
 import {
+  buildConsultantColumnOrder,
   DEFAULT_COLUMN_ORDER,
   mergeGridPreferences,
   PROTECTED_VISIBILITY_COLUMNS,
   type ConsultantGridPreferences,
 } from "@/lib/consultant-workspace/grid-preferences";
+import {
+  PersonalColumnFilterInput,
+  PersonalColumnToolbar,
+} from "@/components/custom-fields/personal-column-toolbar";
+import { PersonalFieldInput, PersonalFieldValue } from "@/components/custom-fields/personal-field-input";
+import {
+  fetchPersonalCustomFieldDefinitions,
+  matchesPersonalFieldFilter,
+  type PersonalCustomFieldDefinition,
+} from "@/lib/custom-fields/personal-custom-field";
 import type {
   ConsultantWorkspacePortfolioRow,
   ConsultantWorkspacePortfolioCursor,
@@ -132,18 +143,41 @@ function buildFilters(q: QueryState) {
   return filters;
 }
 
-function collectCustomFieldKeys(
+/** Owned active definitions first (sort order), then keys only present on loaded rows. */
+function collectCustomFieldDefs(
   rows: ConsultantWorkspacePortfolioRow[],
   defs: CustomFieldDef[],
-): string[] {
-  const keys = new Set<string>();
-  for (const d of defs) keys.add(d.field_key);
+  archivedKeys: ReadonlySet<string>,
+): CustomFieldDef[] {
+  const byKey = new Map<string, CustomFieldDef>();
+  for (const d of defs) {
+    if (!archivedKeys.has(d.field_key)) byKey.set(d.field_key, d);
+  }
+  const extra: CustomFieldDef[] = [];
   for (const row of rows) {
     for (const cf of row.custom_fields ?? []) {
-      keys.add(cf.field_key);
+      if (byKey.has(cf.field_key) || archivedKeys.has(cf.field_key)) continue;
+      if (extra.some((e) => e.field_key === cf.field_key)) continue;
+      extra.push({
+        definition_id: cf.definition_id,
+        field_key: cf.field_key,
+        label: cf.label ?? cf.field_key,
+        data_type: cf.data_type ?? "text",
+      });
     }
   }
-  return [...keys].sort();
+  extra.sort((a, b) => a.field_key.localeCompare(b.field_key));
+  return [...byKey.values(), ...extra];
+}
+
+function moveCustomColumn(order: string[], colId: string, direction: -1 | 1): string[] {
+  const customIds = order.filter((id) => id.startsWith("custom_"));
+  const idx = customIds.indexOf(colId);
+  const swap = idx + direction;
+  if (idx < 0 || swap < 0 || swap >= customIds.length) return order;
+  [customIds[idx], customIds[swap]] = [customIds[swap]!, customIds[idx]!];
+  let cursor = 0;
+  return order.map((id) => (id.startsWith("custom_") ? customIds[cursor++]! : id));
 }
 
 function splitGuardianName(full: string): { familyName: string; givenName: string } {
@@ -151,7 +185,9 @@ function splitGuardianName(full: string): { familyName: string; givenName: strin
   if (!trimmed) return { familyName: "", givenName: "" };
   const parts = trimmed.split(/\s+/);
   if (parts.length === 1) return { familyName: parts[0]!, givenName: parts[0]! };
-  return { familyName: parts[0]!, givenName: parts.slice(1).join(" ") };
+  const givenName = parts[parts.length - 1]!;
+  const familyName = parts.slice(0, -1).join(" ");
+  return { familyName, givenName };
 }
 
 function draftFromRow(row: ConsultantWorkspacePortfolioRow, fieldKeys: string[]): InlineDraft {
@@ -199,6 +235,9 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     mergedPrefs.columnVisibility ?? {},
   );
+  const [columnOrder, setColumnOrder] = useState<string[]>(() =>
+    buildConsultantColumnOrder([], mergedPrefs.columnOrder),
+  );
   const [focusedCell, setFocusedCell] = useState<{ row: number; col: number } | null>(null);
   const [pending, startTransition] = useTransition();
   const [declarationRow, setDeclarationRow] = useState<ConsultantWorkspacePortfolioRow | null>(
@@ -215,31 +254,39 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const filterDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const customFieldKeys = useMemo(
-    () => collectCustomFieldKeys(rows, customFieldDefs),
-    [rows, customFieldDefs],
+  const [archivedCustomKeys, setArchivedCustomKeys] = useState<ReadonlySet<string>>(() => new Set());
+  const [customFilters, setCustomFilters] = useState<Record<string, string>>({});
+  const gridCustomDefs = useMemo(
+    () => collectCustomFieldDefs(rows, customFieldDefs, archivedCustomKeys),
+    [rows, customFieldDefs, archivedCustomKeys],
   );
+  const customFieldKeys = useMemo(() => gridCustomDefs.map((d) => d.field_key), [gridCustomDefs]);
+
+  const reloadCustomFieldDefs = useCallback(async () => {
+    const supabase = createClient();
+    const data = await fetchPersonalCustomFieldDefinitions(supabase);
+    setCustomFieldDefs(
+      data.map((row) => ({
+        definition_id: row.id,
+        field_key: row.field_key,
+        label: row.label ?? row.field_key,
+        data_type: row.data_type ?? "text",
+      })),
+    );
+  }, []);
 
   useEffect(() => {
-    void (async () => {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("consultant_custom_field_definition")
-        .select("id, field_key, label, data_type")
-        .eq("status", "active")
-        .order("sort_order");
-      if (data) {
-        setCustomFieldDefs(
-          data.map((row) => ({
-            definition_id: row.id,
-            field_key: row.field_key,
-            label: row.label ?? row.field_key,
-            data_type: row.data_type ?? "text",
-          })),
-        );
-      }
-    })();
-  }, []);
+    void reloadCustomFieldDefs();
+  }, [reloadCustomFieldDefs]);
+
+  useEffect(() => {
+    setColumnOrder((prev) =>
+      buildConsultantColumnOrder(
+        customFieldKeys,
+        prev.some((id) => id.startsWith("custom_")) ? prev : (mergedPrefs.columnOrder ?? prev),
+      ),
+    );
+  }, [customFieldKeys, mergedPrefs.columnOrder]);
 
   const loadPage = useCallback(
     async (
@@ -301,12 +348,26 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
     });
   };
 
+  const prefsLatestRef = useRef<{
+    columnVisibility: Record<string, boolean>;
+    columnSizing: Record<string, number>;
+    columnOrder: string[];
+  } | null>(null);
+  const prefsChainRef = useRef<Promise<unknown>>(Promise.resolve());
+  const [prefsPending, setPrefsPending] = useState(0);
+
   const persistPreferences = useCallback(
-    (visibility: VisibilityState, sizing: Record<string, number>) => {
-      void saveConsultantGridPreferencesAction({
+    (visibility: VisibilityState, sizing: Record<string, number>, order: string[]) => {
+      prefsLatestRef.current = {
         columnVisibility: visibility as Record<string, boolean>,
         columnSizing: sizing,
-      });
+        columnOrder: order,
+      };
+      setPrefsPending((n) => n + 1);
+      prefsChainRef.current = prefsChainRef.current
+        .then(() => (prefsLatestRef.current ? saveConsultantGridPreferencesAction(prefsLatestRef.current) : null))
+        .catch(() => null)
+        .finally(() => setPrefsPending((n) => n - 1));
     },
     [],
   );
@@ -375,15 +436,23 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
         setInlineError(profileResult.errorCode);
         return;
       }
-      const customFieldValues = customFieldKeys.map((key) => ({
-        field_key: key,
-        value: editDraft.customFields[key] ?? "",
-      }));
-      if (customFieldValues.some((v) => v.value.trim())) {
-        await saveConsultantPortfolioCustomFields(supabase, {
+      const ownedKeys = new Set(customFieldDefs.map((d) => d.field_key));
+      const customFieldValues = customFieldKeys
+        .filter((key) => ownedKeys.has(key))
+        .map((key) => ({
+          field_key: key,
+          value: editDraft.customFields[key] ?? "",
+        }));
+      if (customFieldValues.length > 0) {
+        const customResult = await saveConsultantPortfolioCustomFields(supabase, {
           portfolioEntryId: row.portfolio_entry_id,
           values: customFieldValues,
         });
+        if (!customResult.ok) {
+          setSavingInline(false);
+          setInlineError(customResult.errorCode);
+          return;
+        }
       }
       setSavingInline(false);
       setEditingEntryId(null);
@@ -616,21 +685,25 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
       },
     ];
 
-    const customCols: ColumnDef<ConsultantWorkspacePortfolioRow>[] = customFieldKeys.map((key) => ({
-      id: `custom_${key}`,
-      header: () => customFieldDefs.find((d) => d.field_key === key)?.label ?? key,
-      cell: ({ row }) => {
-        const cf = row.original.custom_fields?.find((f) => f.field_key === key);
-        return cf?.value ?? "—";
-      },
+    const customCols: ColumnDef<ConsultantWorkspacePortfolioRow>[] = gridCustomDefs.map((def) => ({
+      id: `custom_${def.field_key}`,
+      header: () => def.label,
+      cell: ({ row }) => (
+        <PersonalFieldValue
+          dataType={def.data_type}
+          value={row.original.custom_fields?.find((f) => f.field_key === def.field_key)?.value}
+          testId={`portfolio-custom-${def.field_key}`}
+        />
+      ),
     }));
 
-    return [...base, ...customCols];
+    const detailAndEdit = base.filter((c) => c.id === "details" || c.id === "edit");
+    const core = base.filter((c) => c.id !== "details" && c.id !== "edit");
+    return [...core, ...customCols, ...detailAndEdit];
   }, [
     t,
     locale,
-    customFieldKeys,
-    customFieldDefs,
+    gridCustomDefs,
     appliedQuery,
     loadPage,
     startTransition,
@@ -639,26 +712,63 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
     startEditRow,
   ]);
 
+  const toolbarDefs = useMemo((): PersonalCustomFieldDefinition[] => {
+    const position = new Map(columnOrder.map((id, index) => [id, index]));
+    return [...gridCustomDefs]
+      .sort(
+        (a, b) =>
+          (position.get(`custom_${a.field_key}`) ?? Number.MAX_SAFE_INTEGER) -
+          (position.get(`custom_${b.field_key}`) ?? Number.MAX_SAFE_INTEGER),
+      )
+      .map((d, index) => ({
+        id: d.definition_id,
+        field_key: d.field_key,
+        label: d.label,
+        data_type: d.data_type,
+        sort_order: index,
+        status: "active",
+      }));
+  }, [gridCustomDefs, columnOrder]);
+
+  const filteredRows = useMemo(() => {
+    const active = gridCustomDefs.filter(
+      (d) =>
+        (customFilters[d.field_key] ?? "").trim() !== "" &&
+        columnVisibility[`custom_${d.field_key}`] !== false,
+    );
+    if (active.length === 0) return rows;
+    return rows.filter((row) =>
+      active.every((d) =>
+        matchesPersonalFieldFilter(
+          d.data_type,
+          row.custom_fields?.find((f) => f.field_key === d.field_key)?.value ?? "",
+          customFilters[d.field_key] ?? "",
+        ),
+      ),
+    );
+  }, [rows, gridCustomDefs, customFilters, columnVisibility]);
+
   const table = useReactTable({
-    data: rows,
+    data: filteredRows,
     columns,
-    state: { columnVisibility, columnSizing },
+    state: { columnVisibility, columnSizing, columnOrder },
     onColumnVisibilityChange: (updater) => {
-      setColumnVisibility((prev) => {
-        const next = typeof updater === "function" ? updater(prev) : updater;
-        for (const key of PROTECTED_VISIBILITY_COLUMNS) {
-          next[key] = true;
-        }
-        persistPreferences(next, columnSizing);
-        return next;
-      });
+      const next = { ...(typeof updater === "function" ? updater(columnVisibility) : updater) };
+      for (const key of PROTECTED_VISIBILITY_COLUMNS) {
+        next[key] = true;
+      }
+      setColumnVisibility(next);
+      persistPreferences(next, columnSizing, columnOrder);
     },
     onColumnSizingChange: (updater) => {
-      setColumnSizing((prev) => {
-        const next = typeof updater === "function" ? updater(prev) : updater;
-        persistPreferences(columnVisibility, next);
-        return next;
-      });
+      const next = typeof updater === "function" ? updater(columnSizing) : updater;
+      setColumnSizing(next);
+      persistPreferences(columnVisibility, next, columnOrder);
+    },
+    onColumnOrderChange: (updater) => {
+      const next = typeof updater === "function" ? updater(columnOrder) : updater;
+      setColumnOrder(next);
+      persistPreferences(columnVisibility, columnSizing, next);
     },
     getCoreRowModel: getCoreRowModel(),
     columnResizeMode: "onChange",
@@ -770,8 +880,19 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
             <option value="full_phi">{t("paymentState.full_phi")}</option>
           </select>
         );
-      default:
-        return null;
+      default: {
+        if (!colId.startsWith("custom_")) return null;
+        const def = toolbarDefs.find((d) => `custom_${d.field_key}` === colId);
+        if (!def) return null;
+        return (
+          <PersonalColumnFilterInput
+            definition={def}
+            className={inputClass}
+            value={customFilters[def.field_key] ?? ""}
+            onChange={(value) => setCustomFilters((f) => ({ ...f, [def.field_key]: value }))}
+          />
+        );
+      }
     }
   };
 
@@ -922,22 +1043,31 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
     }
     if (colId.startsWith("custom_")) {
       const key = colId.replace(/^custom_/, "");
+      const def = gridCustomDefs.find((d) => d.field_key === key);
       if (draft) {
         return (
-          <input
+          <PersonalFieldInput
+            dataType={def?.data_type ?? "text"}
+            label={def?.label ?? key}
             className={inputClass}
             value={draft.customFields[key] ?? ""}
-            onChange={(e) =>
+            onChange={(value) =>
               setDraft((p) => ({
                 ...p,
-                customFields: { ...p.customFields, [key]: e.target.value },
+                customFields: { ...p.customFields, [key]: value },
               }))
             }
-            data-testid={`inline-custom-${key}`}
+            testId={`inline-custom-${key}`}
           />
         );
       }
-      return readRow?.custom_fields?.find((f) => f.field_key === key)?.value ?? "—";
+      return (
+        <PersonalFieldValue
+          dataType={def?.data_type ?? "text"}
+          value={readRow?.custom_fields?.find((f) => f.field_key === key)?.value}
+          testId={readRow ? `portfolio-custom-${key}` : undefined}
+        />
+      );
     }
     return null;
   };
@@ -1009,17 +1139,46 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
             {t(COLUMN_LABEL_KEY[colId] as "columns.stt")}
           </label>
         ))}
-        {customFieldKeys.map((key) => (
-          <label key={key} className="inline-flex items-center gap-1">
-            <input
-              type="checkbox"
-              checked={table.getColumn(`custom_${key}`)?.getIsVisible() ?? true}
-              onChange={() => table.getColumn(`custom_${key}`)?.toggleVisibility()}
-            />
-            {customFieldDefs.find((d) => d.field_key === key)?.label ?? key}
-          </label>
-        ))}
       </div>
+      <PersonalColumnToolbar
+        definitions={toolbarDefs}
+        visibility={columnVisibility as Record<string, boolean>}
+        sizing={columnSizing}
+        filters={customFilters}
+        showFilters={false}
+        onVisibilityChange={(colId, visible) => table.getColumn(colId)?.toggleVisibility(visible)}
+        onWidthChange={(colId, width) => table.setColumnSizing((prev) => ({ ...prev, [colId]: width }))}
+        onMove={(colId, direction) => table.setColumnOrder((prev) => moveCustomColumn(prev, colId, direction))}
+        onFilterChange={(fieldKey, value) => setCustomFilters((f) => ({ ...f, [fieldKey]: value }))}
+        onCreated={() => {
+          void reloadCustomFieldDefs();
+        }}
+        onRenamed={(definitionId, label) => {
+          setCustomFieldDefs((defs) => defs.map((d) => (d.definition_id === definitionId ? { ...d, label } : d)));
+          setRows((prev) =>
+            prev.map((r) => ({
+              ...r,
+              custom_fields: (r.custom_fields ?? []).map((f) =>
+                f.definition_id === definitionId ? { ...f, label } : f,
+              ),
+            })),
+          );
+        }}
+        onArchived={(definition) => {
+          setArchivedCustomKeys((prev) => new Set([...prev, definition.field_key]));
+          setCustomFilters((f) => {
+            const next = { ...f };
+            delete next[definition.field_key];
+            return next;
+          });
+          void reloadCustomFieldDefs();
+        }}
+      />
+      <span
+        className="sr-only"
+        data-testid="consultant-grid-prefs-status"
+        data-state={prefsPending > 0 ? "saving" : "saved"}
+      />
 
       {inlineError ? (
         <p className="text-sm text-red-700" role="alert" data-testid="portfolio-inline-error">
@@ -1071,6 +1230,7 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
                         key={header.id}
                         className="relative px-2 py-2 text-left font-medium text-slate-700"
                         style={{ width: header.getSize() }}
+                        data-testid={`column-header-${colId}`}
                       >
                         {sortable && sortKey ? (
                           <button
@@ -1177,6 +1337,7 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
                     key={tableRow.id}
                     className="border-b border-slate-100 bg-white"
                     data-testid="portfolio-row"
+                    data-entry-id={tableRow.original.portfolio_entry_id}
                   >
                     {tableRow.getVisibleCells().map((cell, colIndex) => {
                       const colId = cell.column.id;

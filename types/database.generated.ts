@@ -5015,6 +5015,45 @@ export type Database = {
         }
         Relationships: []
       }
+      personal_grid_preference: {
+        Row: {
+          app_user_id: string
+          organization_id: string
+          preferences: Json
+          surface_key: string
+          updated_at: string
+        }
+        Insert: {
+          app_user_id: string
+          organization_id: string
+          preferences?: Json
+          surface_key: string
+          updated_at?: string
+        }
+        Update: {
+          app_user_id?: string
+          organization_id?: string
+          preferences?: Json
+          surface_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personal_grid_preference_organization_id_app_user_id_fkey"
+            columns: ["organization_id", "app_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_user"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "personal_grid_preference_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       personnel_cost_entry: {
         Row: {
           accounting_period: string
@@ -6913,7 +6952,16 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      _cw2_can_manage_personal_custom_fields: { Args: never; Returns: boolean }
       _cw2_can_read_periodic_finance_tables: { Args: never; Returns: boolean }
+      _cw2_can_read_personal_identification: {
+        Args: {
+          p_organization_id: string
+          p_portfolio_consultant_user_id: string
+        }
+        Returns: boolean
+      }
+      _cw2_can_read_student_personal_id: { Args: never; Returns: boolean }
       _cw2_compute_organization_student_sequence_floor: {
         Args: { p_organization_id: string }
         Returns: number
@@ -7261,6 +7309,10 @@ export type Database = {
         Args: { p_lead_id: string; p_org: string }
         Returns: string
       }
+      _cw2_slug_custom_field_key: {
+        Args: { p_attempt?: number; p_label: string }
+        Returns: string
+      }
       _cw2_student_organization_id: {
         Args: { p_student_id: string }
         Returns: string
@@ -7415,6 +7467,14 @@ export type Database = {
       }
       _cw2_t11_teacher: { Args: { p_org: string }; Returns: string }
       _cw2_t11_teacher_only_auth: { Args: { p_org: string }; Returns: string }
+      _cw2_t13_apply_personal_field_permissions: {
+        Args: { p_organization_id: string }
+        Returns: undefined
+      }
+      _cw2_t13_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
       _cw2_tuition_payment_state_label: {
         Args: { p_state: string }
         Returns: string
@@ -8400,6 +8460,10 @@ export type Database = {
         Args: { p_candidates: Json; p_contacts: Json; p_lead: Json }
         Returns: Json
       }
+      create_personal_custom_field_definition: {
+        Args: { p_data_type?: string; p_field_key?: string; p_label: string }
+        Returns: Json
+      }
       create_quick_capital_asset: {
         Args: {
           p_name?: string
@@ -8951,6 +9015,10 @@ export type Database = {
         }
         Returns: Json[]
       }
+      list_finance_student_accounts: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: Json[]
+      }
       list_my_permissions: { Args: never; Returns: string[] }
       list_operational_calendar: {
         Args: {
@@ -8967,6 +9035,14 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      list_personal_custom_field_values: {
+        Args: { p_subject_id: string; p_subject_type: string }
+        Returns: Json
+      }
+      list_personal_custom_field_values_bulk: {
+        Args: { p_subject_ids: string[]; p_subject_type: string }
+        Returns: Json
       }
       list_room_usage: {
         Args: {
@@ -9507,6 +9583,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      save_personal_custom_field_values: {
+        Args: { p_subject_id: string; p_subject_type: string; p_values: Json }
+        Returns: Json
+      }
       schedule_lead_trial: {
         Args: {
           p_class_id: string
@@ -9905,6 +9985,14 @@ export type Database = {
           p_notes_summary?: string
         }
         Returns: undefined
+      }
+      update_personal_custom_field_definition: {
+        Args: {
+          p_field_definition_id: string
+          p_label?: string
+          p_status?: string
+        }
+        Returns: Json
       }
       upsert_lead_campaign_catalog: {
         Args: {

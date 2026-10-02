@@ -1994,7 +1994,15 @@
       "consultant": "Consultant",
       "paymentLink": "Payment link",
       "linkedPayment": "Linked payment",
-      "unlinkedApproved": "Approved, no payment"
+      "unlinkedApproved": "Approved, no payment",
+      "studentCode": "Student code",
+      "totalCharged": "Total charged",
+      "totalPaid": "Total paid",
+      "studentAccountsTitle": "Student accounts",
+      "studentAccountsHint": "Every student with an enrollment or charge, including fully paid students. Personal columns are visible only to you.",
+      "noStudentAccounts": "No students with enrollments or charges yet.",
+      "chargeReceivablesTitle": "Outstanding charges",
+      "studentAccountsActions": "Actions"
     },
     "consultantRevenueReview": {
       "title": "Review declaration",
@@ -2515,5 +2523,58 @@
       "comparisonNew": "New activity vs previous month",
       "comparisonFlat": "Unchanged vs previous month"
     }
+  },
+  "personalCustomFields": {
+    "addColumn": "+ Add column",
+    "dialogTitle": "Add column",
+    "columnName": "Column name",
+    "dataType": "Data type",
+    "scopePersonalHint": "Personal scope: only you see and edit this column and its values.",
+    "submit": "Add",
+    "cancel": "Cancel",
+    "studentPanelTitle": "My personal notes",
+    "empty": "No personal columns yet. Use + Add column to create one.",
+    "saveValues": "Save notes",
+    "editRow": "Edit",
+    "desktopGridHint": "Personal columns are editable in the table view on larger screens.",
+    "saved": "Saved.",
+    "renameColumn": "Rename",
+    "archiveColumn": "Archive",
+    "archiveConfirm": "Archive column \"{label}\"? Values stay stored; the column is removed from your workspace.",
+    "renameDialogTitle": "Rename column",
+    "renameSubmit": "Save name",
+    "moveLeft": "←",
+    "moveRight": "→",
+    "widthPx": "W",
+    "filterPlaceholder": "Filter…",
+    "types": {
+      "text": "Text",
+      "number": "Number",
+      "date": "Date",
+      "boolean": "Yes/No"
+    },
+    "errors": {
+      "labelRequired": "Enter a column name.",
+      "permission_denied": "You do not have permission to manage personal columns.",
+      "invalid_data_type": "Unsupported data type.",
+      "key_reserved": "That column name is reserved.",
+      "unknown": "Could not create the column.",
+      "saveFailed": "Could not save values.",
+      "invalid_label": "Column name must be 1–80 characters.",
+      "updateFailed": "Could not update the column."
+    },
+    "manageColumns": "Your personal columns:",
+    "archiveDialogTitle": "Archive column",
+    "archiveSubmit": "Archive",
+    "moveLeftLabel": "Move {label} left",
+    "moveRightLabel": "Move {label} right",
+    "widthLabel": "Width of {label} (px)",
+    "filterNumberPlaceholder": "e.g. >=10",
+    "filterAny": "All",
+    "booleanYes": "Yes",
+    "booleanNo": "No",
+    "prefsSaving": "Saving layout…",
+    "prefsSaved": "Layout saved",
+    "resizeColumn": "Resize {label}"
   }
 }

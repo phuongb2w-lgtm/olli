@@ -65,6 +65,7 @@ export default async function globalSetup() {
     }
     applyDevSeedSql();
     applySqlFile("scripts/e2e-roster-tuition-fixture.sql");
+    applySqlFile("scripts/e2e-cw2-t13-fixture.sql");
     restoreFixtureOrgCommercialState();
   } catch (error) {
     console.warn("[playwright globalSetup] auth seed skipped:", error?.message ?? error);

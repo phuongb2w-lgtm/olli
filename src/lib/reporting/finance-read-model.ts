@@ -379,6 +379,40 @@ export async function fetchReceivables(
   return { rows, error: null };
 }
 
+export type FinanceStudentAccountRow = {
+  id: string;
+  familyName: string;
+  givenName: string;
+  studentCode: string | null;
+  studentStatus: string;
+  totalCharged: number;
+  totalPaid: number;
+  outstandingBalance: number;
+};
+
+export async function fetchFinanceStudentAccounts(
+  supabase: SupabaseClient,
+): Promise<{ rows: FinanceStudentAccountRow[]; error: string | null }> {
+  const { data, error } = await supabase.rpc("list_finance_student_accounts", {
+    p_limit: 500,
+    p_offset: 0,
+  });
+  if (error) return { rows: [], error: error.message };
+  const rows = (data ?? []).map((row: unknown) =>
+    parseJsonRow(row, (r) => ({
+      id: String(r.student_id),
+      familyName: String(r.family_name ?? ""),
+      givenName: String(r.given_name ?? ""),
+      studentCode: r.student_code != null ? String(r.student_code) : null,
+      studentStatus: String(r.student_status ?? ""),
+      totalCharged: num(r.total_charged),
+      totalPaid: num(r.total_paid),
+      outstandingBalance: num(r.outstanding_balance),
+    })),
+  );
+  return { rows, error: null };
+}
+
 export async function fetchConsultantDeclarations(
   supabase: SupabaseClient,
   period: LocalDateRange,

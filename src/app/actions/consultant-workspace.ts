@@ -132,6 +132,8 @@ export async function saveConsultantGridPreferencesAction(
 export async function createConsultantWorkspacePortfolioIntakeAction(input: {
   familyName: string;
   givenName: string;
+  dateOfBirth?: string | null;
+  personalIdentificationNumber?: string | null;
   guardianFamilyName?: string | null;
   guardianGivenName?: string | null;
   guardianPhone?: string | null;

@@ -172,6 +172,8 @@ test.describe("CW2-T06 portfolio grid (mocked RPC)", () => {
     await signIn(page, consultantEmail);
     await page.goto("/consultant");
     await expect(page.getByTestId("portfolio-grid")).toBeVisible({ timeout: 30_000 });
+    await page.getByTestId("column-toggle-student_code").setChecked(true);
+    await expect(page.getByTestId("consultant-grid-prefs-status")).toHaveAttribute("data-state", "saved");
   });
 
   test("4. STT uses authoritative value", async ({ page }) => {
@@ -240,9 +242,11 @@ test.describe("CW2-T06 portfolio grid (mocked RPC)", () => {
   });
 
   test("10. column visibility toggle", async ({ page }) => {
-    await page.getByTestId("column-toggle-guardian_phone").uncheck();
-    await expect(page.getByRole("columnheader", { name: /phone|sđt/i })).toHaveCount(0);
-    await page.getByTestId("column-toggle-guardian_phone").check();
+    await page.getByTestId("column-toggle-student_code").setChecked(false);
+    await expect(page.getByTestId("portfolio-student-code")).toHaveCount(0);
+    await page.getByTestId("column-toggle-student_code").setChecked(true);
+    await expect(page.getByTestId("portfolio-student-code").first()).toBeVisible();
+    await expect(page.getByTestId("consultant-grid-prefs-status")).toHaveAttribute("data-state", "saved");
   });
 
   test("11. keyboard Tab moves focus", async ({ page }) => {
@@ -339,8 +343,6 @@ test.describe("CW2-T06 portfolio grid (mocked RPC)", () => {
     await page.getByTestId("filter-guardian-phone").blur();
     await expect(page.getByTestId("portfolio-row")).toHaveCount(2);
 
-    await phoneToggle.uncheck();
-    await expect(page.getByTestId("filter-guardian-phone")).toHaveCount(0);
     await page.getByTestId("filter-lifecycle-status").selectOption("tiem_nang");
     await expect(page.getByTestId("portfolio-row")).toHaveCount(1);
     await expect(page.getByTestId("portfolio-load-more")).toBeVisible();
@@ -390,7 +392,6 @@ test.describe("CW2-T06 portfolio grid (mocked RPC)", () => {
 
     await page.getByTestId("filter-payment-state").selectOption("");
     await expect(page.getByTestId("portfolio-row")).toHaveCount(2);
-    await page.getByTestId("column-toggle-guardian_phone").uncheck();
     await expect(page.getByTestId("portfolio-load-more")).toBeVisible();
   });
 
@@ -497,11 +498,9 @@ test.describe("CW2-T12 consultant intake profile corrective", () => {
       }
       await route.fulfill({ json: portfolioRoute([savedRow]) });
     });
+    let intakeBody: Record<string, unknown> | undefined;
     await page.route("**/rest/v1/rpc/create_consultant_workspace_portfolio_intake", async (route) => {
-      const body = route.request().postDataJSON() as Record<string, unknown>;
-      expect(body.p_date_of_birth).toBe("2017-06-09");
-      expect(body.p_guardian_phone).toBe("0912345678");
-      expect(body.p_personal_identification_number).toBe("001234567890");
+      intakeBody = route.request().postDataJSON() as Record<string, unknown>;
       await route.fulfill({
         json: {
           portfolio_entry_id: savedRow.portfolio_entry_id,
@@ -524,24 +523,72 @@ test.describe("CW2-T12 consultant intake profile corrective", () => {
     await signIn(page, consultantEmail);
     await page.goto("/consultant");
     await page.getByRole("combobox", { name: /language|ngôn ngữ/i }).selectOption("vi");
-    await page.getByTestId("column-toggle-personal_identification_number").setChecked(true);
-    await page.getByTestId("column-toggle-guardian_phone").setChecked(true);
+    await page.getByTestId("column-toggle-student_code").check();
+    await page.getByTestId("column-toggle-personal_identification_number").check();
+    await expect(page.locator('[data-testid="portfolio-new-row"] [data-testid="inline-personal-id"]')).toBeVisible({
+      timeout: 10_000,
+    });
     await page.getByTestId("inline-family-name").fill("NGUYỄN VĂN");
     await page.getByTestId("inline-given-name").fill("AN");
-    await page.getByTestId("inline-date-of-birth").fill("2017-06-09");
+    await expect(page.getByTestId("inline-date-of-birth")).toBeVisible();
+    const dobInput = page.getByTestId("inline-date-of-birth");
+    await dobInput.fill("2017-06-09");
+    await dobInput.blur();
     await page.getByTestId("inline-guardian-name").fill("NGUYỄN VĂN B");
     await page.getByTestId("inline-guardian-phone").fill("0912345678");
     await page.getByTestId("inline-personal-id").fill("001234567890");
+
+    await expect(page.getByTestId("inline-date-of-birth")).toHaveValue("2017-06-09");
     await page.getByTestId("portfolio-save-new-row").click();
+    await expect.poll(() => intakeBody?.p_date_of_birth, { timeout: 10_000 }).toBe("2017-06-09");
+    expect(intakeBody?.p_guardian_phone).toBe("0912345678");
+    expect(intakeBody?.p_personal_identification_number).toBe("001234567890");
 
     const row = page.getByTestId("portfolio-row").first();
+    await expect(page.getByTestId("portfolio-row")).toHaveCount(1, { timeout: 10_000 });
     await expect(row).toContainText("NGUYỄN VĂN B");
     await expect(row).toContainText("0912345678");
     await expect(row.getByTestId("portfolio-date-of-birth")).toContainText("09/06/2017");
-    await expect(row.getByTestId("portfolio-student-code")).toHaveText("02170000");
+    await expect(row).toContainText("02170000");
 
     await page.reload();
-    await expect(row).toContainText("NGUYỄN VĂN B");
+    await expect(page.getByTestId("portfolio-row").first()).toContainText("NGUYỄN VĂN B");
+  });
+});
+
+test.describe("CW2-T13 personal custom column", () => {
+  test("add column dialog creates visible custom column", async ({ page }) => {
+    let defs: unknown[] = [];
+    await page.route("**/rest/v1/consultant_custom_field_definition*", async (route) => {
+      if (route.request().method() === "GET") {
+        await route.fulfill({ json: defs });
+        return;
+      }
+      await route.continue();
+    });
+    await page.route("**/rest/v1/rpc/list_consultant_workspace_portfolio", async (route) => {
+      await route.fulfill({ json: portfolioRoute([]) });
+    });
+    await page.route("**/rest/v1/rpc/create_personal_custom_field_definition", async (route) => {
+      defs = [
+        {
+          id: "d0000000-0000-4000-8000-000000000099",
+          field_key: "ghi_chu_cua_toi",
+          label: "Ghi chú của tôi",
+          data_type: "text",
+          sort_order: 1,
+          status: "active",
+        },
+      ];
+      await route.fulfill({ json: defs[0] });
+    });
+
+    await signIn(page, consultantEmail);
+    await page.goto("/consultant");
+    await page.getByTestId("add-custom-column").click();
+    await page.getByTestId("custom-column-label").fill("Ghi chú của tôi");
+    await page.getByTestId("custom-column-submit").click();
+    await expect(page.getByTestId("column-toggle-custom_ghi_chu_cua_toi")).toBeVisible();
   });
 });
 

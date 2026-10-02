@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { StudentListCards } from "@/components/students/student-list-cards";
 import { StudentListFilters } from "@/components/students/student-list-filters";
 import { StudentListPagination } from "@/components/students/student-list-pagination";
+import { StudentListWithPersonalFields } from "@/components/custom-fields/student-list-with-personal-fields";
 import { StudentListTable } from "@/components/students/student-list-table";
 import { can } from "@/lib/permissions/can";
 import { isSearchActive } from "@/lib/students/parse-list-params";
@@ -35,6 +36,8 @@ export default async function StudentsPage({ searchParams }: Props) {
   const hasEnrollmentRead = await can("enrollment.read");
   const hasCreate = await can("student.create");
   const hasUpdate = await can("student.update");
+  const canPersonalFields =
+    (await can("student_personal_field.manage")) || (await can("consultant_custom_field.manage"));
   const successParam = rawParams.success;
   const success =
     successParam === "created" || successParam === "updated" ? successParam : null;
@@ -99,13 +102,23 @@ export default async function StudentsPage({ searchParams }: Props) {
 
       {items.length > 0 ? (
         <>
-          <StudentListTable
-            items={items}
-            showPrimaryContact={hasGuardianRead}
-            canUpdate={hasUpdate}
-            canViewGuardians={hasGuardianRead}
-            canViewEnrollments={hasEnrollmentRead}
-          />
+          {canPersonalFields ? (
+            <StudentListWithPersonalFields
+              items={items}
+              showPrimaryContact={hasGuardianRead}
+              canUpdate={hasUpdate}
+              canViewGuardians={hasGuardianRead}
+              canViewEnrollments={hasEnrollmentRead}
+            />
+          ) : (
+            <StudentListTable
+              items={items}
+              showPrimaryContact={hasGuardianRead}
+              canUpdate={hasUpdate}
+              canViewGuardians={hasGuardianRead}
+              canViewEnrollments={hasEnrollmentRead}
+            />
+          )}
           <StudentListCards
             items={items}
             showPrimaryContact={hasGuardianRead}

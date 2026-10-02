@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { StudentForm } from "@/components/students/student-form";
+import { StudentPersonalFieldsPanel } from "@/components/custom-fields/student-personal-fields-panel";
 import { can } from "@/lib/permissions/can";
 import type { StudentStatus } from "@/lib/students/constants";
 import { createClient } from "@/lib/supabase/server";
@@ -16,6 +17,8 @@ export default async function EditStudentPage({ params }: Props) {
   const t = await getTranslations("students");
   const { id } = await params;
   const hasUpdate = await can("student.update");
+  const canPersonalFields =
+    (await can("student_personal_field.manage")) || (await can("consultant_custom_field.manage"));
 
   if (!hasUpdate) {
     return (
@@ -51,6 +54,7 @@ export default async function EditStudentPage({ params }: Props) {
         <h1 className="mt-2 text-xl font-semibold">{t("editStudent")}</h1>
       </div>
 
+      {canPersonalFields ? <StudentPersonalFieldsPanel studentId={student.id} canManage /> : null}
       <StudentForm
         mode="edit"
         studentId={student.id}

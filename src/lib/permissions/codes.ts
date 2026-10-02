@@ -67,6 +67,8 @@ export const PERMISSION_CODES = [
   "consultant_workspace.read",
   "consultant_workspace.update",
   "consultant_custom_field.manage",
+  "student_personal_field.manage",
+  "student.personal_id.read",
 ] as const;
 
 export type PermissionCode = (typeof PERMISSION_CODES)[number];
