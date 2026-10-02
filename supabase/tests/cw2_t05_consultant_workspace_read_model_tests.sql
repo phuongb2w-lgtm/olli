@@ -192,6 +192,26 @@ BEGIN
     CURRENT_DATE, si.due_date, 'open', 10000000, 10000000
   FROM enrollment_payment_schedule_item si WHERE si.enrollment_financial_terms_id = terms_id
   RETURNING id INTO charge_id;
+  UPDATE enrollment_financial_terms
+  SET tuition_plan_established_at = now(), charges_generated_at = now()
+  WHERE id = terms_id;
+  PERFORM set_config('row_security', 'off', true);
+  INSERT INTO enrollment_tuition_billing AS etb (
+    organization_id, enrollment_id, enrollment_financial_terms_id, billing_mode, established_at
+  )
+  SELECT
+    p_org,
+    _cw2_t05_student_with_finance.enrollment_id,
+    _cw2_t05_student_with_finance.terms_id,
+    'course_lump_sum',
+    now()
+  WHERE NOT EXISTS (
+    SELECT 1
+    FROM enrollment_tuition_billing x
+    WHERE x.organization_id = p_org
+      AND x.enrollment_id = _cw2_t05_student_with_finance.enrollment_id
+  );
+  PERFORM set_config('row_security', 'on', true);
   PERFORM _cw2_t05_as_auth(p_consultant_auth);
 END;
 $$;
@@ -494,7 +514,7 @@ BEGIN
   r := public.list_consultant_workspace_portfolio();
   PERFORM _cw2_t05_record(
     16, 'pending cw2 pending amount separate',
-    (r->'rows'->0->>'tuition_payment_state') = 'dong_phi'
+    (r->'rows'->0->>'tuition_payment_state') = 'nop_phi'
     AND (r->'rows'->0->>'tuition_pending_declaration')::bigint = 2000000
     AND (r->'rows'->0->>'tuition_outstanding')::bigint = 10000000
     AND (r->'rows'->0->>'declaration_status') = 'pending'
@@ -513,7 +533,7 @@ BEGIN
   r := public.list_consultant_workspace_portfolio();
   PERFORM _cw2_t05_record(
     17, 'legacy m5 not cho_xac_nhan',
-    (r->'rows'->0->>'tuition_payment_state') = 'dong_phi'
+    (r->'rows'->0->>'tuition_payment_state') = 'nop_phi'
     AND (r->'rows'->0->>'declaration_status') IS NULL
   );
 END $$;
@@ -528,7 +548,7 @@ BEGIN
   PERFORM _cw2_t05_confirm_partial(f.org_id, f.consultant_a_auth, b.student_id, b.enrollment_id, b.terms_id, b.guardian_id, 4000000);
   PERFORM _cw2_t05_as_auth(f.consultant_a_auth);
   r := public.list_consultant_workspace_portfolio();
-  PERFORM _cw2_t05_record(18, 'partial mot_phan', (r->'rows'->0->>'tuition_payment_state') = 'mot_phan');
+  PERFORM _cw2_t05_record(18, 'partial da_coc', (r->'rows'->0->>'tuition_payment_state') = 'da_coc');
 END $$;
 
 -- 19: full payment state full_phi
@@ -585,11 +605,24 @@ BEGIN
   SELECT f.org_id, v_student, v_enrollment, v_guardian, v_terms, si.id, 'tuition', si.amount, 'VND',
     CURRENT_DATE, si.due_date, 'open', 10000000, 10000000
   FROM enrollment_payment_schedule_item si WHERE si.enrollment_financial_terms_id = v_terms;
+  UPDATE enrollment_financial_terms
+  SET tuition_plan_established_at = now(), charges_generated_at = now()
+  WHERE id = v_terms;
+  PERFORM set_config('row_security', 'off', true);
+  INSERT INTO enrollment_tuition_billing (
+    organization_id, enrollment_id, enrollment_financial_terms_id, billing_mode, established_at
+  )
+  SELECT f.org_id, v_enrollment, v_terms, 'course_lump_sum', now()
+  WHERE NOT EXISTS (
+    SELECT 1 FROM enrollment_tuition_billing x
+    WHERE x.organization_id = f.org_id AND x.enrollment_id = v_enrollment
+  );
+  PERFORM set_config('row_security', 'on', true);
   PERFORM _cw2_t05_add_portfolio_entry(f.org_id, f.consultant_a_user, 20, NULL, v_student);
   PERFORM _cw2_t05_confirm_partial(f.org_id, f.consultant_a_auth, v_student, v_enrollment, v_terms, v_guardian, 2000000);
   PERFORM _cw2_t05_as_auth(f.consultant_a_auth);
   r := public.list_consultant_workspace_portfolio();
-  PERFORM _cw2_t05_record(20, 'deposit coc_phi', (r->'rows'->0->>'tuition_payment_state') = 'coc_phi');
+  PERFORM _cw2_t05_record(20, 'deposit da_coc', (r->'rows'->0->>'tuition_payment_state') = 'da_coc');
 END $$;
 
 -- 21: multi enrollment picks latest active
@@ -778,7 +811,7 @@ BEGIN
 
   PERFORM _cw2_t05_confirm_partial(f.org_id, f.consultant_a_auth, b.student_id, b.enrollment_id, b.terms_id, b.guardian_id, 5000000);
   PERFORM _cw2_t05_as_auth(f.consultant_a_auth);
-  r := public.list_consultant_workspace_portfolio(jsonb_build_object('tuition_payment_state', 'mot_phan'));
+  r := public.list_consultant_workspace_portfolio(jsonb_build_object('tuition_payment_state', 'da_coc'));
   PERFORM _cw2_t05_record(32, 'filter tuition_payment_state', jsonb_array_length(r->'rows') = 1);
 
   v_lead := public.save_consultant_payment_declaration_draft(

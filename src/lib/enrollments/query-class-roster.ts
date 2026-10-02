@@ -18,6 +18,7 @@ export type RosterListItem = {
   status: EnrollmentStatus;
   startDate: string;
   endDate: string | null;
+  operationalTuitionStatus: string | null;
 };
 
 export type RosterListResult = {
@@ -45,6 +46,7 @@ export async function queryClassRoster(
   supabase: SupabaseClient,
   classId: string,
   rawParams: Record<string, string | string[] | undefined>,
+  options?: { includeOperationalTuition?: boolean },
 ): Promise<{ result: RosterListResult | null; error: boolean }> {
   const params = parseRosterListParams(rawParams);
 
@@ -103,6 +105,13 @@ export async function queryClassRoster(
       }
     }
 
+    const tuitionByEnrollment = options?.includeOperationalTuition
+      ? await loadOperationalTuitionByEnrollment(
+          supabase,
+          rows.map((row) => row.id),
+        )
+      : null;
+
     const items: RosterListItem[] = rows
       .map((row) => {
         const student = studentById.get(row.student_id);
@@ -115,6 +124,7 @@ export async function queryClassRoster(
           status: row.status as EnrollmentStatus,
           startDate: row.start_date,
           endDate: row.end_date,
+          operationalTuitionStatus: tuitionByEnrollment?.get(row.id) ?? null,
         };
       })
       .filter((item): item is RosterListItem => item !== null);
@@ -193,4 +203,25 @@ async function resolveMatchingEnrollmentIds(
   }
 
   return enrollmentIds;
+}
+
+async function loadOperationalTuitionByEnrollment(
+  supabase: SupabaseClient,
+  enrollmentIds: string[],
+): Promise<Map<string, string>> {
+  const map = new Map<string, string>();
+  if (enrollmentIds.length === 0) return map;
+
+  await Promise.all(
+    enrollmentIds.map(async (enrollmentId) => {
+      const { data, error } = await supabase.rpc("get_enrollment_operational_tuition_status", {
+        p_enrollment_id: enrollmentId,
+      });
+      if (error || !data || typeof data !== "object") return;
+      const status = (data as { operational_status?: string }).operational_status;
+      if (status) map.set(enrollmentId, status);
+    }),
+  );
+
+  return map;
 }

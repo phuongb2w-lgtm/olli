@@ -7,11 +7,21 @@ export type ConsultantWorkspaceLifecycleStatus =
   | "tot_nghiep";
 
 export type ConsultantWorkspaceTuitionPaymentState =
-  | "dong_phi"
+  | "chua_coc"
+  | "coc_cho_xac_nhan"
+  | "da_coc"
+  | "nop_phi"
+  | "full_phi"
   | "cho_xac_nhan"
+  | "con_hoc_phi"
+  | "sap_het_hoc_phi"
+  | "het_hoc_phi"
+  | "con_thieu"
+  | "da_du_ky"
+  | "co_so_du"
+  | "dong_phi"
   | "coc_phi"
-  | "mot_phan"
-  | "full_phi";
+  | "mot_phan";
 
 export type ConsultantWorkspacePortfolioCapabilities = {
   can_edit_contact: boolean;
@@ -60,6 +70,9 @@ export type ConsultantWorkspacePortfolioRow = {
   tuition_pending_declaration?: number;
   tuition_payment_state: ConsultantWorkspaceTuitionPaymentState;
   tuition_payment_state_label: string;
+  tuition_billing_mode?: "course_lump_sum" | "periodic" | null;
+  tuition_periodic_lessons_remaining?: number | null;
+  tuition_carry_forward_credit?: number;
   declaration_id: string | null;
   declaration_status: string | null;
   declaration_workflow_kind: string | null;

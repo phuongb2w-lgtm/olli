@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { ConsultantRevenueDeclarationsPanel } from "@/components/finance/consultant-revenue-declarations-panel";
 import { ReportingPeriodFilterForm } from "@/components/finance/reporting-period-filter-form";
-import { formatFinanceMoney } from "@/lib/finance/format-finance-value";
-import { fetchConsultantDeclarations } from "@/lib/reporting/finance-read-model";
 import { parseReportingSearchParams } from "@/lib/reporting/parse-reporting-search-params";
 import { can } from "@/lib/permissions/can";
 import { resolveLocale } from "@/i18n/resolve-locale";
 import { getIdentityState } from "@/lib/auth/get-identity-state";
-import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -29,8 +27,8 @@ export default async function FinanceConsultantRevenuePage({ searchParams }: Pro
     );
   }
 
-  const supabase = await createClient();
-  const { rows } = await fetchConsultantDeclarations(supabase, period);
+  const canConfirm =
+    (await can("consultant_revenue.review")) && (await can("payment.record"));
 
   return (
     <div className="space-y-6">
@@ -50,42 +48,12 @@ export default async function FinanceConsultantRevenuePage({ searchParams }: Pro
         showComparisonToggle={false}
       />
 
-      {rows.length === 0 ? (
-        <p className="text-sm text-slate-600">{t("noDeclarations")}</p>
-      ) : (
-        <div className="overflow-x-auto rounded border border-slate-200">
-          <table className="min-w-full text-sm">
-            <thead className="bg-slate-50 text-left">
-              <tr>
-                <th className="px-3 py-2">{t("declarationDate")}</th>
-                <th className="px-3 py-2">{t("consultant")}</th>
-                <th className="px-3 py-2">{t("amount")}</th>
-                <th className="px-3 py-2">{t("status")}</th>
-                <th className="px-3 py-2">{t("paymentLink")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.declarationId} className="border-t border-slate-100">
-                  <td className="px-3 py-2">{row.declarationDate}</td>
-                  <td className="px-3 py-2">{row.consultantName}</td>
-                  <td className="px-3 py-2">
-                    {formatFinanceMoney(row.declaredAmount, locale)}
-                  </td>
-                  <td className="px-3 py-2">{row.status}</td>
-                  <td className="px-3 py-2">
-                    {row.hasCanonicalPayment
-                      ? t("linkedPayment")
-                      : row.status === "approved"
-                        ? t("unlinkedApproved")
-                        : "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <ConsultantRevenueDeclarationsPanel
+        startDate={period.startDate}
+        endDate={period.endDate}
+        locale={locale}
+        canConfirm={canConfirm}
+      />
     </div>
   );
 }

@@ -49,8 +49,8 @@ const eligibleRow = {
   tuition_paid: 3_000_000,
   tuition_outstanding: 7_000_000,
   tuition_pending_declaration: 0,
-  tuition_payment_state: "mot_phan",
-  tuition_payment_state_label: "Partial",
+  tuition_payment_state: "nop_phi",
+  tuition_payment_state_label: "Paying tuition",
   declaration_id: null,
   declaration_status: null,
   declaration_workflow_kind: null,
@@ -69,12 +69,28 @@ const eligibleRow = {
   },
 };
 
+const zeroPlanRow = {
+  ...eligibleRow,
+  portfolio_entry_id: "b0000000-0000-4000-8000-000000000104",
+  workspace_sequence: 47,
+  tuition_total_net: 0,
+  tuition_outstanding: 0,
+  tuition_paid: 0,
+  tuition_payment_state: "chua_coc",
+  tuition_payment_state_label: "No deposit yet",
+  capabilities: {
+    ...eligibleRow.capabilities,
+    can_create_payment_declaration: true,
+  },
+};
+
 const fullPhiRow = {
   ...eligibleRow,
   portfolio_entry_id: "b0000000-0000-4000-8000-000000000102",
   workspace_sequence: 49,
   tuition_outstanding: 0,
   tuition_paid: 10_000_000,
+  tuition_total_net: 10_000_000,
   tuition_payment_state: "full_phi",
   tuition_payment_state_label: "Paid in full",
   capabilities: {
@@ -112,7 +128,27 @@ function portfolioRoute(rows: unknown[]) {
 test.describe("CW2-T07 payment declaration drawer", () => {
   test.beforeEach(async ({ page }) => {
     await page.route("**/rest/v1/rpc/list_consultant_workspace_portfolio", async (route) => {
-      await route.fulfill({ json: portfolioRoute([eligibleRow, fullPhiRow, pendingRow]) });
+      await route.fulfill({
+        json: portfolioRoute([eligibleRow, fullPhiRow, pendingRow, zeroPlanRow]),
+      });
+    });
+    await page.route("**/rest/v1/rpc/get_cw2_tuition_declaration_context", async (route) => {
+      const body = route.request().postDataJSON() as { p_enrollment_id?: string };
+      const established = body?.p_enrollment_id !== eligibleRow.enrollment_id;
+      await route.fulfill({
+        json: {
+          enrollment_id: body?.p_enrollment_id,
+          tuition_established: established,
+          billing_mode: established ? "course_lump_sum" : null,
+          finance: {
+            tuition_total_net: established ? 10_000_000 : 0,
+            tuition_paid: established ? 3_000_000 : 0,
+            tuition_outstanding: established ? 7_000_000 : 0,
+            pending_declaration_amount: 0,
+          },
+          can_change_billing_mode: !established,
+        },
+      });
     });
     await signIn(page, consultantEmail);
     await page.goto("/consultant");
@@ -121,7 +157,7 @@ test.describe("CW2-T07 payment declaration drawer", () => {
 
   test("eligible row shows declare payment action", async ({ page }) => {
     await expect(page.getByTestId("declare-payment-action").first()).toBeVisible();
-    await expect(page.getByTestId("declare-payment-action")).toHaveCount(2);
+    await expect(page.getByTestId("declare-payment-action")).toHaveCount(3);
   });
 
   test("full phí row has no declare action", async ({ page }) => {
@@ -180,7 +216,40 @@ test.describe("CW2-T07 payment declaration drawer", () => {
 
   test("VI declare payment label", async ({ page }) => {
     await page.getByRole("combobox", { name: /language|ngôn ngữ/i }).selectOption("vi");
-    await expect(page.getByTestId("declare-payment-action").first()).toContainText(/khai báo khoản nộp/i);
+    await expect(page.getByTestId("declare-payment-action").first()).toContainText(/nộp phí/i);
+  });
+
+  test("zero tuition plan shows Chưa cọc not Full phí", async ({ page }) => {
+    const tuition = page.getByTestId("portfolio-tuition").nth(3);
+    await expect(tuition).toContainText(/no deposit yet|chưa cọc/i);
+    await expect(tuition).not.toContainText(/paid in full|full phí/i);
+  });
+
+  test("drawer shows course vs periodic options for new plan", async ({ page }) => {
+    await page.getByTestId("portfolio-row").nth(3).getByTestId("declare-payment-action").click();
+    await expect(page.getByTestId("tuition-billing-mode")).toBeVisible();
+    await expect(page.getByText(/pay by course|nộp theo khóa học/i)).toBeVisible();
+    await expect(page.getByText(/pay periodically|nộp định kỳ/i)).toBeVisible();
+  });
+
+  test("school year period disabled without organization academic year", async ({ page }) => {
+    await page.route("**/rest/v1/rpc/get_cw2_tuition_declaration_context", async (route) => {
+      await route.fulfill({
+        json: {
+          enrollment_id: zeroPlanRow.enrollment_id,
+          tuition_established: false,
+          billing_mode: null,
+          finance: { tuition_total_net: 0 },
+          can_change_billing_mode: true,
+          has_organization_academic_year: false,
+        },
+      });
+    });
+    await page.getByTestId("portfolio-row").nth(3).getByTestId("declare-payment-action").click();
+    await page.getByText(/pay periodically|nộp định kỳ/i).click();
+    const schoolYearOption = page.getByTestId("drawer-period-unit").locator('option[value="school_year"]');
+    await expect(schoolYearOption).toHaveAttribute("disabled", "");
+    await expect(page.getByTestId("school-year-unavailable")).toBeVisible();
   });
 
   test("390px viewport drawer usable", async ({ page }) => {

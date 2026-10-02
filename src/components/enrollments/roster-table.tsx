@@ -12,13 +12,21 @@ type ClassOption = {
 type Props = {
   items: RosterListItem[];
   canUpdate: boolean;
+  showOperationalTuition: boolean;
   classId: string;
   classOptions: ClassOption[];
 };
 
-export async function RosterTable({ items, canUpdate, classId, classOptions }: Props) {
+export async function RosterTable({
+  items,
+  canUpdate,
+  showOperationalTuition,
+  classId,
+  classOptions,
+}: Props) {
   const t = await getTranslations("enrollments");
   const tStatus = await getTranslations("status.enrollment");
+  const tPayState = await getTranslations("consultantWorkspace.paymentState");
   const placeholder = t("emptyValue");
 
   return (
@@ -35,6 +43,11 @@ export async function RosterTable({ items, canUpdate, classId, classOptions }: P
             <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
               {t("statusColumn")}
             </th>
+            {showOperationalTuition ? (
+              <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
+                {t("operationalTuitionColumn")}
+              </th>
+            ) : null}
             <th scope="col" className="px-4 py-3 text-left font-medium text-slate-700">
               {t("startDate")}
             </th>
@@ -62,6 +75,17 @@ export async function RosterTable({ items, canUpdate, classId, classOptions }: P
                     {tStatus(item.status)}
                   </span>
                 </td>
+                {showOperationalTuition ? (
+                  <td className="px-4 py-3" data-testid="roster-operational-tuition">
+                    {item.operationalTuitionStatus ? (
+                      <span className="inline-flex rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-900">
+                        {tPayState(item.operationalTuitionStatus as "chua_coc")}
+                      </span>
+                    ) : (
+                      placeholder
+                    )}
+                  </td>
+                ) : null}
                 <td className="px-4 py-3 text-slate-700">{item.startDate}</td>
                 <td className="px-4 py-3 text-slate-700">{item.endDate ?? placeholder}</td>
                 {canUpdate ? (

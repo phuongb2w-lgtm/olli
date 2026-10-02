@@ -37,6 +37,34 @@ export async function refreshDeclarationFinanceAction(
   return { ok: true, finance: data as Record<string, unknown> };
 }
 
+export async function loadTuitionDeclarationContextAction(
+  enrollmentId: string,
+): Promise<
+  { ok: false; errorCode: string } | { ok: true; data: Record<string, unknown> }
+> {
+  if (!(await can("consultant_revenue.declare"))) {
+    return { ok: false as const, errorCode: "permission_denied" };
+  }
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_cw2_tuition_declaration_context", {
+    p_enrollment_id: enrollmentId,
+  });
+  if (error || !data) {
+    return { ok: false as const, errorCode: mapDeclarationError(error?.message ?? "") };
+  }
+  const { count: academicYearCount, error: yearError } = await supabase
+    .from("organization_academic_year")
+    .select("id", { count: "exact", head: true });
+  if (yearError) {
+    return { ok: false as const, errorCode: "unknown" };
+  }
+  const payload: Record<string, unknown> = {
+    ...(data as Record<string, unknown>),
+    has_organization_academic_year: (academicYearCount ?? 0) > 0,
+  };
+  return { ok: true as const, data: payload };
+}
+
 export async function saveConsultantPaymentDeclarationDraftAction(input: {
   declarationId?: string | null;
   declaredAmount: number;
@@ -47,10 +75,18 @@ export async function saveConsultantPaymentDeclarationDraftAction(input: {
   courseId?: string | null;
   classId?: string | null;
   enrollmentId: string;
-  enrollmentFinancialTermsId: string;
+  enrollmentFinancialTermsId?: string | null;
   guardianId: string;
-  totalObligationAmount: number;
+  totalObligationAmount?: number;
   idempotencyKey?: string;
+  tuitionBillingMode?: "course_lump_sum" | "periodic" | null;
+  proposedNetTuitionAmount?: number | null;
+  periodicPeriodUnit?: "lesson" | "week" | "month" | "school_year" | null;
+  periodicPeriodQuantity?: number | null;
+  periodicAmountPerPeriod?: number | null;
+  paymentMethodCode?: string | null;
+  declarationKind?: "payment_only" | "initial_tuition_setup";
+  declarationDate?: string;
 }): Promise<DeclarationActionResult> {
   if (!(await can("consultant_revenue.declare"))) {
     return { ok: false, errorCode: "permission_denied" };
@@ -58,7 +94,7 @@ export async function saveConsultantPaymentDeclarationDraftAction(input: {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("save_consultant_payment_declaration_draft", {
     p_declaration_id: input.declarationId ?? undefined,
-    p_declaration_date: new Date().toISOString().slice(0, 10),
+    p_declaration_date: input.declarationDate ?? new Date().toISOString().slice(0, 10),
     p_declared_amount: input.declaredAmount,
     p_description: input.description ?? undefined,
     p_promotion_context: input.promotionContext ?? undefined,
@@ -67,10 +103,17 @@ export async function saveConsultantPaymentDeclarationDraftAction(input: {
     p_course_id: input.courseId ?? undefined,
     p_class_id: input.classId ?? undefined,
     p_enrollment_id: input.enrollmentId,
-    p_enrollment_financial_terms_id: input.enrollmentFinancialTermsId,
+    p_enrollment_financial_terms_id: input.enrollmentFinancialTermsId ?? undefined,
     p_guardian_id: input.guardianId,
-    p_total_obligation_amount: input.totalObligationAmount,
+    p_total_obligation_amount: input.totalObligationAmount ?? undefined,
     p_idempotency_key: input.idempotencyKey ?? undefined,
+    p_tuition_billing_mode: input.tuitionBillingMode ?? undefined,
+    p_proposed_net_tuition_amount: input.proposedNetTuitionAmount ?? undefined,
+    p_periodic_period_unit: input.periodicPeriodUnit ?? undefined,
+    p_periodic_period_quantity: input.periodicPeriodQuantity ?? undefined,
+    p_periodic_amount_per_period: input.periodicAmountPerPeriod ?? undefined,
+    p_payment_method_code: input.paymentMethodCode ?? undefined,
+    p_declaration_kind: input.declarationKind ?? undefined,
   });
   if (error || !data) {
     return { ok: false, errorCode: mapDeclarationError(error?.message ?? "") };

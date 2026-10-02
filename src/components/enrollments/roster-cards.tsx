@@ -12,13 +12,21 @@ type ClassOption = {
 type Props = {
   items: RosterListItem[];
   canUpdate: boolean;
+  showOperationalTuition: boolean;
   classId: string;
   classOptions: ClassOption[];
 };
 
-export async function RosterCards({ items, canUpdate, classId, classOptions }: Props) {
+export async function RosterCards({
+  items,
+  canUpdate,
+  showOperationalTuition,
+  classId,
+  classOptions,
+}: Props) {
   const t = await getTranslations("enrollments");
   const tStatus = await getTranslations("status.enrollment");
+  const tPayState = await getTranslations("consultantWorkspace.paymentState");
   const placeholder = t("emptyValue");
 
   return (
@@ -42,6 +50,16 @@ export async function RosterCards({ items, canUpdate, classId, classOptions }: P
               </span>
             </div>
             <dl className="mt-3 space-y-1 text-sm">
+              {showOperationalTuition ? (
+                <div className="flex gap-2">
+                  <dt className="text-slate-500">{t("operationalTuitionColumn")}:</dt>
+                  <dd className="text-slate-800" data-testid="roster-operational-tuition">
+                    {item.operationalTuitionStatus
+                      ? tPayState(item.operationalTuitionStatus as "chua_coc")
+                      : placeholder}
+                  </dd>
+                </div>
+              ) : null}
               <div className="flex gap-2">
                 <dt className="text-slate-500">{t("startDate")}:</dt>
                 <dd className="text-slate-800">{item.startDate}</dd>

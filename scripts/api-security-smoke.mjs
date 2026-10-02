@@ -6,7 +6,44 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
-import { execSync } from "node:child_process";
+import { execSync, spawnSync } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { waitForKongAuthAdminReady } from "./lib/local-supabase-auth-ready.mjs";
+
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function ensureLocalApiFixtures() {
+  await waitForKongAuthAdminReady();
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const seedAuth = spawnSync("node", ["scripts/seed-auth-users.mjs"], {
+      cwd: projectRoot,
+      encoding: "utf8",
+    });
+    if (seedAuth.status === 0) break;
+    if (attempt === 3) {
+      throw new Error(seedAuth.stderr || seedAuth.stdout || "seed-auth-users failed");
+    }
+    await sleep(3000);
+  }
+  const seedPath = path.join(projectRoot, "supabase", "seed.sql");
+  if (fs.existsSync(seedPath)) {
+    const sql = fs.readFileSync(seedPath, "utf8");
+    const apply = spawnSync(
+      "docker",
+      ["exec", "-i", "supabase_db_olli-local", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1"],
+      { input: sql, encoding: "utf8" },
+    );
+    if (apply.status !== 0) {
+      throw new Error(apply.stderr || apply.stdout || "seed.sql apply failed before API smoke");
+    }
+  }
+}
 
 function loadEnvFromSupabaseStatus() {
   const raw = execSync("npx supabase status -o env", { encoding: "utf8" });
@@ -80,14 +117,21 @@ async function signIn(email, password) {
   const client = createClient(SUPABASE_URL, PUBLISHABLE_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-  const { data, error } = await client.auth.signInWithPassword({ email, password });
-  if (error || !data.session?.access_token) {
-    throw new Error(`Sign-in failed for ${email}: ${error?.message ?? "no token"}`);
+  let lastError;
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    if (!error && data.session?.access_token) {
+      return data.session.access_token;
+    }
+    lastError = error;
+    await sleep(1500);
   }
-  return data.session.access_token;
+  throw new Error(`Sign-in failed for ${email}: ${lastError?.message ?? "no token"}`);
 }
 
 async function main() {
+  await ensureLocalApiFixtures();
+
   // API-1: unauthenticated cannot read student
   {
     const { status, body } = await restGet("student?select=id&limit=1");
@@ -100,16 +144,22 @@ async function main() {
 
   // API-2: org A admin reads org A student
   {
-    const { status, body } = await restGet(
-      `student?select=id,organization_id&organization_id=eq.${ORG_A}&limit=5`,
-      orgAAdminToken,
-    );
-    const rows = Array.isArray(body) ? body : [];
-    record(
-      2,
-      "org A admin reads org A Student",
-      status === 200 && rows.length >= 1 && rows.every((r) => r.organization_id === ORG_A),
-    );
+    let passed = false;
+    for (let attempt = 1; attempt <= 8; attempt++) {
+      const token =
+        attempt === 1 ? orgAAdminToken : await signIn("org-a-admin@olli.local", "testpass123");
+      const { status, body } = await restGet(
+        `student?select=id,organization_id&organization_id=eq.${ORG_A}&limit=5`,
+        token,
+      );
+      const rows = Array.isArray(body) ? body : [];
+      if (status === 200 && rows.length >= 1 && rows.every((r) => r.organization_id === ORG_A)) {
+        passed = true;
+        break;
+      }
+      await sleep(2000);
+    }
+    record(2, "org A admin reads org A Student", passed);
   }
 
   // API-3: org A cannot read org B student
@@ -173,43 +223,44 @@ async function main() {
 
   // API-6: admin with permission can mutate allowed test data (organization name round-trip)
   {
-    const before = await restGet(
-      `organization?select=name&id=eq.${ORG_A}`,
-      orgAAdminToken,
-    );
-    const originalName = before.body?.[0]?.name;
-    const tempName = `${originalName} API6`;
-    const update = await fetch(
-      `${SUPABASE_URL}/rest/v1/organization?id=eq.${ORG_A}`,
-      {
+    let passed = false;
+    for (let attempt = 1; attempt <= 8; attempt++) {
+      const token =
+        attempt === 1 ? orgAAdminToken : await signIn("org-a-admin@olli.local", "testpass123");
+      const before = await restGet(`organization?select=name&id=eq.${ORG_A}`, token);
+      const originalName = before.body?.[0]?.name;
+      if (!originalName) {
+        await sleep(2000);
+        continue;
+      }
+      const tempName = `${originalName} API6`;
+      const update = await fetch(`${SUPABASE_URL}/rest/v1/organization?id=eq.${ORG_A}`, {
         method: "PATCH",
         headers: {
           apikey: PUBLISHABLE_KEY,
-          Authorization: `Bearer ${orgAAdminToken}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
           Prefer: "return=representation",
         },
         body: JSON.stringify({ name: tempName }),
-      },
-    );
-    const restore = await fetch(
-      `${SUPABASE_URL}/rest/v1/organization?id=eq.${ORG_A}`,
-      {
+      });
+      const restore = await fetch(`${SUPABASE_URL}/rest/v1/organization?id=eq.${ORG_A}`, {
         method: "PATCH",
         headers: {
           apikey: PUBLISHABLE_KEY,
-          Authorization: `Bearer ${orgAAdminToken}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name: originalName }),
-      },
-    );
-    const updatedBody = update.status === 200 ? await update.json() : [];
-    record(
-      6,
-      "authorized user can perform allowed mutation",
-      update.status === 200 && updatedBody[0]?.name === tempName && restore.status === 204,
-    );
+      });
+      const updatedBody = update.status === 200 ? await update.json() : [];
+      if (update.status === 200 && updatedBody[0]?.name === tempName && restore.status === 204) {
+        passed = true;
+        break;
+      }
+      await sleep(2000);
+    }
+    record(6, "authorized user can perform allowed mutation", passed);
   }
 
   const unique = new Map();

@@ -184,11 +184,13 @@ DECLARE f record; caps jsonb;
 BEGIN
   SELECT * INTO f FROM _cw2_t04_fixture();
   PERFORM _cw2_t04_as_auth(f.consultant_auth);
-  caps := public._cw2_portfolio_declaration_capabilities(gen_random_uuid(), 5000000, NULL, true);
+  caps := public._cw2_portfolio_declaration_capabilities(f.terms_id, 5000000, NULL, true);
   PERFORM _cw2_t07_record(19, 'can_add_payment always false for consultant path', (caps->>'can_add_payment')::boolean = false);
-  caps := public._cw2_portfolio_declaration_capabilities(gen_random_uuid(), 5000000, 'pending', true);
+  caps := public._cw2_portfolio_declaration_capabilities(f.terms_id, 5000000, 'pending', true);
   PERFORM _cw2_t07_record(20, 'can_create true when pending and outstanding remains', (caps->>'can_create_payment_declaration')::boolean = true);
-  caps := public._cw2_portfolio_declaration_capabilities(gen_random_uuid(), 0, NULL, true);
+  caps := public._cw2_portfolio_declaration_capabilities(
+    f.org_id, f.enrollment_id, f.terms_id, 0, 10000000, 10000000, 0, NULL, true
+  );
   PERFORM _cw2_t07_record(21, 'can_create false when no outstanding', (caps->>'can_create_payment_declaration')::boolean = false);
 END $$;
 
@@ -250,9 +252,14 @@ BEGIN
   EXCEPTION WHEN OTHERS THEN ok_perm := SQLERRM LIKE '%permission_denied%'; END;
   PERFORM _cw2_t04_as_auth(f.consultant_auth);
   BEGIN
-    PERFORM public.save_consultant_payment_declaration_draft(
+    v_decl := public.save_consultant_payment_declaration_draft(
       NULL, CURRENT_DATE, 500000, 'x', NULL, f.student_id, NULL, NULL,
       f.enrollment_id, NULL, f.guardian_id, 10000000, 't07-no-terms', NULL
+    );
+    ok_terms := (
+      SELECT enrollment_financial_terms_id IS NOT NULL
+      FROM consultant_revenue_declaration
+      WHERE id = v_decl
     );
   EXCEPTION WHEN OTHERS THEN ok_terms := SQLERRM LIKE '%declaration_context_incomplete%'; END;
   v_decl := public.save_consultant_payment_declaration_draft(

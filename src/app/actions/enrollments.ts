@@ -381,12 +381,7 @@ export async function transferEnrollment(
     return { error: "save_error", values };
   }
 
-  const callRpc = supabase.rpc.bind(supabase) as (
-    fn: string,
-    args: Record<string, unknown>,
-  ) => ReturnType<typeof supabase.rpc>;
-
-  const { error } = await callRpc("transfer_enrollment", {
+  const { error } = await supabase.rpc("transfer_enrollment", {
     p_source_enrollment_id: enrollmentId,
     p_destination_class_id: destinationClassId,
     p_destination_start_date: startDate,

@@ -117,6 +117,10 @@ export type ConsultantDeclarationRow = {
   approvedPaymentId: string | null;
   hasCanonicalPayment: boolean;
   description: string | null;
+  declarationKind: string | null;
+  workflowKind: string | null;
+  enrollmentId: string | null;
+  studentId: string | null;
 };
 
 export type ClassEconomicsSummaryRow = {
@@ -400,6 +404,10 @@ export async function fetchConsultantDeclarations(
         r.approved_payment_id != null ? String(r.approved_payment_id) : null,
       hasCanonicalPayment: Boolean(r.has_canonical_payment),
       description: r.description != null ? String(r.description) : null,
+      declarationKind: r.declaration_kind != null ? String(r.declaration_kind) : null,
+      workflowKind: r.workflow_kind != null ? String(r.workflow_kind) : null,
+      enrollmentId: r.enrollment_id != null ? String(r.enrollment_id) : null,
+      studentId: r.student_id != null ? String(r.student_id) : null,
     })),
   );
   return { rows, error: null };

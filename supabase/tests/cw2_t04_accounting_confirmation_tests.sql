@@ -100,6 +100,13 @@ BEGIN
   SELECT org_id, student_id, enrollment_id, guardian_id, terms_id, si.id, 'tuition', si.amount, 'VND', CURRENT_DATE, si.due_date, 'open', 10000000, 10000000
   FROM enrollment_payment_schedule_item si WHERE si.enrollment_financial_terms_id = terms_id
   RETURNING id INTO charge_id;
+  UPDATE enrollment_financial_terms
+  SET tuition_plan_established_at = COALESCE(charges_generated_at, updated_at, created_at)
+  WHERE id = terms_id;
+  INSERT INTO enrollment_tuition_billing (
+    organization_id, enrollment_id, enrollment_financial_terms_id, billing_mode, established_at
+  ) VALUES (org_id, _cw2_t04_fixture.enrollment_id, terms_id, 'course_lump_sum', now())
+  ON CONFLICT DO NOTHING;
 END;
 $$;
 
@@ -339,6 +346,13 @@ BEGIN
   SELECT f.org_id, v_s2, v_e2, v_g2, v_t2, si.id, 'tuition', si.amount, 'VND', CURRENT_DATE, si.due_date, 'open', 5000000, 5000000
   FROM enrollment_payment_schedule_item si WHERE si.enrollment_financial_terms_id = v_t2
   RETURNING id INTO v_c2;
+  UPDATE enrollment_financial_terms
+  SET tuition_plan_established_at = COALESCE(charges_generated_at, updated_at, created_at)
+  WHERE id = v_t2;
+  INSERT INTO enrollment_tuition_billing (
+    organization_id, enrollment_id, enrollment_financial_terms_id, billing_mode, established_at
+  ) VALUES (f.org_id, v_e2, v_t2, 'course_lump_sum', now())
+  ON CONFLICT DO NOTHING;
 
   PERFORM _cw2_t04_as_auth(f.consultant_auth);
   v_d1 := public.save_consultant_payment_declaration_draft(NULL, CURRENT_DATE, 1000000, 'a', NULL, f.student_id, NULL, NULL, f.enrollment_id, f.terms_id, f.guardian_id, NULL, 't04-a');

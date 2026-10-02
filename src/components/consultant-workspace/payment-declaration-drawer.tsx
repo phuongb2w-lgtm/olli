@@ -4,6 +4,7 @@ import { useCallback, useEffect, useId, useRef, useState, useTransition } from "
 import { useLocale, useTranslations } from "next-intl";
 import {
   loadDeclarationDrawerAction,
+  loadTuitionDeclarationContextAction,
   refreshDeclarationFinanceAction,
   saveConsultantPaymentDeclarationDraftAction,
   submitConsultantPaymentDeclarationAction,
@@ -23,6 +24,7 @@ type Props = {
 
 export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }: Props) {
   const t = useTranslations("consultantWorkspace.declaration");
+  const tV2 = useTranslations("consultantWorkspace.declarationV2");
   const locale = useLocale() as Locale;
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -44,6 +46,15 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
     outstanding: row.tuition_outstanding,
     pending: row.tuition_pending_declaration ?? 0,
   });
+  const [tuitionEstablished, setTuitionEstablished] = useState(row.tuition_total_net > 0);
+  const [billingMode, setBillingMode] = useState<"course_lump_sum" | "periodic" | "">("");
+  const [courseTotalInput, setCourseTotalInput] = useState("");
+  const [periodUnit, setPeriodUnit] = useState<"lesson" | "week" | "month" | "school_year">("month");
+  const [periodQuantityInput, setPeriodQuantityInput] = useState("1");
+  const [amountPerPeriodInput, setAmountPerPeriodInput] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [declarationDate, setDeclarationDate] = useState(new Date().toISOString().slice(0, 10));
+  const [hasOrganizationAcademicYear, setHasOrganizationAcademicYear] = useState(false);
 
   const refreshFinance = useCallback(async () => {
     if (!row.enrollment_financial_terms_id) return;
@@ -62,6 +73,27 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
 
   useEffect(() => {
     let cancelled = false;
+    if (row.enrollment_id) {
+      void loadTuitionDeclarationContextAction(row.enrollment_id).then((res) => {
+        if (cancelled || !res.ok) return;
+        const fin = (res.data.finance ?? {}) as Record<string, unknown>;
+        setTuitionEstablished(Boolean(res.data.tuition_established));
+        setHasOrganizationAcademicYear(
+          Boolean(res.data.has_organization_academic_year ?? true),
+        );
+        if (typeof fin.tuition_total_net === "number") {
+          setFinance((prev) => ({
+            ...prev,
+            total: Number(fin.tuition_total_net),
+            paid: Number(fin.tuition_paid ?? prev.paid),
+            outstanding: Number(fin.tuition_outstanding ?? prev.outstanding),
+            pending: Number(fin.tuition_pending_declaration ?? prev.pending),
+          }));
+        }
+        const mode = res.data.billing_mode as string | null;
+        if (mode === "course_lump_sum" || mode === "periodic") setBillingMode(mode);
+      });
+    }
     if (row.declaration_id && row.declaration_status !== "pending") {
       void loadDeclarationDrawerAction(row.declaration_id).then((res) => {
         if (cancelled || !res.ok) return;
@@ -78,7 +110,10 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
     return () => {
       cancelled = true;
     };
-  }, [row.declaration_id, row.declaration_status, locale]);
+  }, [row.declaration_id, row.declaration_status, row.enrollment_id, locale]);
+
+  const effectivePeriodUnit =
+    !hasOrganizationAcademicYear && periodUnit === "school_year" ? "month" : periodUnit;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -93,12 +128,13 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
   }, [onClose, pending, triggerRef]);
 
   const guardianId = row.primary_guardian_id;
+  const isInitialSetup = !tuitionEstablished && billingMode !== "";
   const canMutate =
     !readOnly &&
-    row.enrollment_financial_terms_id &&
     row.enrollment_id &&
     guardianId &&
-    finance.outstanding > 0;
+    row.capabilities.can_create_payment_declaration &&
+    (isInitialSetup || finance.outstanding > 0 || row.tuition_payment_state === "chua_coc");
 
   const saveOrSubmit = (mode: "draft" | "submit") => {
     const amount = parseVndInput(amountInput);
@@ -107,11 +143,15 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
       return;
     }
     const enrollmentId = row.enrollment_id;
-    const enrollmentFinancialTermsId = row.enrollment_financial_terms_id;
-    if (!enrollmentId || !enrollmentFinancialTermsId || !guardianId) {
+    if (!enrollmentId || !guardianId) {
       setErrorCode("context_incomplete");
       return;
     }
+    const enrollmentFinancialTermsId = row.enrollment_financial_terms_id;
+    const proposedTotal = parseVndInput(courseTotalInput);
+    const perPeriod = parseVndInput(amountPerPeriodInput);
+    const periodQty = Number.parseInt(periodQuantityInput, 10);
+    const declarationKind = isInitialSetup ? "initial_tuition_setup" : "payment_only";
     setErrorCode(null);
     startTransition(async () => {
       const saved = await saveConsultantPaymentDeclarationDraftAction({
@@ -124,10 +164,22 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
         courseId: row.course_id,
         classId: row.class_id,
         enrollmentId,
-        enrollmentFinancialTermsId,
+        enrollmentFinancialTermsId: enrollmentFinancialTermsId ?? undefined,
         guardianId,
-        totalObligationAmount: finance.total,
+        totalObligationAmount: isInitialSetup ? proposedTotal ?? finance.total : finance.total,
         idempotencyKey: declarationId ? undefined : `cw2-drawer-${row.portfolio_entry_id}`,
+        tuitionBillingMode: isInitialSetup ? billingMode || null : null,
+        proposedNetTuitionAmount:
+          isInitialSetup && billingMode === "course_lump_sum" ? proposedTotal : undefined,
+        periodicPeriodUnit:
+          isInitialSetup && billingMode === "periodic" ? effectivePeriodUnit : undefined,
+        periodicPeriodQuantity:
+          isInitialSetup && billingMode === "periodic" ? periodQty : undefined,
+        periodicAmountPerPeriod:
+          isInitialSetup && billingMode === "periodic" ? perPeriod ?? undefined : undefined,
+        paymentMethodCode: paymentMethod,
+        declarationKind,
+        declarationDate,
       });
       if (!saved.ok) {
         setErrorCode(saved.errorCode);
@@ -191,6 +243,97 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
           </div>
         </header>
 
+        {!tuitionEstablished ? (
+          <fieldset className="mb-4 space-y-2 text-sm" data-testid="tuition-billing-mode">
+            <legend className="font-medium text-slate-800">{tV2("billingModeTitle")}</legend>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="billingMode"
+                checked={billingMode === "course_lump_sum"}
+                disabled={pending}
+                onChange={() => setBillingMode("course_lump_sum")}
+              />
+              {tV2("courseLumpSum")}
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="billingMode"
+                checked={billingMode === "periodic"}
+                disabled={pending}
+                onChange={() => setBillingMode("periodic")}
+              />
+              {tV2("periodic")}
+            </label>
+          </fieldset>
+        ) : null}
+
+        {isInitialSetup && billingMode === "course_lump_sum" ? (
+          <label className="mb-3 block text-sm">
+            <span className="text-slate-700">{tV2("courseTotal")}</span>
+            <input
+              className="mt-1 w-full rounded border border-slate-300 px-2 py-2"
+              value={courseTotalInput}
+              disabled={pending}
+              onChange={(e) => setCourseTotalInput(e.target.value)}
+              data-testid="drawer-course-total"
+            />
+          </label>
+        ) : null}
+
+        {isInitialSetup && billingMode === "periodic" ? (
+          <div className="mb-3 space-y-2 text-sm">
+            <label className="block">
+              <span className="text-slate-700">{tV2("periodUnit")}</span>
+              <select
+                className="mt-1 w-full rounded border border-slate-300 px-2 py-2"
+                value={effectivePeriodUnit}
+                disabled={pending}
+                onChange={(e) =>
+                  setPeriodUnit(e.target.value as "lesson" | "week" | "month" | "school_year")
+                }
+                data-testid="drawer-period-unit"
+              >
+                <option value="month">{tV2("periodUnitMonth")}</option>
+                <option value="lesson">{tV2("periodUnitLesson")}</option>
+                <option value="week">{tV2("periodUnitWeek")}</option>
+                <option value="school_year" disabled={!hasOrganizationAcademicYear}>
+                  {tV2("periodUnitSchoolYear")}
+                </option>
+              </select>
+              {!hasOrganizationAcademicYear ? (
+                <span className="mt-1 block text-xs text-slate-500" data-testid="school-year-unavailable">
+                  {tV2("schoolYearRequiresAcademicYear")}
+                </span>
+              ) : null}
+            </label>
+            {effectivePeriodUnit === "lesson" ? (
+              <label className="block">
+                <span className="text-slate-700">{tV2("periodQuantity")}</span>
+                <input
+                  className="mt-1 w-full rounded border border-slate-300 px-2 py-2"
+                  inputMode="numeric"
+                  value={periodQuantityInput}
+                  disabled={pending}
+                  onChange={(e) => setPeriodQuantityInput(e.target.value)}
+                  data-testid="drawer-period-quantity"
+                />
+              </label>
+            ) : null}
+            <label className="block">
+              <span className="text-slate-700">{tV2("amountPerPeriod")}</span>
+              <input
+                className="mt-1 w-full rounded border border-slate-300 px-2 py-2"
+                value={amountPerPeriodInput}
+                disabled={pending}
+                onChange={(e) => setAmountPerPeriodInput(e.target.value)}
+                data-testid="drawer-amount-per-period"
+              />
+            </label>
+          </div>
+        ) : null}
+
         <dl className="space-y-2 text-sm">
           <div>
             <dt className="text-slate-600">{t("student")}</dt>
@@ -239,7 +382,7 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
 
         <div className="mt-4 space-y-3">
           <label className="block text-sm">
-            <span className="text-slate-700">{t("amountThisTime")}</span>
+            <span className="text-slate-700">{tV2("payThisTime")}</span>
             <input
               className="mt-1 w-full rounded border border-slate-300 px-2 py-2"
               inputMode="numeric"
@@ -248,6 +391,30 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
               onChange={(e) => setAmountInput(e.target.value)}
               data-testid="drawer-amount"
             />
+          </label>
+          <label className="block text-sm">
+            <span className="text-slate-700">{tV2("paymentDate")}</span>
+            <input
+              type="date"
+              className="mt-1 w-full rounded border border-slate-300 px-2 py-2"
+              value={declarationDate}
+              disabled={!canMutate || pending}
+              onChange={(e) => setDeclarationDate(e.target.value)}
+              data-testid="drawer-payment-date"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-slate-700">{tV2("paymentMethod")}</span>
+            <select
+              className="mt-1 w-full rounded border border-slate-300 px-2 py-2"
+              value={paymentMethod}
+              disabled={!canMutate || pending}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+              data-testid="drawer-payment-method"
+            >
+              <option value="cash">Cash</option>
+              <option value="bank_transfer">Bank transfer</option>
+            </select>
           </label>
           <label className="block text-sm">
             <span className="text-slate-700">{t("promotion")}</span>
@@ -296,7 +463,7 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
             onClick={() => saveOrSubmit("submit")}
             data-testid="drawer-submit"
           >
-            {pending ? t("submitting") : t("submit")}
+            {pending ? t("submitting") : tV2("submitAccounting")}
           </button>
         </div>
       </div>

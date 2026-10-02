@@ -442,19 +442,50 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
           const r = row.original;
           return (
             <div className="space-y-0.5 text-xs" data-testid="portfolio-tuition">
-              <p className="font-medium">{r.tuition_payment_state_label}</p>
-              <p className="text-slate-600">
-                {formatMoneyVnd(r.tuition_total_net, locale)} · {t("tuition.paid")}{" "}
-                {formatMoneyVnd(r.tuition_paid, locale)}
-                {(r.tuition_pending_declaration ?? 0) > 0 ? (
-                  <>
-                    {" "}
-                    · {t("tuition.pendingConfirmation")}{" "}
-                    {formatMoneyVnd(r.tuition_pending_declaration ?? 0, locale)}
-                  </>
-                ) : null}{" "}
-                · {t("tuition.outstandingDue")} {formatMoneyVnd(r.tuition_outstanding, locale)}
+              <p className="font-medium">
+                {r.tuition_payment_state_label ||
+                  t(`paymentState.${r.tuition_payment_state}` as "paymentState.chua_coc")}
               </p>
+              {r.tuition_payment_state === "full_phi" && r.tuition_total_net > 0 ? (
+                <p className="text-slate-600">
+                  {formatMoneyVnd(r.tuition_paid, locale)} / {formatMoneyVnd(r.tuition_total_net, locale)}
+                </p>
+              ) : r.tuition_payment_state === "chua_coc" ? null : (
+                <p className="text-slate-600">
+                  {r.tuition_billing_mode === "periodic" ? (
+                    <>
+                      {typeof r.tuition_periodic_lessons_remaining === "number"
+                        ? t("tuition.lessonsRemaining", { count: r.tuition_periodic_lessons_remaining })
+                        : null}
+                      {(r.tuition_carry_forward_credit ?? 0) > 0 ? (
+                        <>
+                          {" "}
+                          · {t("tuition.carryForward")}{" "}
+                          {formatMoneyVnd(r.tuition_carry_forward_credit ?? 0, locale)}
+                        </>
+                      ) : null}
+                    </>
+                  ) : (
+                    <>
+                      {t("tuition.paid")} {formatMoneyVnd(r.tuition_paid, locale)}
+                      {(r.tuition_pending_declaration ?? 0) > 0 ? (
+                        <>
+                          {" "}
+                          · {t("tuition.pendingConfirmation")}{" "}
+                          {formatMoneyVnd(r.tuition_pending_declaration ?? 0, locale)}
+                        </>
+                      ) : null}
+                      {r.tuition_outstanding > 0 ? (
+                        <>
+                          {" "}
+                          · {t("tuition.outstandingDue")}{" "}
+                          {formatMoneyVnd(r.tuition_outstanding, locale)}
+                        </>
+                      ) : null}
+                    </>
+                  )}
+                </p>
+              )}
               {r.capabilities.can_open_payment_declaration ? (
                 <button
                   type="button"

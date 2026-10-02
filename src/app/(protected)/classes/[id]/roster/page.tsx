@@ -7,6 +7,7 @@ import { RosterPagination } from "@/components/enrollments/roster-pagination";
 import { RosterTable } from "@/components/enrollments/roster-table";
 import { isRosterSearchActive } from "@/lib/enrollments/parse-roster-params";
 import { queryClassRoster } from "@/lib/enrollments/query-class-roster";
+import { canViewRosterOperationalTuition } from "@/lib/enrollments/roster-tuition-visibility";
 import { can } from "@/lib/permissions/can";
 import { createClient } from "@/lib/supabase/server";
 
@@ -60,7 +61,11 @@ export default async function ClassRosterPage({ params, searchParams }: Props) {
     .eq("id", classRow.course_id)
     .maybeSingle();
 
-  const { result, error } = await queryClassRoster(supabase, classId, rawParams);
+  const showOperationalTuition = await canViewRosterOperationalTuition(supabase);
+
+  const { result, error } = await queryClassRoster(supabase, classId, rawParams, {
+    includeOperationalTuition: showOperationalTuition,
+  });
 
   const { data: allClasses } = await supabase
     .from("class")
@@ -162,12 +167,14 @@ export default async function ClassRosterPage({ params, searchParams }: Props) {
           <RosterTable
             items={items}
             canUpdate={hasUpdate}
+            showOperationalTuition={showOperationalTuition}
             classId={classId}
             classOptions={classOptions}
           />
           <RosterCards
             items={items}
             canUpdate={hasUpdate}
+            showOperationalTuition={showOperationalTuition}
             classId={classId}
             classOptions={classOptions}
           />

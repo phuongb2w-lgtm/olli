@@ -113,6 +113,13 @@ BEGIN
   SELECT p_org, student_id, enrollment_id, guardian_id, terms_id, si.id, 'tuition', si.amount, 'VND', CURRENT_DATE, si.due_date, 'open', 10000000, 10000000
   FROM enrollment_payment_schedule_item si WHERE si.enrollment_financial_terms_id = terms_id
   RETURNING id INTO charge_id;
+  UPDATE enrollment_financial_terms
+  SET tuition_plan_established_at = COALESCE(charges_generated_at, updated_at, created_at)
+  WHERE id = terms_id;
+  INSERT INTO enrollment_tuition_billing (
+    organization_id, enrollment_id, enrollment_financial_terms_id, billing_mode, established_at
+  ) VALUES (p_org, _cw2_t041_student_first_bundle.enrollment_id, terms_id, 'course_lump_sum', now())
+  ON CONFLICT DO NOTHING;
 END;
 $$;
 
@@ -166,6 +173,13 @@ BEGIN
   )
   SELECT p_org, prospect_student_id, enrollment_id, guardian_id, terms_id, si.id, 'tuition', si.amount, 'VND', CURRENT_DATE, si.due_date, 'open', 10000000, 10000000
   FROM enrollment_payment_schedule_item si WHERE si.enrollment_financial_terms_id = terms_id;
+  UPDATE enrollment_financial_terms
+  SET tuition_plan_established_at = COALESCE(charges_generated_at, updated_at, created_at)
+  WHERE id = terms_id;
+  INSERT INTO enrollment_tuition_billing (
+    organization_id, enrollment_id, enrollment_financial_terms_id, billing_mode, established_at
+  ) VALUES (p_org, _cw2_t041_lead_first_bundle.enrollment_id, terms_id, 'course_lump_sum', now())
+  ON CONFLICT DO NOTHING;
 END;
 $$;
 
