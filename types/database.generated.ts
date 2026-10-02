@@ -6930,6 +6930,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      _cw2_derive_lead_only_tuition_state: {
+        Args: {
+          p_consultant: string
+          p_declaration_status: string
+          p_lead_id: string
+          p_org: string
+        }
+        Returns: string
+      }
       _cw2_derive_periodic_tuition_status: {
         Args: {
           p_enrollment_id: string
@@ -6975,6 +6984,58 @@ export type Database = {
       _cw2_enrollment_tuition_established: {
         Args: { p_enrollment_id: string; p_org: string }
         Returns: boolean
+      }
+      _cw2_ensure_declaration_enrollment_for_confirm: {
+        Args: {
+          p_org: string
+          p_row: Database["public"]["Tables"]["consultant_revenue_declaration"]["Row"]
+        }
+        Returns: {
+          approved_payment_id: string | null
+          class_id: string | null
+          confirmation_idempotency_key: string | null
+          consultant_operational_code_snapshot: string | null
+          consultant_user_id: string
+          course_id: string | null
+          created_at: string
+          currency_code: string
+          declaration_date: string
+          declaration_kind: string
+          declared_amount: number
+          declared_at: string
+          depends_on_declaration_id: string | null
+          description: string | null
+          enrollment_financial_terms_id: string | null
+          enrollment_id: string | null
+          guardian_id: string | null
+          id: string
+          idempotency_key: string | null
+          lead_id: string | null
+          organization_id: string
+          payment_method_code: string | null
+          periodic_academic_year_id: string | null
+          periodic_amount_per_period: number | null
+          periodic_period_quantity: number | null
+          periodic_period_unit: string | null
+          promotion_context: string | null
+          proposed_net_tuition_amount: number | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["consultant_revenue_declaration_status"]
+          student_id: string | null
+          submitted_at: string | null
+          total_obligation_amount: number | null
+          tuition_billing_mode: string | null
+          updated_at: string
+          workflow_kind: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "consultant_revenue_declaration"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       _cw2_ensure_placeholder_financial_terms: {
         Args: { p_enrollment_id: string; p_org: string }
@@ -7088,9 +7149,11 @@ export type Database = {
       _cw2_portfolio_declaration_capabilities:
         | {
             Args: {
+              p_consultant_user_id?: string
               p_declaration_status: string
               p_enrollment_financial_terms_id: string
               p_has_student: boolean
+              p_lead_id?: string
               p_outstanding: number
               p_student_code_raw?: string
             }
@@ -7099,10 +7162,12 @@ export type Database = {
         | {
             Args: {
               p_allocated: number
+              p_consultant_user_id?: string
               p_declaration_status: string
               p_enrollment_financial_terms_id: string
               p_enrollment_id: string
               p_has_student: boolean
+              p_lead_id?: string
               p_net_tuition: number
               p_org: string
               p_outstanding: number
@@ -7146,10 +7211,12 @@ export type Database = {
           p_allocated: number
           p_billing_mode: string
           p_carry_forward_credit: number
+          p_consultant_user_id?: string
           p_declaration_status: string
           p_enrollment_financial_terms_id: string
           p_enrollment_id: string
           p_has_student: boolean
+          p_lead_id?: string
           p_net_tuition: number
           p_org: string
           p_outstanding: number
@@ -7166,6 +7233,10 @@ export type Database = {
       _cw2_refresh_organization_student_sequence_floor: {
         Args: { p_organization_id: string }
         Returns: number
+      }
+      _cw2_resolve_lead_declaration_guardian: {
+        Args: { p_lead_id: string; p_org: string }
+        Returns: string
       }
       _cw2_student_organization_id: {
         Args: { p_student_id: string }
@@ -8556,6 +8627,10 @@ export type Database = {
       }
       get_cw2_tuition_declaration_context: {
         Args: { p_enrollment_id: string }
+        Returns: Json
+      }
+      get_cw2_tuition_declaration_context_for_portfolio: {
+        Args: { p_portfolio_entry_id: string }
         Returns: Json
       }
       get_enrollment_financial_summary: {

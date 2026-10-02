@@ -2338,7 +2338,8 @@
       "tot_nghiep": "Graduated"
     },
     "paymentState": {
-      "chua_coc": "No deposit yet",
+      "chua_nop_phi": "Tuition not submitted",
+      "chua_coc": "Tuition not submitted",
       "coc_cho_xac_nhan": "Deposit pending confirmation",
       "da_coc": "Deposit confirmed",
       "nop_phi": "Paying tuition",
@@ -2390,7 +2391,8 @@
       "rejected": "Rejected",
       "returned": "Returned",
       "openAction": "Declare payment",
-      "title": "Payment declaration",
+      "openTuitionFor": "Submit tuition for {name}",
+      "title": "Submit tuition",
       "refreshFinance": "Refresh amounts",
       "close": "Close",
       "closeOverlay": "Close drawer",

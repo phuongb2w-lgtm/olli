@@ -3,8 +3,8 @@ import { signIn } from "./sign-in";
 
 /** Grid keyboard focus ring can intercept Playwright clicks on row 0; DOM click still fires handlers. */
 async function openEligibleDeclarationDrawer(page: Page) {
-  const action = page.getByTestId("declare-payment-action").first();
-  await action.scrollIntoViewIfNeeded();
+  const action = page.getByTestId("portfolio-tuition-action").first();
+  await action.waitFor({ state: "visible" });
   await action.evaluate((el) => {
     (el as HTMLButtonElement).click();
   });
@@ -12,7 +12,7 @@ async function openEligibleDeclarationDrawer(page: Page) {
 }
 
 async function openPendingRowDeclarationDrawer(page: Page) {
-  const action = page.getByTestId("portfolio-row").nth(2).getByTestId("declare-payment-action");
+  const action = page.getByTestId("portfolio-row").nth(2).getByTestId("portfolio-tuition-action");
   await action.scrollIntoViewIfNeeded();
   await action.evaluate((el) => {
     (el as HTMLButtonElement).click();
@@ -76,8 +76,8 @@ const zeroPlanRow = {
   tuition_total_net: 0,
   tuition_outstanding: 0,
   tuition_paid: 0,
-  tuition_payment_state: "chua_coc",
-  tuition_payment_state_label: "No deposit yet",
+  tuition_payment_state: "chua_nop_phi",
+  tuition_payment_state_label: null as unknown as string,
   capabilities: {
     ...eligibleRow.capabilities,
     can_create_payment_declaration: true,
@@ -156,13 +156,13 @@ test.describe("CW2-T07 payment declaration drawer", () => {
   });
 
   test("eligible row shows declare payment action", async ({ page }) => {
-    await expect(page.getByTestId("declare-payment-action").first()).toBeVisible();
-    await expect(page.getByTestId("declare-payment-action")).toHaveCount(3);
+    await expect(page.getByTestId("portfolio-tuition-action").first()).toBeVisible();
+    await expect(page.getByTestId("portfolio-tuition-action")).toHaveCount(3);
   });
 
   test("full phí row has no declare action", async ({ page }) => {
     const rows = page.getByTestId("portfolio-row");
-    await expect(rows.nth(1).getByTestId("declare-payment-action")).toHaveCount(0);
+    await expect(rows.nth(1).getByTestId("portfolio-tuition-action")).toHaveCount(0);
   });
 
   test("pending row shows pending total separately from confirmed paid", async ({ page }) => {
@@ -211,22 +211,24 @@ test.describe("CW2-T07 payment declaration drawer", () => {
 
   test("EN declare payment label", async ({ page }) => {
     await page.getByRole("combobox", { name: /language|ngôn ngữ/i }).selectOption("en");
-    await expect(page.getByTestId("declare-payment-action").first()).toContainText(/declare payment/i);
+    await expect(page.getByTestId("portfolio-tuition-action").nth(2)).toContainText(
+      /tuition not submitted/i,
+    );
   });
 
   test("VI declare payment label", async ({ page }) => {
     await page.getByRole("combobox", { name: /language|ngôn ngữ/i }).selectOption("vi");
-    await expect(page.getByTestId("declare-payment-action").first()).toContainText(/nộp phí/i);
+    await expect(page.getByTestId("portfolio-tuition-action").nth(2)).toContainText(/chưa nộp phí/i);
   });
 
-  test("zero tuition plan shows Chưa cọc not Full phí", async ({ page }) => {
+  test("zero tuition plan shows Chưa nộp phí not Full phí", async ({ page }) => {
     const tuition = page.getByTestId("portfolio-tuition").nth(3);
-    await expect(tuition).toContainText(/no deposit yet|chưa cọc/i);
+    await expect(tuition).toContainText(/tuition not submitted|chưa nộp phí/i);
     await expect(tuition).not.toContainText(/paid in full|full phí/i);
   });
 
   test("drawer shows course vs periodic options for new plan", async ({ page }) => {
-    await page.getByTestId("portfolio-row").nth(3).getByTestId("declare-payment-action").click();
+    await page.getByTestId("portfolio-row").nth(3).getByTestId("portfolio-tuition-action").click();
     await expect(page.getByTestId("tuition-billing-mode")).toBeVisible();
     await expect(page.getByText(/pay by course|nộp theo khóa học/i)).toBeVisible();
     await expect(page.getByText(/pay periodically|nộp định kỳ/i)).toBeVisible();
@@ -245,7 +247,7 @@ test.describe("CW2-T07 payment declaration drawer", () => {
         },
       });
     });
-    await page.getByTestId("portfolio-row").nth(3).getByTestId("declare-payment-action").click();
+    await page.getByTestId("portfolio-row").nth(3).getByTestId("portfolio-tuition-action").click();
     await page.getByText(/pay periodically|nộp định kỳ/i).click();
     const schoolYearOption = page.getByTestId("drawer-period-unit").locator('option[value="school_year"]');
     await expect(schoolYearOption).toHaveAttribute("disabled", "");

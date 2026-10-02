@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import {
   loadDeclarationDrawerAction,
   loadTuitionDeclarationContextAction,
+  loadTuitionDeclarationContextForPortfolioAction,
   refreshDeclarationFinanceAction,
   saveConsultantPaymentDeclarationDraftAction,
   submitConsultantPaymentDeclarationAction,
@@ -73,27 +74,26 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
 
   useEffect(() => {
     let cancelled = false;
-    if (row.enrollment_id) {
-      void loadTuitionDeclarationContextAction(row.enrollment_id).then((res) => {
-        if (cancelled || !res.ok) return;
-        const fin = (res.data.finance ?? {}) as Record<string, unknown>;
-        setTuitionEstablished(Boolean(res.data.tuition_established));
-        setHasOrganizationAcademicYear(
-          Boolean(res.data.has_organization_academic_year ?? true),
-        );
-        if (typeof fin.tuition_total_net === "number") {
-          setFinance((prev) => ({
-            ...prev,
-            total: Number(fin.tuition_total_net),
-            paid: Number(fin.tuition_paid ?? prev.paid),
-            outstanding: Number(fin.tuition_outstanding ?? prev.outstanding),
-            pending: Number(fin.tuition_pending_declaration ?? prev.pending),
-          }));
-        }
-        const mode = res.data.billing_mode as string | null;
-        if (mode === "course_lump_sum" || mode === "periodic") setBillingMode(mode);
-      });
-    }
+    const loadContext = row.enrollment_id
+      ? loadTuitionDeclarationContextAction(row.enrollment_id)
+      : loadTuitionDeclarationContextForPortfolioAction(row.portfolio_entry_id);
+    void loadContext.then((res) => {
+      if (cancelled || !res.ok) return;
+      const fin = (res.data.finance ?? {}) as Record<string, unknown>;
+      setTuitionEstablished(Boolean(res.data.tuition_established));
+      setHasOrganizationAcademicYear(Boolean(res.data.has_organization_academic_year ?? true));
+      if (typeof fin.tuition_total_net === "number") {
+        setFinance((prev) => ({
+          ...prev,
+          total: Number(fin.tuition_total_net),
+          paid: Number(fin.tuition_paid ?? prev.paid),
+          outstanding: Number(fin.tuition_outstanding ?? prev.outstanding),
+          pending: Number(fin.tuition_pending_declaration ?? prev.pending),
+        }));
+      }
+      const mode = res.data.billing_mode as string | null;
+      if (mode === "course_lump_sum" || mode === "periodic") setBillingMode(mode);
+    });
     if (row.declaration_id && row.declaration_status !== "pending") {
       void loadDeclarationDrawerAction(row.declaration_id).then((res) => {
         if (cancelled || !res.ok) return;
@@ -110,7 +110,7 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
     return () => {
       cancelled = true;
     };
-  }, [row.declaration_id, row.declaration_status, row.enrollment_id, locale]);
+  }, [row.declaration_id, row.declaration_status, row.enrollment_id, row.portfolio_entry_id, locale]);
 
   const effectivePeriodUnit =
     !hasOrganizationAcademicYear && periodUnit === "school_year" ? "month" : periodUnit;
@@ -129,12 +129,13 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
 
   const guardianId = row.primary_guardian_id;
   const isInitialSetup = !tuitionEstablished && billingMode !== "";
+  const isUnpaidInitial =
+    row.tuition_payment_state === "chua_nop_phi" || row.tuition_payment_state === "chua_coc";
   const canMutate =
     !readOnly &&
-    row.enrollment_id &&
-    guardianId &&
     row.capabilities.can_create_payment_declaration &&
-    (isInitialSetup || finance.outstanding > 0 || row.tuition_payment_state === "chua_coc");
+    (isInitialSetup || finance.outstanding > 0 || isUnpaidInitial) &&
+    (Boolean(row.enrollment_id) || Boolean(row.lead_id));
 
   const saveOrSubmit = (mode: "draft" | "submit") => {
     const amount = parseVndInput(amountInput);
@@ -143,7 +144,7 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
       return;
     }
     const enrollmentId = row.enrollment_id;
-    if (!enrollmentId || !guardianId) {
+    if (!enrollmentId && !row.lead_id) {
       setErrorCode("context_incomplete");
       return;
     }
@@ -163,9 +164,9 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
         studentId: row.student_id,
         courseId: row.course_id,
         classId: row.class_id,
-        enrollmentId,
+        enrollmentId: enrollmentId ?? undefined,
         enrollmentFinancialTermsId: enrollmentFinancialTermsId ?? undefined,
-        guardianId,
+        guardianId: guardianId ?? undefined,
         totalObligationAmount: isInitialSetup ? proposedTotal ?? finance.total : finance.total,
         idempotencyKey: declarationId ? undefined : `cw2-drawer-${row.portfolio_entry_id}`,
         tuitionBillingMode: isInitialSetup ? billingMode || null : null,

@@ -440,17 +440,38 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
         header: () => t("columns.tuition"),
         cell: ({ row }) => {
           const r = row.original;
+          const tuitionLabel = r.tuition_payment_state
+            ? t(`paymentState.${r.tuition_payment_state}` as "paymentState.chua_nop_phi")
+            : (r.tuition_payment_state_label ?? "—");
+          const isUnpaidInitial =
+            r.tuition_payment_state === "chua_nop_phi" || r.tuition_payment_state === "chua_coc";
+          const openDeclaration = () => setDeclarationRow(r);
+          const displayName = `${formatPortfolioNamePart(r.family_name, locale)} ${formatPortfolioNamePart(r.given_name, locale)}`.trim();
           return (
             <div className="space-y-0.5 text-xs" data-testid="portfolio-tuition">
-              <p className="font-medium">
-                {r.tuition_payment_state_label ||
-                  t(`paymentState.${r.tuition_payment_state}` as "paymentState.chua_coc")}
-              </p>
+              {r.capabilities.can_open_payment_declaration ? (
+                <button
+                  type="button"
+                  ref={
+                    declarationRow?.portfolio_entry_id === r.portfolio_entry_id
+                      ? declarationTriggerRef
+                      : undefined
+                  }
+                  className="font-medium text-left text-slate-900 underline decoration-slate-400 underline-offset-2 hover:decoration-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-800"
+                  data-testid="portfolio-tuition-action"
+                  aria-label={t("declaration.openTuitionFor", { name: displayName })}
+                  onClick={openDeclaration}
+                >
+                  {tuitionLabel}
+                </button>
+              ) : (
+                <p className="font-medium">{tuitionLabel}</p>
+              )}
               {r.tuition_payment_state === "full_phi" && r.tuition_total_net > 0 ? (
                 <p className="text-slate-600">
                   {formatMoneyVnd(r.tuition_paid, locale)} / {formatMoneyVnd(r.tuition_total_net, locale)}
                 </p>
-              ) : r.tuition_payment_state === "chua_coc" ? null : (
+              ) : isUnpaidInitial ? null : (
                 <p className="text-slate-600">
                   {r.tuition_billing_mode === "periodic" ? (
                     <>
@@ -486,21 +507,6 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
                   )}
                 </p>
               )}
-              {r.capabilities.can_open_payment_declaration ? (
-                <button
-                  type="button"
-                  ref={
-                    declarationRow?.portfolio_entry_id === r.portfolio_entry_id
-                      ? declarationTriggerRef
-                      : undefined
-                  }
-                  className="mt-1 text-left text-xs font-medium text-slate-900 underline"
-                  data-testid="declare-payment-action"
-                  onClick={() => setDeclarationRow(r)}
-                >
-                  {t("declaration.openAction")}
-                </button>
-              ) : null}
             </div>
           );
         },
@@ -827,9 +833,12 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
     }
     if (colId === "tuition" && readRow) {
       const r = readRow;
+      const tuitionLabel = r.tuition_payment_state
+        ? t(`paymentState.${r.tuition_payment_state}` as "paymentState.chua_nop_phi")
+        : (r.tuition_payment_state_label ?? "—");
       return (
         <div className="space-y-0.5 text-xs" data-testid="portfolio-tuition">
-          <p className="font-medium">{r.tuition_payment_state_label}</p>
+          <p className="font-medium">{tuitionLabel}</p>
         </div>
       );
     }

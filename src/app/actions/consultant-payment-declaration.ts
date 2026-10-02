@@ -65,6 +65,34 @@ export async function loadTuitionDeclarationContextAction(
   return { ok: true as const, data: payload };
 }
 
+export async function loadTuitionDeclarationContextForPortfolioAction(
+  portfolioEntryId: string,
+): Promise<
+  { ok: false; errorCode: string } | { ok: true; data: Record<string, unknown> }
+> {
+  if (!(await can("consultant_revenue.declare"))) {
+    return { ok: false as const, errorCode: "permission_denied" };
+  }
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_cw2_tuition_declaration_context_for_portfolio", {
+    p_portfolio_entry_id: portfolioEntryId,
+  });
+  if (error || !data) {
+    return { ok: false as const, errorCode: mapDeclarationError(error?.message ?? "") };
+  }
+  const { count: academicYearCount, error: yearError } = await supabase
+    .from("organization_academic_year")
+    .select("id", { count: "exact", head: true });
+  if (yearError) {
+    return { ok: false as const, errorCode: "unknown" };
+  }
+  const payload: Record<string, unknown> = {
+    ...(data as Record<string, unknown>),
+    has_organization_academic_year: (academicYearCount ?? 0) > 0,
+  };
+  return { ok: true as const, data: payload };
+}
+
 export async function saveConsultantPaymentDeclarationDraftAction(input: {
   declarationId?: string | null;
   declaredAmount: number;
@@ -74,9 +102,9 @@ export async function saveConsultantPaymentDeclarationDraftAction(input: {
   studentId?: string | null;
   courseId?: string | null;
   classId?: string | null;
-  enrollmentId: string;
+  enrollmentId?: string | null;
   enrollmentFinancialTermsId?: string | null;
-  guardianId: string;
+  guardianId?: string | null;
   totalObligationAmount?: number;
   idempotencyKey?: string;
   tuitionBillingMode?: "course_lump_sum" | "periodic" | null;
@@ -102,9 +130,9 @@ export async function saveConsultantPaymentDeclarationDraftAction(input: {
     p_student_id: input.studentId ?? undefined,
     p_course_id: input.courseId ?? undefined,
     p_class_id: input.classId ?? undefined,
-    p_enrollment_id: input.enrollmentId,
+    p_enrollment_id: input.enrollmentId ?? undefined,
     p_enrollment_financial_terms_id: input.enrollmentFinancialTermsId ?? undefined,
-    p_guardian_id: input.guardianId,
+    p_guardian_id: input.guardianId ?? undefined,
     p_total_obligation_amount: input.totalObligationAmount ?? undefined,
     p_idempotency_key: input.idempotencyKey ?? undefined,
     p_tuition_billing_mode: input.tuitionBillingMode ?? undefined,

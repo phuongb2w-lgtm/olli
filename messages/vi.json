@@ -2338,7 +2338,8 @@
       "tot_nghiep": "Tốt nghiệp"
     },
     "paymentState": {
-      "chua_coc": "Chưa cọc",
+      "chua_nop_phi": "Chưa nộp phí",
+      "chua_coc": "Chưa nộp phí",
       "coc_cho_xac_nhan": "Cọc chờ xác nhận",
       "da_coc": "Đã cọc",
       "nop_phi": "Nộp phí",
@@ -2390,7 +2391,8 @@
       "rejected": "Từ chối",
       "returned": "Trả lại",
       "openAction": "Nộp phí",
-      "title": "Khai báo thanh toán",
+      "openTuitionFor": "Nộp phí cho {name}",
+      "title": "Nộp phí",
       "refreshFinance": "Làm mới số liệu",
       "close": "Đóng",
       "closeOverlay": "Đóng ngăn kéo",

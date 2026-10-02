@@ -148,8 +148,8 @@ BEGIN
   PERFORM _cw2_t11_as_auth(f.consultant_a_auth);
   r := public.list_consultant_workspace_portfolio();
   PERFORM _cw2_t11_record(
-    1, 'unestablished chua_coc',
-    (r->'rows'->0->>'tuition_payment_state') = 'chua_coc'
+    1, 'unestablished chua_nop_phi',
+    (r->'rows'->0->>'tuition_payment_state') = 'chua_nop_phi'
     AND COALESCE((r->'rows'->0->>'tuition_total_net')::bigint, -1) = 0
   );
   v_ctx := public.get_cw2_tuition_declaration_context(b.enrollment_id);
@@ -797,6 +797,43 @@ BEGIN
   PERFORM _cw2_t11_record(50, 'accountant same-org periodic obligation readable', v_cnt >= 1);
 END $$;
 
+-- 51–54: consultant lead intake tuition entry (no enrollment / official code)
+DO $$
+DECLARE f record; j jsonb; r jsonb; v_ctx jsonb; v_decl uuid;
+BEGIN
+  SELECT * INTO f FROM _cw2_t05_org();
+  PERFORM _cw2_t11_as_auth(f.consultant_a_auth);
+  j := public.create_consultant_workspace_portfolio_intake(
+    'MAI TRONG', 'HOANG', '2017-06-01', 'MAI', 'Parent', '0901234567', '[]'::jsonb
+  );
+  r := public.list_consultant_workspace_portfolio();
+  PERFORM _cw2_t11_record(
+    51, 'intake row chua_nop_phi',
+    (r->'rows'->0->>'tuition_payment_state') = 'chua_nop_phi'
+  );
+  PERFORM _cw2_t11_record(
+    52, 'tiem_nang allows tuition open',
+    (r->'rows'->0->>'lifecycle_status') = 'tiem_nang'
+    AND (r->'rows'->0->'capabilities'->>'can_open_payment_declaration')::boolean = true
+  );
+  v_ctx := public.get_cw2_tuition_declaration_context_for_portfolio((j->>'portfolio_entry_id')::uuid);
+  PERFORM _cw2_t11_record(
+    53, 'portfolio context without enrollment',
+    (v_ctx->>'enrollment_id') IS NULL AND (v_ctx->>'can_change_billing_mode')::boolean = true
+  );
+  v_decl := public.save_consultant_payment_declaration_draft(
+    NULL, CURRENT_DATE, 2000000, 'init', (j->>'lead_id')::uuid, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, 't11-lead-init', NULL,
+    'course_lump_sum', 10000000, NULL, NULL, NULL, NULL, NULL, 'initial_tuition_setup'
+  );
+  PERFORM public.submit_consultant_payment_declaration(v_decl);
+  r := public.list_consultant_workspace_portfolio();
+  PERFORM _cw2_t11_record(
+    54, 'lead initial submit coc_cho_xac_nhan',
+    (r->'rows'->0->>'tuition_payment_state') = 'coc_cho_xac_nhan'
+  );
+END $$;
+
 DO $$
 DECLARE v_fail integer; v_total integer;
 BEGIN
@@ -806,8 +843,8 @@ BEGIN
       v_fail, v_total,
       (SELECT string_agg(test_no::text || ':' || test_name, '; ') FROM _cw2_t11_results WHERE result = 'FAIL');
   END IF;
-  IF v_total <> 50 THEN
-    RAISE EXCEPTION 'CW2-T11 expected 50 scenarios, recorded %', v_total;
+  IF v_total <> 54 THEN
+    RAISE EXCEPTION 'CW2-T11 expected 54 scenarios, recorded %', v_total;
   END IF;
   RAISE NOTICE 'CW2-T11: all % tests passed', v_total;
 END $$;

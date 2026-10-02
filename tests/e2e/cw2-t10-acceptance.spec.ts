@@ -21,7 +21,7 @@ test.describe("CW2-T10 Consultant Workspace V2 integration smoke", () => {
   test("2. declaration drawer opens from grid context", async ({ page }) => {
     await page.goto("/consultant");
     await expect(page.getByTestId("consultant-workspace")).toBeVisible();
-    const declareBtn = page.getByTestId("declare-payment-action").first();
+    const declareBtn = page.getByTestId("portfolio-tuition-action").first();
     if ((await declareBtn.count()) === 0) {
       test.skip(true, "No eligible declare row in seed — covered by CW2-T07 E2E mocks");
     }

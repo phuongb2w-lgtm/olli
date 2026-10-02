@@ -7,6 +7,7 @@ export type ConsultantWorkspaceLifecycleStatus =
   | "tot_nghiep";
 
 export type ConsultantWorkspaceTuitionPaymentState =
+  | "chua_nop_phi"
   | "chua_coc"
   | "coc_cho_xac_nhan"
   | "da_coc"
