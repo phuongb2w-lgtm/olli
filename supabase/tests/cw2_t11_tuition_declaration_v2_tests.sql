@@ -804,7 +804,7 @@ BEGIN
   SELECT * INTO f FROM _cw2_t05_org();
   PERFORM _cw2_t11_as_auth(f.consultant_a_auth);
   j := public.create_consultant_workspace_portfolio_intake(
-    'MAI TRONG', 'HOANG', '2017-06-01', 'MAI', 'Parent', '0901234567', '[]'::jsonb
+    'MAI TRONG', 'HOANG', '2017-06-01', 'MAI', 'Parent', '0901234567', NULL, '[]'::jsonb
   );
   r := public.list_consultant_workspace_portfolio();
   PERFORM _cw2_t11_record(

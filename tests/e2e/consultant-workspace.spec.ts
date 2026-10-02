@@ -242,6 +242,7 @@ test.describe("CW2-T06 portfolio grid (mocked RPC)", () => {
   test("10. column visibility toggle", async ({ page }) => {
     await page.getByTestId("column-toggle-guardian_phone").uncheck();
     await expect(page.getByRole("columnheader", { name: /phone|sđt/i })).toHaveCount(0);
+    await page.getByTestId("column-toggle-guardian_phone").check();
   });
 
   test("11. keyboard Tab moves focus", async ({ page }) => {
@@ -465,6 +466,82 @@ test.describe("CW2 inline intake (mocked RPC)", () => {
     await page.getByTestId("portfolio-save-new-row").click();
     await expect(page.getByTestId("portfolio-new-row")).toBeVisible();
     await expect(page.getByTestId("portfolio-row")).toHaveCount(1);
+  });
+});
+
+test.describe("CW2-T12 consultant intake profile corrective", () => {
+  test("intake captures DOB, guardian, PIN and grid shows provisional code", async ({ page }) => {
+    const savedRow = {
+      ...mockRow,
+      family_name: "NGUYỄN VĂN",
+      given_name: "AN",
+      date_of_birth: "2017-06-09",
+      personal_identification_number: "001234567890",
+      primary_guardian_name: "NGUYỄN VĂN B",
+      primary_guardian_phone: "0912345678",
+      student_code_display: "02170000",
+      student_code_is_provisional: true,
+      tuition_payment_state: "chua_nop_phi",
+      workspace_sequence: 1,
+    };
+
+    let listCalls = 0;
+    await page.route("**/rest/v1/consultant_custom_field_definition*", async (route) => {
+      await route.fulfill({ json: [] });
+    });
+    await page.route("**/rest/v1/rpc/list_consultant_workspace_portfolio", async (route) => {
+      listCalls += 1;
+      if (listCalls === 1) {
+        await route.fulfill({ json: portfolioRoute([]) });
+        return;
+      }
+      await route.fulfill({ json: portfolioRoute([savedRow]) });
+    });
+    await page.route("**/rest/v1/rpc/create_consultant_workspace_portfolio_intake", async (route) => {
+      const body = route.request().postDataJSON() as Record<string, unknown>;
+      expect(body.p_date_of_birth).toBe("2017-06-09");
+      expect(body.p_guardian_phone).toBe("0912345678");
+      expect(body.p_personal_identification_number).toBe("001234567890");
+      await route.fulfill({
+        json: {
+          portfolio_entry_id: savedRow.portfolio_entry_id,
+          workspace_sequence: 1,
+          family_name: savedRow.family_name,
+          given_name: savedRow.given_name,
+          date_of_birth: savedRow.date_of_birth,
+          personal_identification_number: savedRow.personal_identification_number,
+          primary_guardian_given_name: "B",
+          primary_guardian_family_name: "NGUYỄN VĂN",
+          primary_guardian_phone: savedRow.primary_guardian_phone,
+          student_code_display: savedRow.student_code_display,
+          lifecycle_status: "tiem_nang",
+          capabilities: savedRow.capabilities,
+          custom_fields: [],
+        },
+      });
+    });
+
+    await signIn(page, consultantEmail);
+    await page.goto("/consultant");
+    await page.getByRole("combobox", { name: /language|ngôn ngữ/i }).selectOption("vi");
+    await page.getByTestId("column-toggle-personal_identification_number").setChecked(true);
+    await page.getByTestId("column-toggle-guardian_phone").setChecked(true);
+    await page.getByTestId("inline-family-name").fill("NGUYỄN VĂN");
+    await page.getByTestId("inline-given-name").fill("AN");
+    await page.getByTestId("inline-date-of-birth").fill("2017-06-09");
+    await page.getByTestId("inline-guardian-name").fill("NGUYỄN VĂN B");
+    await page.getByTestId("inline-guardian-phone").fill("0912345678");
+    await page.getByTestId("inline-personal-id").fill("001234567890");
+    await page.getByTestId("portfolio-save-new-row").click();
+
+    const row = page.getByTestId("portfolio-row").first();
+    await expect(row).toContainText("NGUYỄN VĂN B");
+    await expect(row).toContainText("0912345678");
+    await expect(row.getByTestId("portfolio-date-of-birth")).toContainText("09/06/2017");
+    await expect(row.getByTestId("portfolio-student-code")).toHaveText("02170000");
+
+    await page.reload();
+    await expect(row).toContainText("NGUYỄN VĂN B");
   });
 });
 

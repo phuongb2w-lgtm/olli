@@ -2320,6 +2320,8 @@
       "stt": "No.",
       "familyName": "Family & middle name",
       "givenName": "Given name",
+      "dateOfBirth": "Date of birth",
+      "personalId": "Citizen ID / Personal ID",
       "studentCode": "Student code",
       "status": "Status",
       "guardian": "Guardian",

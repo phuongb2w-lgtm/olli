@@ -24,6 +24,7 @@ export type ConsultantPortfolioDetail = {
   family_name: string | null;
   given_name: string | null;
   date_of_birth: string | null;
+  personal_identification_number: string | null;
   subject_updated_at: string | null;
   student_code_official: string | null;
   student_code_display: string | null;
@@ -91,6 +92,10 @@ export function parseConsultantPortfolioDetail(raw: Record<string, unknown>): Co
     family_name: raw.family_name != null ? String(raw.family_name) : null,
     given_name: raw.given_name != null ? String(raw.given_name) : null,
     date_of_birth: raw.date_of_birth != null ? String(raw.date_of_birth).slice(0, 10) : null,
+    personal_identification_number:
+      raw.personal_identification_number != null
+        ? String(raw.personal_identification_number)
+        : null,
     subject_updated_at: raw.subject_updated_at != null ? String(raw.subject_updated_at) : null,
     student_code_official: raw.student_code_official ? String(raw.student_code_official) : null,
     student_code_display: raw.student_code_display ? String(raw.student_code_display) : null,
@@ -157,6 +162,8 @@ export function portfolioDetailToDeclarationRow(
     subject_type: detail.subject_type,
     family_name: detail.family_name,
     given_name: detail.given_name,
+    date_of_birth: detail.date_of_birth,
+    personal_identification_number: detail.personal_identification_number,
     student_code_official: detail.student_code_official,
     student_code_display: detail.student_code_display,
     student_code_is_provisional: detail.student_code_is_provisional,

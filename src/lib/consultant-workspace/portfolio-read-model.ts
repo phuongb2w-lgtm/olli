@@ -51,6 +51,8 @@ export type ConsultantWorkspacePortfolioRow = {
   subject_type: "lead" | "student";
   family_name: string | null;
   given_name: string | null;
+  date_of_birth: string | null;
+  personal_identification_number: string | null;
   student_code_official: string | null;
   student_code_display: string | null;
   student_code_is_provisional: boolean;

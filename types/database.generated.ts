@@ -3239,6 +3239,7 @@ export type Database = {
           is_primary_candidate: boolean
           lead_id: string
           organization_id: string
+          personal_identification_number: string | null
           status: string
           target_class_id: string | null
           target_course_id: string | null
@@ -3256,6 +3257,7 @@ export type Database = {
           is_primary_candidate?: boolean
           lead_id: string
           organization_id: string
+          personal_identification_number?: string | null
           status?: string
           target_class_id?: string | null
           target_course_id?: string | null
@@ -3273,6 +3275,7 @@ export type Database = {
           is_primary_candidate?: boolean
           lead_id?: string
           organization_id?: string
+          personal_identification_number?: string | null
           status?: string
           target_class_id?: string | null
           target_course_id?: string | null
@@ -5697,6 +5700,7 @@ export type Database = {
           given_name: string
           id: string
           organization_id: string
+          personal_identification_number: string | null
           status: string
           student_code: string | null
           updated_at: string
@@ -5710,6 +5714,7 @@ export type Database = {
           given_name: string
           id?: string
           organization_id: string
+          personal_identification_number?: string | null
           status?: string
           student_code?: string | null
           updated_at?: string
@@ -5723,6 +5728,7 @@ export type Database = {
           given_name?: string
           id?: string
           organization_id?: string
+          personal_identification_number?: string | null
           status?: string
           student_code?: string | null
           updated_at?: string
@@ -7066,6 +7072,10 @@ export type Database = {
         Args: { p_consultant_user_id: string; p_organization_id: string }
         Returns: number
       }
+      _cw2_normalize_personal_identification_number: {
+        Args: { p_raw: string }
+        Returns: string
+      }
       _cw2_official_student_code_write_allowed: {
         Args: never
         Returns: boolean
@@ -7205,6 +7215,19 @@ export type Database = {
           enrollment_financial_terms_id: string
           enrollment_id: string
         }[]
+      }
+      _cw2_portfolio_primary_contact_display: {
+        Args: {
+          p_guardian_family_name: string
+          p_guardian_given_name: string
+          p_guardian_id: string
+          p_guardian_phone: string
+          p_lead_contact_family_name: string
+          p_lead_contact_given_name: string
+          p_lead_contact_id: string
+          p_lead_contact_phone: string
+        }
+        Returns: Json
       }
       _cw2_portfolio_row_tuition_fields: {
         Args: {
@@ -8339,6 +8362,7 @@ export type Database = {
           p_guardian_family_name?: string
           p_guardian_given_name?: string
           p_guardian_phone?: string
+          p_personal_identification_number?: string
         }
         Returns: Json
       }
@@ -9446,6 +9470,7 @@ export type Database = {
           p_guardian_family_name?: string
           p_guardian_given_name?: string
           p_guardian_phone?: string
+          p_personal_identification_number?: string
           p_portfolio_entry_id: string
         }
         Returns: Json

@@ -44,6 +44,7 @@ export async function saveConsultantPortfolioProfile(
     familyName: string;
     givenName: string;
     dateOfBirth?: string | null;
+    personalIdentificationNumber?: string | null;
     guardianFamilyName?: string | null;
     guardianGivenName?: string | null;
     guardianPhone?: string | null;
@@ -55,6 +56,7 @@ export async function saveConsultantPortfolioProfile(
     p_family_name: input.familyName.trim(),
     p_given_name: input.givenName.trim(),
     p_date_of_birth: input.dateOfBirth || undefined,
+    p_personal_identification_number: input.personalIdentificationNumber?.trim() || undefined,
     p_guardian_family_name: input.guardianFamilyName?.trim() || undefined,
     p_guardian_given_name: input.guardianGivenName?.trim() || undefined,
     p_guardian_phone: input.guardianPhone?.trim() || undefined,
@@ -77,6 +79,7 @@ export async function createConsultantWorkspacePortfolioIntake(
     familyName: string;
     givenName: string;
     dateOfBirth?: string | null;
+    personalIdentificationNumber?: string | null;
     guardianFamilyName?: string | null;
     guardianGivenName?: string | null;
     guardianPhone?: string | null;
@@ -87,6 +90,7 @@ export async function createConsultantWorkspacePortfolioIntake(
     p_family_name: input.familyName.trim(),
     p_given_name: input.givenName.trim(),
     p_date_of_birth: input.dateOfBirth || undefined,
+    p_personal_identification_number: input.personalIdentificationNumber?.trim() || undefined,
     p_guardian_family_name: input.guardianFamilyName?.trim() || undefined,
     p_guardian_given_name: input.guardianGivenName?.trim() || undefined,
     p_guardian_phone: input.guardianPhone?.trim() || undefined,

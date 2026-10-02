@@ -2320,6 +2320,8 @@
       "stt": "STT",
       "familyName": "Họ và tên đệm",
       "givenName": "Tên",
+      "dateOfBirth": "Ngày sinh",
+      "personalId": "CCCD / Mã định danh",
       "studentCode": "Mã học viên",
       "status": "Trạng thái",
       "guardian": "Phụ huynh",

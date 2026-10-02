@@ -77,6 +77,8 @@ type CustomFieldDef = {
 type InlineDraft = {
   familyName: string;
   givenName: string;
+  dateOfBirth: string;
+  personalIdentificationNumber: string;
   guardianName: string;
   guardianPhone: string;
   customFields: Record<string, string>;
@@ -86,7 +88,9 @@ const COLUMN_LABEL_KEY: Record<string, string> = {
   stt: "columns.stt",
   family_name: "columns.familyName",
   given_name: "columns.givenName",
+  date_of_birth: "columns.dateOfBirth",
   student_code: "columns.studentCode",
+  personal_identification_number: "columns.personalId",
   lifecycle_status: "columns.status",
   guardian_name: "columns.guardian",
   guardian_phone: "columns.phone",
@@ -110,6 +114,8 @@ const DEFAULT_QUERY: QueryState = {
 const EMPTY_DRAFT: InlineDraft = {
   familyName: "",
   givenName: "",
+  dateOfBirth: "",
+  personalIdentificationNumber: "",
   guardianName: "",
   guardianPhone: "",
   customFields: {},
@@ -156,10 +162,20 @@ function draftFromRow(row: ConsultantWorkspacePortfolioRow, fieldKeys: string[])
   return {
     familyName: row.family_name ?? "",
     givenName: row.given_name ?? "",
+    dateOfBirth: row.date_of_birth?.slice(0, 10) ?? "",
+    personalIdentificationNumber: row.personal_identification_number ?? "",
     guardianName: row.primary_guardian_name ?? "",
     guardianPhone: row.primary_guardian_phone ?? "",
     customFields,
   };
+}
+
+function formatDateOfBirthDisplay(isoDate: string | null | undefined, locale: Locale): string {
+  if (!isoDate) return "—";
+  const d = isoDate.slice(0, 10);
+  const [y, m, day] = d.split("-");
+  if (!y || !m || !day) return d;
+  return locale === "vi" ? `${day}/${m}/${y}` : d;
 }
 
 export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
@@ -312,6 +328,8 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
       const result = await createConsultantWorkspacePortfolioIntake(supabase, {
         familyName,
         givenName,
+        dateOfBirth: newEntryDraft.dateOfBirth || undefined,
+        personalIdentificationNumber: newEntryDraft.personalIdentificationNumber || undefined,
         guardianFamilyName: guardian.familyName || undefined,
         guardianGivenName: guardian.givenName || undefined,
         guardianPhone: newEntryDraft.guardianPhone || undefined,
@@ -346,6 +364,8 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
         portfolioEntryId: row.portfolio_entry_id,
         familyName: editDraft.familyName,
         givenName: editDraft.givenName,
+        dateOfBirth: editDraft.dateOfBirth || undefined,
+        personalIdentificationNumber: editDraft.personalIdentificationNumber || undefined,
         guardianFamilyName: guardian.familyName || undefined,
         guardianGivenName: guardian.givenName || undefined,
         guardianPhone: editDraft.guardianPhone || undefined,
@@ -392,6 +412,20 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
         accessorKey: "given_name",
         header: () => t("columns.givenName"),
         cell: ({ row }) => formatPortfolioNamePart(row.original.given_name, locale),
+      },
+      {
+        id: "date_of_birth",
+        header: () => t("columns.dateOfBirth"),
+        cell: ({ row }) => (
+          <span data-testid="portfolio-date-of-birth">
+            {formatDateOfBirthDisplay(row.original.date_of_birth, locale)}
+          </span>
+        ),
+      },
+      {
+        id: "personal_identification_number",
+        header: () => t("columns.personalId"),
+        cell: ({ row }) => row.original.personal_identification_number ?? "—",
       },
       {
         id: "student_code",
@@ -778,6 +812,39 @@ export function ConsultantPortfolioWorkspace({ initialPreferences }: Props) {
         );
       }
       return formatPortfolioNamePart(readRow?.given_name ?? null, locale);
+    }
+    if (colId === "date_of_birth") {
+      if (draft) {
+        return (
+          <input
+            type="date"
+            className={inputClass}
+            value={draft.dateOfBirth}
+            onChange={(e) => setDraft((p) => ({ ...p, dateOfBirth: e.target.value }))}
+            data-testid="inline-date-of-birth"
+          />
+        );
+      }
+      return (
+        <span data-testid="portfolio-date-of-birth">
+          {formatDateOfBirthDisplay(readRow?.date_of_birth ?? null, locale)}
+        </span>
+      );
+    }
+    if (colId === "personal_identification_number") {
+      if (draft) {
+        return (
+          <input
+            className={inputClass}
+            value={draft.personalIdentificationNumber}
+            onChange={(e) =>
+              setDraft((p) => ({ ...p, personalIdentificationNumber: e.target.value }))
+            }
+            data-testid="inline-personal-id"
+          />
+        );
+      }
+      return readRow?.personal_identification_number ?? "—";
     }
     if (colId === "student_code") {
       const display = readRow?.student_code_display ?? readRow?.student_code_official;

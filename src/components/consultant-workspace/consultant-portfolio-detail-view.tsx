@@ -42,6 +42,7 @@ export function ConsultantPortfolioDetailView({ initialDetail, startInEditMode }
     familyName: detail.family_name ?? "",
     givenName: detail.given_name ?? "",
     dateOfBirth: detail.date_of_birth ?? "",
+    personalIdentificationNumber: detail.personal_identification_number ?? "",
     guardianFamilyName: detail.primary_guardian_family_name ?? "",
     guardianGivenName: detail.primary_guardian_given_name ?? "",
     guardianPhone: detail.primary_guardian_phone ?? "",
@@ -62,6 +63,7 @@ export function ConsultantPortfolioDetailView({ initialDetail, startInEditMode }
         familyName: form.familyName,
         givenName: form.givenName,
         dateOfBirth: form.dateOfBirth || null,
+        personalIdentificationNumber: form.personalIdentificationNumber || null,
         guardianFamilyName: form.guardianFamilyName,
         guardianGivenName: form.guardianGivenName,
         guardianPhone: form.guardianPhone,
@@ -158,6 +160,18 @@ export function ConsultantPortfolioDetailView({ initialDetail, startInEditMode }
                 data-testid="detail-dob"
               />
             </label>
+            <label className="block text-sm sm:col-span-2">
+              <span className="text-slate-600">{tWs("columns.personalId")}</span>
+              <input
+                className="mt-1 w-full rounded border border-slate-300 px-2 py-1.5"
+                value={form.personalIdentificationNumber}
+                disabled={!detail.editable.can_edit_profile}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, personalIdentificationNumber: e.target.value }))
+                }
+                data-testid="detail-personal-id"
+              />
+            </label>
           </div>
         ) : (
           <dl className="grid gap-2 text-sm sm:grid-cols-2">
@@ -188,7 +202,13 @@ export function ConsultantPortfolioDetailView({ initialDetail, startInEditMode }
             </div>
             <div>
               <dt className="text-slate-500">{t("dateOfBirth")}</dt>
-              <dd>{detail.date_of_birth ?? "—"}</dd>
+              <dd data-testid="detail-dob-display">{detail.date_of_birth ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">{tWs("columns.personalId")}</dt>
+              <dd data-testid="detail-personal-id-display">
+                {detail.personal_identification_number ?? "—"}
+              </dd>
             </div>
           </dl>
         )}
