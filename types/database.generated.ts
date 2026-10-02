@@ -7475,6 +7475,25 @@ export type Database = {
         Args: { passed: boolean; test_name: string; test_no: number }
         Returns: undefined
       }
+      _cw2_t14_lead_in_confirm_scope: {
+        Args: { p_lead_id: string }
+        Returns: boolean
+      }
+      _cw2_t14_prepare_confirm_lead_identity: {
+        Args: {
+          p_declaration: Database["public"]["Tables"]["consultant_revenue_declaration"]["Row"]
+        }
+        Returns: undefined
+      }
+      _cw2_t14_record: {
+        Args: { passed: boolean; test_name: string; test_no: number }
+        Returns: undefined
+      }
+      _cw2_t14_row: { Args: { p_portfolio_entry_id: string }; Returns: Json }
+      _cw2_t14_valid_declaration_guardian: {
+        Args: { p_guardian_id: string; p_org: string }
+        Returns: string
+      }
       _cw2_tuition_payment_state_label: {
         Args: { p_state: string }
         Returns: string

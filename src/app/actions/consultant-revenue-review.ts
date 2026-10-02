@@ -14,6 +14,10 @@ function mapReviewError(message: string): string {
   if (message.includes("declaration_not_confirmable")) return "not_confirmable";
   if (message.includes("declaration_not_reviewable")) return "not_reviewable";
   if (message.includes("depends_on_declaration_not_confirmed")) return "depends_on_unconfirmed";
+  if (message.includes("identity_not_ready") || message.includes("strong_match_ack_required"))
+    return "identity_not_ready";
+  if (message.includes("declaration_enrollment_context_required")) return "enrollment_context_required";
+  if (message.includes("lead_conversion_failed")) return "lead_conversion_failed";
   if (message.includes("payment_exceeds_outstanding")) return "exceeds_outstanding";
   if (message.includes("invalid_review_action")) return "invalid_action";
   return "unknown";
@@ -39,7 +43,15 @@ export async function confirmConsultantPaymentDeclarationAction(input: {
     p_method_code: input.methodCode ?? undefined,
   });
   if (error) {
-    return { ok: false, errorCode: mapReviewError(error.message) };
+    const errorCode = mapReviewError(error.message);
+    console.error("[consultant-revenue-review] confirm", {
+      errorCode,
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    });
+    return { ok: false, errorCode };
   }
   revalidateConsultantRevenue();
   return { ok: true };

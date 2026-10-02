@@ -41,6 +41,11 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
   const [promotion, setPromotion] = useState("");
   const [note, setNote] = useState("");
   const [errorCode, setErrorCode] = useState<string | null>(null);
+  const [debugReason, setDebugReason] = useState<string | null>(null);
+  const [idempotencySession] = useState(
+    () => globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  );
+  const [pendingDeclaredAmount, setPendingDeclaredAmount] = useState<number | null>(null);
   const [finance, setFinance] = useState({
     total: row.tuition_total_net,
     paid: row.tuition_paid,
@@ -94,6 +99,13 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
       const mode = res.data.billing_mode as string | null;
       if (mode === "course_lump_sum" || mode === "periodic") setBillingMode(mode);
     });
+    if (row.declaration_id && row.declaration_status === "pending") {
+      void loadDeclarationDrawerAction(row.declaration_id).then((res) => {
+        if (cancelled || !res.ok) return;
+        const amount = Number(res.data.declaration.declared_amount);
+        if (Number.isFinite(amount) && amount > 0) setPendingDeclaredAmount(amount);
+      });
+    }
     if (row.declaration_id && row.declaration_status !== "pending") {
       void loadDeclarationDrawerAction(row.declaration_id).then((res) => {
         if (cancelled || !res.ok) return;
@@ -127,33 +139,73 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, pending, triggerRef]);
 
-  const guardianId = row.primary_guardian_id;
-  const isInitialSetup = !tuitionEstablished && billingMode !== "";
+  // Lead-only rows expose the primary lead contact as primary_guardian_id; only a
+  // student's guardian id may be sent, the server resolves the lead guardian.
+  const hasPrimaryContact = Boolean(row.primary_guardian_id);
+  const guardianId = row.student_id ? row.primary_guardian_id : null;
+  const initialPending = !tuitionEstablished && row.declaration_status === "pending";
+  const leadInitialPending = initialPending && !row.enrollment_id;
+  const needsInitialSetup = !tuitionEstablished && !initialPending;
+  const isInitialSetup = needsInitialSetup && billingMode !== "";
   const isUnpaidInitial =
     row.tuition_payment_state === "chua_nop_phi" || row.tuition_payment_state === "chua_coc";
   const canMutate =
     !readOnly &&
     row.capabilities.can_create_payment_declaration &&
-    (isInitialSetup || finance.outstanding > 0 || isUnpaidInitial) &&
+    !leadInitialPending &&
+    (needsInitialSetup || initialPending || finance.outstanding > 0 || isUnpaidInitial) &&
     (Boolean(row.enrollment_id) || Boolean(row.lead_id));
+  const pendingAmount = Math.max(finance.pending, pendingDeclaredAmount ?? 0);
+
+  const fail = (code: string, reason?: string | null) => {
+    setErrorCode(code);
+    setDebugReason(reason ?? null);
+  };
 
   const saveOrSubmit = (mode: "draft" | "submit") => {
     const amount = parseVndInput(amountInput);
     if (!amount) {
-      setErrorCode("invalid_amount");
+      fail("invalid_amount");
       return;
     }
     const enrollmentId = row.enrollment_id;
     if (!enrollmentId && !row.lead_id) {
-      setErrorCode("context_incomplete");
+      fail("context_incomplete");
       return;
     }
     const enrollmentFinancialTermsId = row.enrollment_financial_terms_id;
     const proposedTotal = parseVndInput(courseTotalInput);
     const perPeriod = parseVndInput(amountPerPeriodInput);
-    const periodQty = Number.parseInt(periodQuantityInput, 10);
+    const periodQty =
+      effectivePeriodUnit === "lesson" ? Number.parseInt(periodQuantityInput, 10) : 1;
+    if (needsInitialSetup && billingMode === "") {
+      fail("billing_mode_required");
+      return;
+    }
+    if (isInitialSetup && billingMode === "course_lump_sum" && !proposedTotal) {
+      fail("course_total_required");
+      return;
+    }
+    if (isInitialSetup && billingMode === "periodic") {
+      if (!perPeriod) {
+        fail("amount_per_period_required");
+        return;
+      }
+      if (!Number.isFinite(periodQty) || periodQty <= 0) {
+        fail("period_quantity_required");
+        return;
+      }
+    }
     const declarationKind = isInitialSetup ? "initial_tuition_setup" : "payment_only";
+    const totalObligationAmount = isInitialSetup
+      ? billingMode === "course_lump_sum"
+        ? proposedTotal ?? undefined
+        : undefined
+      : finance.total > 0
+        ? finance.total
+        : undefined;
     setErrorCode(null);
+    setDebugReason(null);
     startTransition(async () => {
       const saved = await saveConsultantPaymentDeclarationDraftAction({
         declarationId,
@@ -167,8 +219,10 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
         enrollmentId: enrollmentId ?? undefined,
         enrollmentFinancialTermsId: enrollmentFinancialTermsId ?? undefined,
         guardianId: guardianId ?? undefined,
-        totalObligationAmount: isInitialSetup ? proposedTotal ?? finance.total : finance.total,
-        idempotencyKey: declarationId ? undefined : `cw2-drawer-${row.portfolio_entry_id}`,
+        totalObligationAmount,
+        idempotencyKey: declarationId
+          ? undefined
+          : `cw2-drawer-${row.portfolio_entry_id}-${idempotencySession}`,
         tuitionBillingMode: isInitialSetup ? billingMode || null : null,
         proposedNetTuitionAmount:
           isInitialSetup && billingMode === "course_lump_sum" ? proposedTotal : undefined,
@@ -183,7 +237,7 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
         declarationDate,
       });
       if (!saved.ok) {
-        setErrorCode(saved.errorCode);
+        fail(saved.errorCode, saved.debugReason);
         await refreshFinance();
         return;
       }
@@ -194,7 +248,7 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
       }
       const submitted = await submitConsultantPaymentDeclarationAction(saved.declarationId);
       if (!submitted.ok) {
-        setErrorCode(submitted.errorCode);
+        fail(submitted.errorCode, submitted.debugReason);
         await refreshFinance();
         return;
       }
@@ -245,6 +299,18 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
         </header>
 
         {!tuitionEstablished ? (
+          <p className="mb-3 text-sm text-slate-700" data-testid="drawer-plan-not-established">
+            {t("planNotEstablished")}
+          </p>
+        ) : null}
+
+        {leadInitialPending ? (
+          <p className="mb-3 text-sm text-amber-700" data-testid="drawer-pending-initial">
+            {t("pendingInitialReadOnly")}
+          </p>
+        ) : null}
+
+        {needsInitialSetup ? (
           <fieldset className="mb-4 space-y-2 text-sm" data-testid="tuition-billing-mode">
             <legend className="font-medium text-slate-800">{tV2("billingModeTitle")}</legend>
             <label className="flex items-center gap-2">
@@ -353,29 +419,37 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
           </div>
           <div>
             <dt className="text-slate-600">{t("totalDue")}</dt>
-            <dd data-testid="drawer-total">{formatMoneyVnd(finance.total, locale)}</dd>
+            <dd data-testid="drawer-total">
+              {tuitionEstablished ? formatMoneyVnd(finance.total, locale) : "—"}
+            </dd>
           </div>
           <div>
             <dt className="text-slate-600">{t("confirmedPaid")}</dt>
-            <dd data-testid="drawer-paid">{formatMoneyVnd(finance.paid, locale)}</dd>
+            <dd data-testid="drawer-paid">
+              {tuitionEstablished ? formatMoneyVnd(finance.paid, locale) : "—"}
+            </dd>
           </div>
-          {finance.pending > 0 ? (
+          {pendingAmount > 0 ? (
             <div>
               <dt className="text-slate-600">{t("pendingConfirmation")}</dt>
-              <dd data-testid="drawer-pending">{formatMoneyVnd(finance.pending, locale)}</dd>
+              <dd data-testid="drawer-pending">{formatMoneyVnd(pendingAmount, locale)}</dd>
             </div>
           ) : null}
           <div>
             <dt className="text-slate-600">{t("outstandingDue")}</dt>
-            <dd data-testid="drawer-outstanding">{formatMoneyVnd(finance.outstanding, locale)}</dd>
+            <dd data-testid="drawer-outstanding">
+              {tuitionEstablished ? formatMoneyVnd(finance.outstanding, locale) : "—"}
+            </dd>
           </div>
         </dl>
 
-        {finance.outstanding <= 0 && !row.declaration_id ? (
-          <p className="mt-4 text-sm text-slate-600">{t("fullySettled")}</p>
+        {tuitionEstablished && finance.outstanding <= 0 && !row.declaration_id ? (
+          <p className="mt-4 text-sm text-slate-600" data-testid="drawer-fully-settled">
+            {t("fullySettled")}
+          </p>
         ) : null}
 
-        {!guardianId ? (
+        {!hasPrimaryContact ? (
           <p className="mt-4 text-sm text-red-700" role="alert">
             {t("missingGuardian")}
           </p>
@@ -442,7 +516,13 @@ export function PaymentDeclarationDrawer({ row, onClose, onSuccess, triggerRef }
         </div>
 
         {errorCode ? (
-          <p className="mt-3 text-sm text-red-700" role="alert" data-testid="drawer-error">
+          <p
+            className="mt-3 text-sm text-red-700"
+            role="alert"
+            data-testid="drawer-error"
+            data-error-code={errorCode}
+            data-error-reason={debugReason ?? undefined}
+          >
             {t(`errors.${errorCode}` as "errors.unknown")}
           </p>
         ) : null}

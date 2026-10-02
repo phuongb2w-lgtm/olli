@@ -3,15 +3,22 @@
 import { can } from "@/lib/permissions/can";
 import { createClient } from "@/lib/supabase/server";
 
-export type DeclarationActionResult =
-  | { ok: true; declarationId: string }
-  | { ok: false; errorCode: string };
+type DeclarationFailure = { ok: false; errorCode: string; debugReason?: string };
+
+export type DeclarationActionResult = { ok: true; declarationId: string } | DeclarationFailure;
+
+type RpcError = { code?: string; message?: string; details?: string; hint?: string } | null;
 
 function mapDeclarationError(message: string): string {
   if (message.includes("permission_denied")) return "permission_denied";
   if (message.includes("payment_exceeds_outstanding")) return "exceeds_outstanding";
   if (message.includes("no_outstanding_obligation")) return "already_settled";
   if (message.includes("declaration_already_pending")) return "already_pending";
+  if (message.includes("initial_tuition_plan_already_pending")) return "initial_plan_pending";
+  if (message.includes("initial_tuition_setup_required")) return "initial_setup_required";
+  if (message.includes("tuition_plan_already_established")) return "plan_already_established";
+  if (message.includes("conflicting_tuition_proposal")) return "conflicting_proposal";
+  if (message.includes("academic_year_required")) return "academic_year_required";
   if (message.includes("declaration_context_incomplete")) return "context_incomplete";
   if (message.includes("declaration_not_editable")) return "not_editable";
   if (message.includes("declaration_not_submittable")) return "not_submittable";
@@ -19,6 +26,21 @@ function mapDeclarationError(message: string): string {
     return "invalid_amount";
   if (message.includes("declaration_not_found")) return "not_found";
   return "unknown";
+}
+
+function declarationFailure(operation: string, error: RpcError): DeclarationFailure {
+  const message = error?.message ?? "";
+  const errorCode = mapDeclarationError(message);
+  console.error("[consultant-payment-declaration]", operation, {
+    errorCode,
+    code: error?.code,
+    message,
+    details: error?.details,
+    hint: error?.hint,
+  });
+  return process.env.NODE_ENV === "production"
+    ? { ok: false, errorCode }
+    : { ok: false, errorCode, debugReason: [error?.code, message].filter(Boolean).join(": ") };
 }
 
 export async function refreshDeclarationFinanceAction(
@@ -144,14 +166,14 @@ export async function saveConsultantPaymentDeclarationDraftAction(input: {
     p_declaration_kind: input.declarationKind ?? undefined,
   });
   if (error || !data) {
-    return { ok: false, errorCode: mapDeclarationError(error?.message ?? "") };
+    return declarationFailure("save_draft", error);
   }
   return { ok: true, declarationId: data as string };
 }
 
 export async function submitConsultantPaymentDeclarationAction(
   declarationId: string,
-): Promise<{ ok: true } | { ok: false; errorCode: string }> {
+): Promise<{ ok: true } | DeclarationFailure> {
   if (!(await can("consultant_revenue.declare"))) {
     return { ok: false, errorCode: "permission_denied" };
   }
@@ -160,7 +182,7 @@ export async function submitConsultantPaymentDeclarationAction(
     p_declaration_id: declarationId,
   });
   if (error) {
-    return { ok: false, errorCode: mapDeclarationError(error.message) };
+    return declarationFailure("submit", error);
   }
   return { ok: true };
 }
